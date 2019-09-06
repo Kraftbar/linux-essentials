@@ -29,8 +29,22 @@
 > **[freenas](https://www.freenas.org/)**   
 > **[openmediavault](https://www.openmediavault.org/)**
 
-# :rice_ball:	Ricing :rice_ball:	
+# :rice_ball:	Distros :rice_ball:	
+#### main
+> **[debian](https://www.debian.org/)**   
+> **[opensuse](https://www.opensuse.org/)**   
+> **[fedora](https://getfedora.org/)**   
+> **[centos](https://www.centos.org/)**   
+> **[archlinux](https://www.archlinux.org/)**   
+> **[gentoo](https://www.gentoo.org/)**   :eyes:
 
+#### Debian derivatives
+> **[ubuntu](https://ubuntu.com//)**   
+> **[mxlinux](https://mxlinux.org/)**   
+#### Ubuntu derivatives
+> **[linuxmint](https://linuxmint.com/)**   
+> **[pop!_os](https://system76.com/pop)**   
+> **[elementary_os](https://elementary.io/)**   
 
 
 ## :dizzy: Miscellaneous :dizzy:
