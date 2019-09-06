@@ -53,7 +53,7 @@
 <br/>
 
 
-## :dizzy: Miscellaneous :dizzy::dizzy:
+## :dizzy: Miscellaneous :dizzy:
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[custom scripts](//usr/local/bin)** 
 
