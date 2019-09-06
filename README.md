@@ -23,7 +23,7 @@
 ## :tv: Gaming :tv:
 
 >**[wine](https://www.winehq.org/)**   
->**[lutris](https://lutris.net/)**
+>**[lutris](https://lutris.net/)**   \
 
 
 
