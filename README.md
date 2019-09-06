@@ -33,7 +33,7 @@
 
 
 
-## Miscellaneous
+## :dizzy: Miscellaneous :dizzy:
 
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**
 > 	
