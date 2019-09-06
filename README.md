@@ -48,7 +48,11 @@
 > **[elementary_os](https://elementary.io/)**   
 
 
-## :dizzy: Miscellaneous :dizzy:
+## :dizzy: Miscellaneous :dizzy::dizzy:
 
-> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**
-> **[Custom scripts] (/usr/local/bin) **
+> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**:dizzy:
+>
+> > **[custom scripts](/usr/local/bin)   **
+> >
+> > [Custom scripts] (/usr/local/bin) **
+
