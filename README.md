@@ -34,7 +34,7 @@
 <br/>
 
 
-## :rice_ball:	Distros :rice_ball:	
+## :penguin:	Distros :penguin:
 #### Main
 > **[debian](https://www.debian.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
