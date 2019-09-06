@@ -5,8 +5,6 @@
 
 
 ##  :office:  Workflow improvments  :office: 
-
-
 #### **The terminal**
 > **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
 >  **[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)**  
@@ -14,7 +12,6 @@
 >  **[tmux](https://github.com/tmux/tmux)**
 
 #### Git
-
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
 <br/>
@@ -27,7 +24,6 @@
 
 
 ## :fax: Server :fax:
-
 #### Virtualization
 > **[zcp-ng](https://xcp-ng.com/)**   
 >**[xen-orchestra](https://xen-orchestra.com/#!/about)**
@@ -58,7 +54,6 @@
 
 
 ## :dizzy: Miscellaneous :dizzy::dizzy:
-
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[custom scripts](//usr/local/bin)** 
 
