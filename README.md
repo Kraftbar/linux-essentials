@@ -60,8 +60,6 @@
 
 ## :dizzy: Miscellaneous :dizzy::dizzy:
 
-> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**:dizzy:
->
-> **[custom scripts](//usr/local/bin)   ** 
-> 
-> 
+> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**
+> **[custom scripts](//usr/local/bin)** 
+
