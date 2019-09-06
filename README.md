@@ -17,14 +17,13 @@
 
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
-
 <br/>
 
 ## :tv: Gaming :tv:
 
 >**[wine](https://www.winehq.org/)**   
->**[lutris](https://lutris.net/)**   \
-
+>**[lutris](https://lutris.net/)**   
+<br/>
 
 
 ## :fax: Server :fax:
@@ -36,10 +35,10 @@
 #### NAS
 > **[freenas](https://www.freenas.org/)**   
 > **[openmediavault](https://www.openmediavault.org/)**
+<br/>
 
 
-
-# :rice_ball:	Distros :rice_ball:	
+## :rice_ball:	Distros :rice_ball:	
 
 #### Main
 > **[debian](https://www.debian.org/)**   
@@ -56,7 +55,7 @@
 > **[linuxmint](https://linuxmint.com/)**   
 > **[pop!_os](https://system76.com/pop)**   
 > **[elementary_os](https://elementary.io/)**   
-
+<br/>
 
 
 ## :dizzy: Miscellaneous :dizzy::dizzy:
