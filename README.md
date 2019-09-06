@@ -1,6 +1,9 @@
 #  :sparkles::sparkles: Linux Essentials :sparkles::sparkles: # 
 
 
+
+
+
 ##  :office:  Workflow improvments  :office: 
 
 
@@ -15,12 +18,17 @@
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
 
+
+
 ## :tv: Gaming :tv:
+
 >**[wine](https://www.winehq.org/)**   
 >**[lutris](https://lutris.net/)**
 
 
+
 ## :fax: Server :fax:
+
 #### Virtualization
 > **[zcp-ng](https://xcp-ng.com/)**   
 >**[xen-orchestra](https://xen-orchestra.com/#!/about)**
@@ -48,11 +56,11 @@
 > **[elementary_os](https://elementary.io/)**   
 
 
+
 ## :dizzy: Miscellaneous :dizzy::dizzy:
 
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**:dizzy:
 >
-> > **[custom scripts](//usr/local/bin)   **
-> >
-> > [Custom scripts] (/usr/local/bin) **
-
+> **[custom scripts](//usr/local/bin)   ** 
+> 
+> 
