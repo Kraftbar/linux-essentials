@@ -52,7 +52,7 @@
 
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**:dizzy:
 >
-> > **[custom scripts](/usr/local/bin)   **
+> > **[custom scripts](//usr/local/bin)   **
 > >
 > > [Custom scripts] (/usr/local/bin) **
 
