@@ -29,7 +29,7 @@
 > **[freenas](https://www.freenas.org/)**   
 > **[openmediavault](https://www.openmediavault.org/)**
 
-# :nail_care:	Ricing :nail_care:	
+# :rice_ball:	Ricing :rice_ball:	
 
 
 
