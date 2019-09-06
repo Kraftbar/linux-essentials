@@ -30,7 +30,7 @@
 > **[openmediavault](https://www.openmediavault.org/)**
 
 # :rice_ball:	Distros :rice_ball:	
-#### main
+#### Main
 > **[debian](https://www.debian.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
 > **[fedora](https://getfedora.org/)**   
