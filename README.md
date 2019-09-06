@@ -17,9 +17,7 @@
 
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
-
-
-
+<br/>
 ## :tv: Gaming :tv:
 
 >**[wine](https://www.winehq.org/)**   
