@@ -39,7 +39,6 @@
 
 
 ## :rice_ball:	Distros :rice_ball:	
-
 #### Main
 > **[debian](https://www.debian.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
