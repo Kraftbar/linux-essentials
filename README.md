@@ -53,8 +53,15 @@
 > **[elementary_os](https://elementary.io/)**   
 <br/>
 
+## :shipit: Nice to have's :shipit:
+> **[qdirstat](https://github.com/shundhammer/qdirstat)**    
+> **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
+<br/>
 
 ## :dizzy: Miscellaneous :dizzy:
+> **[guide](https://github.com/mayfrost/guides)**    
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
-> **[custom scripts](//usr/local/bin)** 
+> **[custom scripts](//usr/local/bin)**    
+
+
 
