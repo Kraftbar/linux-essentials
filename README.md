@@ -2,9 +2,9 @@
 <br/>
 
 
- 
 
-##  :office:  Workflow improvments  :office: 
+
+##  :office:  Workflow improvements  :office: 
 #### **The terminal**
 > **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
 >  **[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)**  
@@ -53,13 +53,18 @@
 > **[elementary_os](https://elementary.io/)**   
 <br/>
 
-## :shipit: Nice to have's :shipit:
+## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
 > **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
 <br/>
 
-## :dizzy: Miscellaneous :dizzy:
+## :turtle: Guides :turtle:
+> **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
 > **[guide](https://github.com/mayfrost/guides)**    
+<br/>
+
+
+## :dizzy: Miscellaneous :dizzy:
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[custom scripts](//usr/local/bin)**    
 
