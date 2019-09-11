@@ -1,4 +1,17 @@
 #!/bin/bash
+
+
+# repo_name=$1
+# test -z $repo_name && echo "Repo name required." 1>&2 && exit 1
+
+dir=${PWD##*/}
+
+curl -u 'Kraftbar' https://api.github.com/user/repos -d "{\"name\":\"$dir\"}"
+# TODO:
+# - exit on wrong password
+
+
+
 git init
 git add .
 git commit -m "myautoinit commit"
