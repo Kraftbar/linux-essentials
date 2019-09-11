@@ -1,0 +1,5 @@
+#!/bin/bash
+str="$*"
+git add . && git commit -m "$str" && git push
+
+# usage: mytest "commit message"

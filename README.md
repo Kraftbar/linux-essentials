@@ -37,15 +37,15 @@
 ## :penguin:	Distros :penguin:
 #### Main
 > **[debian](https://www.debian.org/)**   
-> **[opensuse](https://www.opensuse.org/)**   
-> **[fedora](https://getfedora.org/)**   
-> **[centos](https://www.centos.org/)**   
+> **[fedora (rh desktop)](https://getfedora.org/)**   
+> **[centos (/rhel)](https://www.centos.org/)**   
+> **[opensuse (free?)](https://www.opensuse.org/)**   
 > **[archlinux](https://www.archlinux.org/)**   
 > **[gentoo](https://www.gentoo.org/)**   :eyes:
 
 #### Debian derivatives
 > **[ubuntu](https://ubuntu.com//)**   
-> **[mxlinux](https://mxlinux.org/)**   
+> **[mxlinux](https://mxlinu x.org/)**   
 > **[kali](https://www.kali.org/)**   
 #### Ubuntu derivatives
 > **[linuxmint](https://linuxmint.com/)**   
@@ -56,6 +56,7 @@
 ## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
 > **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
+> **[imagemagick](https://www.imagemagick.org/)**   
 <br/>
 
 ## :turtle: Guides :turtle:
@@ -65,8 +66,27 @@
 
 
 ## :dizzy: Miscellaneous :dizzy:
-> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[custom scripts](//usr/local/bin)**    
+> **[cheat.sh](https://github.com/chubin/cheat.sh)**    
+> **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
+> **[oneDrive using rclone](https://www.linuxuprising.com/2018/07/how-to-mount-onedrive-in-linux-using.html)**   
+
+## good commandes
+> **[locate]()**    
+> **[whereis]()**    
+> **[sed]()**    
+> **[awk]()**    
+
+
+## good lang's
+> **[c, forth, lisp]()**    
+
+
+## One-liners
+>   ```sh
+>    man -k .| dmenu -l 30 | awk '{print $1}' | xargs -r man -Tpdf | zathura - 
+>   ```
+
 
 
 
