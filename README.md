@@ -70,6 +70,8 @@
 > **[cheat.sh](https://github.com/chubin/cheat.sh)**    
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[oneDrive using rclone](https://www.linuxuprising.com/2018/07/how-to-mount-onedrive-in-linux-using.html)**   
+> **[cheatsheetfactory](https://cheatsheetfactory.geekyhacker.com)**   
+
 <br/>
 
 ## Usefull commands
@@ -78,6 +80,8 @@
 > **[sed]()**    
 > **[awk]()**    
 <br/>
+
+
 
 ## One-liners
 >   ```sh
