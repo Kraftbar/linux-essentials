@@ -39,13 +39,13 @@
 > **[debian](https://www.debian.org/)**   
 > **[fedora (rh desktop)](https://getfedora.org/)**   
 > **[centos (/rhel)](https://www.centos.org/)**   
-> **[opensuse (free?)](https://www.opensuse.org/)**   
+> **[opensuse](https://www.opensuse.org/)**   
 > **[archlinux](https://www.archlinux.org/)**   
 > **[gentoo](https://www.gentoo.org/)**   :eyes:
 
 #### Debian derivatives
 > **[ubuntu](https://ubuntu.com//)**   
-> **[mxlinux](https://mxlinu x.org/)**   
+> **[mxlinux](https://mxlinux.org/)**   
 > **[kali](https://www.kali.org/)**   
 #### Ubuntu derivatives
 > **[linuxmint](https://linuxmint.com/)**   
@@ -70,17 +70,14 @@
 > **[cheat.sh](https://github.com/chubin/cheat.sh)**    
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[oneDrive using rclone](https://www.linuxuprising.com/2018/07/how-to-mount-onedrive-in-linux-using.html)**   
+<br/>
 
-## good commandes
+## Usefull commands
 > **[locate]()**    
 > **[whereis]()**    
 > **[sed]()**    
 > **[awk]()**    
-
-
-## good lang's
-> **[c, forth, lisp]()**    
-
+<br/>
 
 ## One-liners
 >   ```sh
