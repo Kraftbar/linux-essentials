@@ -1,5 +1,18 @@
 #!/bin/bash
+
+push_msg=$1
+test -z $push_msg && echo "Commit message required." 1>&2 && exit 1
+
+#FILE=.gitignore
+#if [ -f $FILE ]; then
+#   echo "The file '$FILE' exists."
+#else
+#  touch .gitignore
+#  echo ".vscode" >> .gitignore
+#fi
+
 str="$*"
 git add . && git commit -m "$str" && git push
 
 # usage: mytest "commit message"
+

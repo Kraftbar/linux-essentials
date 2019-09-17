@@ -90,7 +90,7 @@ reactOS
 > **[jpegoptim ](https://github.com/tjko/jpegoptim/)**   
 > **[OptiPNG](http://optipng.sourceforge.net/)**   
 > **[imagemagick](https://www.imagemagick.org/)**   
-testtest
+
 
 ## One-liners
 >   ```sh
