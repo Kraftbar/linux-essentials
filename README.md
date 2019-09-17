@@ -53,15 +53,20 @@
 > **[elementary_os](https://elementary.io/)**   
 <br/>
 
+
+non linux
+haikuos
+reactOS
+
 ## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
 > **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
-> **[imagemagick](https://www.imagemagick.org/)**   
 <br/>
 
 ## :turtle: Guides :turtle:
 > **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
 > **[guide](https://github.com/mayfrost/guides)**    
+> **[Practical Linux Tutorial](http://xahlee.info/linux/linux_index.html)**    
 <br/>
 
 
@@ -81,13 +86,20 @@
 > **[awk]()**    
 <br/>
 
+## images
+> **[jpegoptim ](https://github.com/tjko/jpegoptim/)**   
+> **[OptiPNG](http://optipng.sourceforge.net/)**   
+> **[imagemagick](https://www.imagemagick.org/)**   
 
 
 ## One-liners
 >   ```sh
 >    man -k .| dmenu -l 30 | awk '{print $1}' | xargs -r man -Tpdf | zathura - 
 >   ```
+<br/>
 
 
-
-
+## Books
+> code complete 2     
+> the c programming language     
+ 
