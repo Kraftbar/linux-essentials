@@ -9,12 +9,18 @@
 > **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
 >  **[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)**  
 > **[terminator](https://terminator-gtk3.readthedocs.io/en/latest/#)**  
->  **[tmux](https://github.com/tmux/tmux)**
+>  **[tmux](https://github.com/tmux/tmux)**   
 
 #### Git
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
+
+
+#### other
+>  **[sxhkd (Simple X hotkey daemon)](https://github.com/baskerville/sxhkd)**    
+>  **[entr(1) (cmds on filechange)](http://eradman.com/entrproject/)**    
 <br/>
+
 
 ## :tv: Gaming :tv:
 
@@ -76,6 +82,10 @@ reactOS
 > **[markdown](https://daringfireball.net/projects/markdown/syntax#backslash)**   
 > **[oneDrive using rclone](https://www.linuxuprising.com/2018/07/how-to-mount-onedrive-in-linux-using.html)**   
 > **[cheatsheetfactory](https://cheatsheetfactory.geekyhacker.com)**   
+> **[benchmarksgame-team](https://benchmarksgame-team.pages.debian.net/benchmarksgame/index.html)**   
+> **[setting up vpn](https://www.redhat.com/sysadmin/run-your-own-vpn-libreswan)**   
+
+
 
 <br/>
 
@@ -87,10 +97,12 @@ reactOS
 <br/>
 
 ## images
-> **[jpegoptim ](https://github.com/tjko/jpegoptim/)**   
-> **[OptiPNG](http://optipng.sourceforge.net/)**   
+> **[image_optim](https://github.com/toy/image_optim)**   
 > **[imagemagick](https://www.imagemagick.org/)**   
+> **[gigapixel-ai (paied)](https://topazlabs.com/gigapixel-ai/)**   
+> **[dcscn-super-resolution (free)](https://github.com/jiny2001/dcscn-super-resolution)**   
 
+<br/>
 
 ## One-liners
 >   ```sh
