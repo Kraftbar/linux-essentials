@@ -1,6 +1,5 @@
 #  :sparkles::sparkles: My Linux Essentials :sparkles::sparkles: # 
-This is a list of some of the stuff i find usefull. 
-<br/>
+
 <br/>
 
 
