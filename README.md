@@ -84,6 +84,7 @@ reactOS
 > **[cheatsheetfactory](https://cheatsheetfactory.geekyhacker.com)**   
 > **[benchmarksgame-team](https://benchmarksgame-team.pages.debian.net/benchmarksgame/index.html)**   
 > **[setting up vpn](https://www.redhat.com/sysadmin/run-your-own-vpn-libreswan)**   
+>  **[eSpeak](https://github.com/espeak-ng/espeak-ng)**    
 
 
 
@@ -108,6 +109,10 @@ reactOS
 >   ```sh
 >    man -k .| dmenu -l 30 | awk '{print $1}' | xargs -r man -Tpdf | zathura - 
 >   ```
+>   ```sh
+>    du -d 2 -h /home/nybo | sort -rh | head 
+>   ```
+
 <br/>
 
 
