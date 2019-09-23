@@ -10,7 +10,8 @@
 >  **[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)**  
 > **[terminator](https://terminator-gtk3.readthedocs.io/en/latest/#)**  
 >  **[tmux](https://github.com/tmux/tmux)**   
-
+>  **[terminal file manager](https://github.com/gokcehan/lf)**   
+> 
 #### Git
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
@@ -85,6 +86,7 @@ reactOS
 > **[benchmarksgame-team](https://benchmarksgame-team.pages.debian.net/benchmarksgame/index.html)**   
 > **[setting up vpn](https://www.redhat.com/sysadmin/run-your-own-vpn-libreswan)**   
 >  **[eSpeak](https://github.com/espeak-ng/espeak-ng)**    
+>  **[openvpn](https://openvpn.net/)**    
 
 
 
