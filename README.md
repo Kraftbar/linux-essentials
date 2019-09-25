@@ -44,7 +44,7 @@
 ## :penguin:	Distros :penguin:
 #### Main
 > **[debian](https://www.debian.org/)**   
-> **[fedora (rh desktop)](https://getfedora.org/)**   
+> **[fedora (rehl base)](https://getfedora.org/)**   
 > **[centos (/rhel)](https://www.centos.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
 > **[archlinux](https://www.archlinux.org/)**   
@@ -102,6 +102,7 @@ reactOS
 ## images
 > **[image_optim](https://github.com/toy/image_optim)**   
 > **[imagemagick](https://www.imagemagick.org/)**   
+> **[fred's imagemagick scripts](http://www.fmwconcepts.com/imagemagick/index.php)**   
 > **[gigapixel-ai (paied)](https://topazlabs.com/gigapixel-ai/)**   
 > **[dcscn-super-resolution (free)](https://github.com/jiny2001/dcscn-super-resolution)**   
 
