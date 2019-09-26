@@ -1,4 +1,4 @@
-#  :sparkles::sparkles: My Linux Essentials :sparkles::sparkles: # 
+#  :sparkles::sparkles: My linux essentials :sparkles::sparkles: # 
 
 <br/>
 
@@ -58,12 +58,15 @@
 > **[linuxmint](https://linuxmint.com/)**   
 > **[pop!_os](https://system76.com/pop)**   
 > **[elementary_os](https://elementary.io/)**   
+
+#### Non-linux
+> **[haikuos](https://www.haiku-os.org)**   
+> **[reactOS](https://reactos.org)**   
+> **[freebsd](http://www.freebsd.no)**   
+
+
+
 <br/>
-
-
-non linux
-haikuos
-reactOS
 
 ## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
