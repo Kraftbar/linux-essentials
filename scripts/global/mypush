@@ -1,18 +1,32 @@
 #!/bin/bash
+# usage: mypush "commit message"
 
-push_msg=$1
+push_msg="$1"
 test -z $push_msg && echo "Commit message required." 1>&2 && exit 1
 
-#FILE=.gitignore
-#if [ -f $FILE ]; then
-#   echo "The file '$FILE' exists."
+
+# need for checking what is going on in remote
+git remote update
+
+
+
+HEADHASH=$(git rev-parse HEAD)
+UPSTREAMHASH=$(git rev-parse master@{upstream})
+if [ "$HEADHASH" != "$UPSTREAMHASH" ]
+then
+   echo -e ${ERROR}Not up to date with origin. Aborting.${NOCOLOR}
+   echo
+   exit 0
+fi
+
+FILE=.gitignore
+if [ -f $FILE ]; then
+   echo "The file '$FILE' exists."
 #else
-#  touch .gitignore
-#  echo ".vscode" >> .gitignore
-#fi
+ #  touch .gitignore
+ #  echo ".vscode" >> .gitignore
+fi
 
 str="$*"
 git add . && git commit -m "$str" && git push
-
-# usage: mytest "commit message"
 

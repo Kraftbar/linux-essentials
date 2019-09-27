@@ -117,7 +117,7 @@
 >   ```
 >   ```sh
 >    du -d 2 -h /home/nybo | sort -rh | head 
->   ```
+>   ```     
 >   ```sh
 >    git config --global url."git@github.com:".insteadOf "https://github.com/"
 >   ```
