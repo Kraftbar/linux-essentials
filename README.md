@@ -98,7 +98,7 @@
 ## Usefull commands
 > **[locate]()**    
 > **[whereis]()**    
-> **[sed]()**    
+> **[sed]()**      
 > **[awk]()**    
 
 > **[Anacron / Cron]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
