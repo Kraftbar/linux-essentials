@@ -62,8 +62,8 @@
 #### Non-linux
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
-> **[freebsd](http://www.freebsd.no)** 
-> **[riscos](https://www.riscosopen.org/content/)** 
+> **[freebsd](http://www.freebsd.no)**     
+> **[riscos](https://www.riscosopen.org/content/)**     
 
 
 <br/>
