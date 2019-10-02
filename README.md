@@ -89,7 +89,7 @@
 > **[benchmarksgame-team](https://benchmarksgame-team.pages.debian.net/benchmarksgame/index.html)**   
 > **[setting up vpn](https://www.redhat.com/sysadmin/run-your-own-vpn-libreswan)**   
 >  **[eSpeak](https://github.com/espeak-ng/espeak-ng)**    
->  **[openvpn](https://openvpn.net/)**    
+>  **[openvpn](https://github.com/angristan/openvpn-install)**    
 
 
 
@@ -100,6 +100,12 @@
 > **[whereis]()**    
 > **[sed]()**    
 > **[awk]()**    
+
+> **[Anacron / Cron]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
+> **[ACPI (battery)]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
+
+
+
 <br/>
 
 ## images
