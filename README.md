@@ -11,7 +11,7 @@
 > **[terminator](https://terminator-gtk3.readthedocs.io/en/latest/#)**  
 >  **[tmux](https://github.com/tmux/tmux)**   
 >  **[terminal file manager](https://github.com/gokcehan/lf)**   
-> 
+>    
 #### Git
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
