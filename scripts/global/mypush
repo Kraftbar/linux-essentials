@@ -1,8 +1,7 @@
 #!/bin/bash
-# usage: mypush "commit message"
 
 push_msg="$1"
-test -z $push_msg && echo "Commit message required." 1>&2 && exit 1
+test -z "$push_msg" && echo "Commit message required." 1>&2 && exit 1
 
 
 # need for checking what is going on in remote
@@ -29,3 +28,4 @@ fi
 str="$*"
 git add . && git commit -m "$str" && git push
 
+# usage: mytest "commit message"

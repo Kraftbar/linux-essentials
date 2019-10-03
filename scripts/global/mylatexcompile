@@ -1,0 +1,6 @@
+#!/bin/bash
+
+texFile="$1"
+
+pdflatex $texFile outout.pdf 
+latexmk -c

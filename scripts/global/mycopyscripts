@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo cp /usr/local/bin/my* /home/nybo/dev/collection/linuxessentials/scripts/global/
