@@ -15,8 +15,7 @@ UPSTREAMHASH=$(git rev-parse master@{upstream})
 if [ "$HEADHASH" != "$UPSTREAMHASH" ]
 then
    echo -e ${ERROR}Not up to date with origin. Aborting.${NOCOLOR}
-   echo
-   exit 0
+   exit 1
 fi
 
 FILE=.gitignore
