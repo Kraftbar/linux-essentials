@@ -2,5 +2,10 @@
 
 texFile="$1"
 
-pdflatex $texFile outout.pdf 
+if [ -z "$texFile"   ]
+then
+	echo "Using main.tex" 
+	texFile="main.tex" 
+fi
+latexmk "$texFile" -pdf 
 latexmk -c
