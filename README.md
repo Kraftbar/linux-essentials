@@ -18,7 +18,7 @@
 
 
 #### other
->  **[sxhkd (Simple X hotkey daemon)](https://github.com/baskerville/sxhkd)**    
+>  **[sxhkd](https://github.com/baskerville/sxhkd)**    
 >  **[entr(1) (cmds on filechange)](http://eradman.com/entrproject/)**    
 <br/>
 
