@@ -12,10 +12,14 @@ then
 	texFile="main.tex" 
 fi
 
+
+latexmk "$texFile" -pdf
+
+# if its a sage -> compile that 
 if [ -f "build_latex/$filename" ]; then
-    latexmk "$texFile" -pdf && cd build_latex && pwd && sage "$filename" && cd .. && latexmk "$texFile" -g -pdf
+     cd build_latex && pwd && sage "$filename" && cd .. && latexmk "$texFile" -g -pdf 
 else
-    latexmk "$texFile" -pdf 
+    echo "not a sage"
 fi
 latexmk -c
 
