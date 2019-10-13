@@ -15,6 +15,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+;; comes in usefull
+(defun my/bypass-confirmation-all (function &rest args)
+  "Call FUNCTION with ARGS, bypassing all prompts.
+This includes both `y-or-n-p' and `yes-or-no-p'."
+  (my/with-advice
+      ((#'y-or-n-p    :override (lambda (prompt) t))
+       (#'yes-or-no-p :override (lambda (prompt) t)))
+    (apply function args)))
+
 ;;; Bootstrapping use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -30,6 +40,43 @@
 (org-babel-do-load-languages
  'org-babel-load-languages '((C . t)
 			     (octave . t)))
+
+;; fontify code in code blocks
+(setq org-src-fontify-natively t)
+
+
+
+(setq org-confirm-babel-evaluate nil)
+
+
+(defun org-export-as-pdf-and-open ()
+  (interactive)
+  (save-buffer)
+  (org-open-file (org-latex-export-to-pdf) )
+  (windmove-left))
+
+(add-hook 
+ 'org-mode-hook
+ (lambda()
+   (define-key org-mode-map 
+       (kbd "<f5>") 'org-export-as-pdf-and-open)))
+
+;; dont remember what this is
+(setq org-startup-truncated nil)
+
+;; gjelder for alle filer men best for pdf
+(global-auto-revert-mode t)
+(setq revert-without-query '(".*"))
+
+;; For pdf org
+;; Source: http://www.emacswiki.org/emacs-en/download/misc-cmds.el
+(defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
+
+
+
 
 ;; company  --- not working 
 (use-package company
@@ -50,9 +97,6 @@
 ;; company  --- not working 
 
 
-
-
-(setq org-startup-truncated nil)
 
 
 ;; help on what key to press next
@@ -264,6 +308,7 @@ version 2016-06-18"
   "Return t if current buffer is a user buffer, else nil."
   (or
    (string-equal "*" (substring (buffer-name) 0 1))
+   (string-equal "pdf" (substring (buffer-name) -3))
    (memq major-mode '(dired-mode magit-status-mode))))
 
 (defun xah-next-user-buffer ()
@@ -282,7 +327,7 @@ Version 2016-06-19"
 
 
 
-(defun xah-previous-user-buffer ()
+(defun  xah-previous-emacs-buffer ()
   "Switch to the previous user buffer.
 “user buffer” is determined by `xah-user-buffer-q'.
 URL `http://ergoemacs.org/emacs/elisp_next_prev_user_buffer.html'
@@ -297,48 +342,25 @@ Version 2016-06-19"
         (progn (setq i 100))))))
 
 
-(defvar spacemacs-useless-buffers-regexp '("*\.\+")
-  "Regexp used to determine if a buffer is not useful.")
-(defvar spacemacs-useful-buffers-regexp '("\\*scratch\\*")
-  "Regexp used to define buffers that are useful despite matching
-`spacemacs-useless-buffers-regexp'.")
 
-(push "\\*Messages\\*" spacemacs-useful-buffers-regexp)
-(push "\\*helm\.\+\\*" spacemacs-useless-buffers-regexp)
-
-
-
-(defun spacemacs/useful-buffer-p (buffer)
-  "Determines if a buffer is useful."
-  (let ((buf-name (buffer-name buffer)))
-    (or (with-current-buffer buffer
-          (derived-mode-p 'comint-mode))
-        (cl-loop for useful-regexp in spacemacs-useful-buffers-regexp
-                 thereis (string-match-p useful-regexp buf-name))
-        (cl-loop for useless-regexp in spacemacs-useless-buffers-regexp
-                 never (string-match-p useless-regexp buf-name)))))
-
-(defun spacemacs/useless-buffer-p (buffer)
-  "Determines if a buffer is useless."
-  (not (spacemacs/useful-buffer-p buffer)))
-
-
-
-
-
-;; make `next-buffer', `other-buffer', etc. ignore useless buffers (see
-;; `spacemacs/useless-buffer-p')
-(let ((buf-pred-entry (assq 'buffer-predicate default-frame-alist)))
-  (if buf-pred-entry
-      ;; `buffer-predicate' entry exists, modify it
-      (setcdr buf-pred-entry #'spacemacs/useful-buffer-p)
-    ;; `buffer-predicate' entry doesn't exist, create it
-    (push '(buffer-predicate . spacemacs/useful-buffer-p) default-frame-alist)))
-
-
-(global-set-key [f8] 'next-buffer)
+(global-set-key [C-tab] 'xah-next-user-buffer)
+(global-set-key [C-iso-lefttab] 'xah-previous-emacs-buffer)
 
 ;; ---------------- SHIFT TAB BUFFER END
+
+
+
+
+
+
+;; fix some org-mode shortcuts
+
+
+;; esc by its own has weird behavior when
+;; dealing with multiple windows
+(define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+
+
 
 
 
@@ -349,9 +371,22 @@ Version 2016-06-19"
 
 
 
+;; split window default right
+(setq split-height-threshold nil)
+(setq split-width-threshold 122)
+
+;; toggle fullscreen buffer
+;; NOTE: This when toggled desktopmode will not save
+(defun toggle-maximize-buffer () "Maximize buffer"
+  (interactive)
+  (if (= 1 (length (window-list)))
+      (jump-to-register '_) 
+    (progn
+      (window-configuration-to-register '_)
+      (delete-other-windows))))
 
 
-
+(global-set-key [f9] 'toggle-maximize-buffer)
 
 
 ;;     Own functions
@@ -401,10 +436,8 @@ Version 2016-06-19"
 
 
 
+
 (global-set-key (kbd "C-c C-c") 'eval-buffer)
-(global-set-key [f9] 'testtest)
-
-
 
 
 
@@ -415,6 +448,7 @@ Version 2016-06-19"
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cwm-centered-window-width 122)
+ '(doc-view-continuous t)
  '(package-selected-packages
    (quote
     (s centered-window helm which-key use-package undo-tree flycheck company-auctex))))
