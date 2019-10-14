@@ -16,6 +16,7 @@
 
 
 
+
 ;; comes in usefull
 (defun my/bypass-confirmation-all (function &rest args)
   "Call FUNCTION with ARGS, bypassing all prompts.
@@ -75,6 +76,28 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
     (interactive)
     (revert-buffer :ignore-auto :noconfirm))
 
+
+
+
+;; no shift or alt with arrows
+(define-key org-mode-map (kbd "<S-left>") nil)
+(define-key org-mode-map (kbd "<S-right>") nil)
+(define-key org-mode-map (kbd "<M-left>") nil)
+(define-key org-mode-map (kbd "<M-right>") nil)
+;; no shift-alt with arrows
+(define-key org-mode-map (kbd "<M-S-left>") nil)
+(define-key org-mode-map (kbd "<M-S-right>") nil)
+
+(define-key org-mode-map (kbd "C-s-<left>") 'org-metaleft)
+(define-key org-mode-map (kbd "C-s-<right>") 'org-metaright)
+
+
+
+
+
+
+;; Always open files in the same frame, even when double-clicked from file.m
+(setq ns-pop-up-frames nil)
 
 
 
@@ -146,6 +169,19 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
 
 ;; delete highlited text  when writing  
  (delete-selection-mode 1)
+
+
+(use-package shell-pop
+  :bind (("C-s-t" . shell-pop)
+         ("C-x t" . shell-pop))
+  :ensure t
+  :config
+  (setq shell-pop-window-size 30)
+  (setq shell-pop-full-span nil)
+  (setq shell-pop-default-directory "~")
+  (setq shell-pop-universal-key "C-s-t")
+  (setq shell-pop-window-position "bottom")
+  (setq shell-pop-in-after-hook 'end-of-buffer))
 
 
 
@@ -235,9 +271,55 @@ Version 2019-03-07"
 (save-place-mode 1)
 
 
+
+
+
+
+
+
+
+;; not working 
+(use-package shackle
+  :ensure t
+  :init
+  (setq shackle-default-alignment 'below
+        shackle-default-size 0.4
+        shackle-rules '((help-mode           :align below :select t)
+                        (helpful-mode        :align below)
+                        (compilation-mode    :select t   :size 0.25)
+                        ("*compilation*"     :select nil :size 0.25)
+                        ("*ag search*"       :select nil :size 0.25)
+                        ("*Flycheck errors*" :select nil :size 0.25)
+                        ("*Warnings*"        :select nil :size 0.25)
+                        ("*Error*"           :select nil :size 0.25)
+                        ("*Org Links*"       :select nil :size 0.1)
+                        (magit-status-mode                :align bottom :size 0.5  :inhibit-window-quit t)
+                        (magit-log-mode                   :same t                  :inhibit-window-quit t)
+                        (magit-commit-mode                :ignore t)
+                        (magit-diff-mode     :select nil  :align left   :size 0.5)
+                        (git-commit-mode                  :same t)
+                        (vc-annotate-mode                 :same t)
+                        ))
+  :config
+  (shackle-mode 1))
+;; not working 
+
+
+
+
+
+
+
+
+
+
+
 ;; on Linux, make Control+wheel do increase/decrease font size
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
+
+
+
 
 
 ;; ________________________
@@ -280,6 +362,7 @@ Version 2019-03-07"
 (global-set-key [f12] 'tool-bar-mode)
 
 
+(global-set-key (kbd "s-a") 'mark-whole-buffer)       ;; select all
 
 
 
@@ -451,7 +534,7 @@ Version 2016-06-19"
  '(doc-view-continuous t)
  '(package-selected-packages
    (quote
-    (s centered-window helm which-key use-package undo-tree flycheck company-auctex))))
+    (shackle shell-pop s centered-window helm which-key use-package undo-tree flycheck company-auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
