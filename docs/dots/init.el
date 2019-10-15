@@ -17,6 +17,9 @@
 
 
 
+
+
+
 ;; comes in usefull
 (defun my/bypass-confirmation-all (function &rest args)
   "Call FUNCTION with ARGS, bypassing all prompts.
@@ -41,6 +44,7 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
 (org-babel-do-load-languages
  'org-babel-load-languages '((C . t)
 			     (octave . t)))
+(setq org-highlight-latex-and-related '(latex))
 
 ;; fontify code in code blocks
 (setq org-src-fontify-natively t)
@@ -96,8 +100,9 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
 
 
 
-;; Always open files in the same frame, even when double-clicked from file.m
+;; Always open files in the same frame, even when double-clicked from file-m
 (setq ns-pop-up-frames nil)
+;; not working 
 
 
 
@@ -209,13 +214,23 @@ Version 2019-03-07"
 
 
 
+;; works!! remember to bind it!
+(defun open-fileman-linux ()
+  (interactive)
+  (call-process-shell-command "xdg-open ."))
+(global-set-key (kbd "s-w") 'open-fileman-linux)
 
 
 
+;; works!! remember to bind it!
+(defun open-term-linux ()
+  (interactive)
+  (call-process-shell-command "terminator"))
+(global-set-key (kbd "s-t") 'open-term-linux) 
+;;(global-set-key [C-m-t] 'open-term-linux)        ; move to right window
 
 
 ;;; move window
-
 (global-set-key [M-left] 'windmove-left)          ; move to left window
 (global-set-key [M-right] 'windmove-right)        ; move to right window
 (global-set-key [M-up] 'windmove-up)              ; move to upper window
