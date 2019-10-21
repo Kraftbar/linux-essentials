@@ -122,15 +122,16 @@
 
 
 
-<br/>
 
 ## Good programs
 > **[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)**   
 > **[blender](https://www.blender.org)**   
 > **[freeoffice](https://www.freeoffice.com/en/)**   
 > **[rawtherapee](https://rawtherapee.com/)**   
+> **[ghidra](https://ghidra-sre.org/)**   
 
 
+<br/>
 ## One-liners
 >   ```sh
 >    man -k .| dmenu -l 30 | awk '{print $1}' | xargs -r man -Tpdf | zathura - 
