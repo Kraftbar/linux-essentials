@@ -76,7 +76,7 @@
 
 ## :turtle: Guides :turtle:
 > **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
-> **[guide](https://github.com/mayfrost/guides)**    
+> **[guides](https://github.com/mayfrost/guides)**    
 > **[Practical Linux Tutorial](http://xahlee.info/linux/linux_index.html)**    
 <br/>
 
