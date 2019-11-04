@@ -78,6 +78,7 @@
 > **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
 > **[guides](https://github.com/mayfrost/guides)**    
 > **[Practical Linux Tutorial](http://xahlee.info/linux/linux_index.html)**    
+> **[explainshell](https://explainshell.com/)**    
 <br/>
 
 
