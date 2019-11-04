@@ -40,10 +40,22 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
 (desktop-save-mode 1)
 
 
+
+
 ;; orgmode
+
+;; setup matlab in babel
+(setq org-babel-default-header-args:matlab
+  '((:results . "output") (:session . "*MATLAB*")))
+
+
+;;(setq matlab-shell-command "/usr/local/MATLAB/R2019b/bin/matlab")
+;;(customize-set-variable 'matlab-shell-command "/usr/local/bin/matlab_emacs_wrapper")
+
 (org-babel-do-load-languages
  'org-babel-load-languages '((C . t)
-			     (octave . t)))
+			     (octave . t)
+			     (matlab . t)))
 (setq org-highlight-latex-and-related '(latex))
 
 ;; fontify code in code blocks
@@ -146,6 +158,9 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
  (let ((last-nonmenu-event nil))
        ad-do-it))
 
+;; (setq scroll-preserve-screen-position t)
+
+
 
 ;; --- copy pasta helm config --- 
 ;; NOTE: needs  elpa-helm and elpa-async
@@ -214,7 +229,7 @@ Version 2019-03-07"
 
 
 
-;; works!! remember to bind it!
+;; works 
 (defun open-fileman-linux ()
   (interactive)
   (call-process-shell-command "xdg-open ."))
@@ -222,7 +237,7 @@ Version 2019-03-07"
 
 
 
-;; works!! remember to bind it!
+;; 
 (defun open-term-linux ()
   (interactive)
   (call-process-shell-command "terminator"))
@@ -549,7 +564,7 @@ Version 2016-06-19"
  '(doc-view-continuous t)
  '(package-selected-packages
    (quote
-    (shackle shell-pop s centered-window helm which-key use-package undo-tree flycheck company-auctex))))
+    (matlab-load matlab-mode shackle shell-pop s centered-window helm which-key use-package undo-tree flycheck company-auctex))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
