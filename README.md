@@ -39,6 +39,8 @@
 > **[freenas](https://www.freenas.org/)**   
 > **[openmediavault](https://www.openmediavault.org/)**       
 > **[odroid-xu4(hc2)](https://wiki.odroid.com/odroid-xu4/application_note/odroid-hc2_with_minidcups)**       
+> **[samba](https://www.samba.org/)**       
+
 <br/>
 
 
