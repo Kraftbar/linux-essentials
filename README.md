@@ -128,10 +128,17 @@
 
 
 ## Good programs
+> **[pinta](https://pinta-project.com/)**   
 > **[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)**   
 > **[blender](https://www.blender.org)**   
 > **[freeoffice](https://www.freeoffice.com/en/)**   
 > **[rawtherapee](https://rawtherapee.com/)**   
+
+<br/>
+
+
+
+## Reverse eng
 > **[ghidra](https://ghidra-sre.org/)**   
 
 
