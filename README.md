@@ -179,9 +179,6 @@
 <br/>
 
 
-## usefull websites
-
-
 
 
 ## Books
