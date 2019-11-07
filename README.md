@@ -41,6 +41,12 @@
 > **[odroid-xu4(hc2)](https://wiki.odroid.com/odroid-xu4/application_note/odroid-hc2_with_minidcups)**       
 > **[samba](https://www.samba.org/)**       
 
+
+### HTTP server
+> **[apache](https://httpd.apache.org/)**       
+> **[Nginx](https://www.nginx.com/)**       
+
+
 <br/>
 
 
@@ -160,9 +166,15 @@
 
 
 ## Some decent fonts
-> IBM plex mono       
+> IBM plex mono        
 > libertine       
 
+
+<br/>
+
+## Legal stuff
+> **[gplv3](https://www.gnu.org/licenses/quick-guide-gplv3.html)**   
+> **[opensourcedef](https://opensource.org/osd-annotated)**   
 
 <br/>
 
