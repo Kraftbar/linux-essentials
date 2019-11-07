@@ -146,7 +146,7 @@
 
 ## Reverse eng
 > **[ghidra](https://ghidra-sre.org/)**   
-
+> **[ida](https://www.hex-rays.com/products/ida/)**   
 
 <br/>
 
@@ -177,6 +177,10 @@
 > **[opensourcedef](https://opensource.org/osd-annotated)**   
 
 <br/>
+
+
+## usefull websites
+
 
 
 
