@@ -18,6 +18,7 @@
 
 
 #### other
+>  **[albert](https://github.com/albertlauncher/albert)**    
 >  **[sxhkd](https://github.com/baskerville/sxhkd)**    
 >  **[entr(1) (cmds on filechange)](http://eradman.com/entrproject/)**    
 <br/>
