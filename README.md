@@ -101,6 +101,8 @@
 > **[setting up vpn](https://www.redhat.com/sysadmin/run-your-own-vpn-libreswan)**   
 >  **[eSpeak](https://github.com/espeak-ng/espeak-ng)**    
 >  **[openvpn](https://github.com/angristan/openvpn-install)**    
+>  **[OSTEP](http://pages.cs.wisc.edu/~remzi/OSTEP/)**    
+
 
 
 
@@ -188,8 +190,6 @@
 > Compilers: Principles, Techniques, and Tools     
 > The Art of Computer Programming     
 > operating system concepts     
-> Operating Systems: Three Easy Pieces     
-
 
 
  
