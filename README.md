@@ -69,6 +69,11 @@
 > **[pop!_os](https://system76.com/pop)**   
 > **[elementary_os](https://elementary.io/)**   
 
+
+#### Funny
+> **[Source Mage](https://sourcemage.org/)**   
+
+
 #### Non-linux
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
@@ -150,7 +155,7 @@
 
 
 
-## Reverse eng
+## :crystal_ball: Reverse eng :crystal_ball:
 > **[ghidra](https://ghidra-sre.org/)**   
 > **[ida](https://www.hex-rays.com/products/ida/)**   
 
