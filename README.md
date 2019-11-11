@@ -85,8 +85,8 @@
 ## Desktop environments 
 ### Main
 > **[gnome (gtk)](https://www.gnome.org/)**  
-> **[kde-plasma (qt)](https://kde.org/plasma-desktop)**   
 > **[xfce (gtk)](https://www.xfce.org/)**  
+> **[kde-plasma (qt)](https://kde.org/plasma-desktop)**   
 
 
 ### Gnome shell derivatives
