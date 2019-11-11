@@ -83,7 +83,15 @@
 <br/>
 
 ## Desktop environments 
+### Main
+> **[gnome (gtk)](https://www.gnome.org/)**  
+> **[kde-plasma (qt)](https://kde.org/plasma-desktop)**   
+> **[xfce (gtk)](https://www.xfce.org/)**  
 
+
+### Gnome shell derivatives
+> **[cinnamon](https://wiki.archlinux.org/index.php/Cinnamon)**    
+> **[pantheon](https://wiki.archlinux.org/index.php/Pantheon)**   
 <br/>
 
 ## :squirrel: Nice to have's :squirrel:
