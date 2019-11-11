@@ -75,6 +75,9 @@
 > **[freebsd](http://www.freebsd.no)**     
 > **[riscos](https://www.riscosopen.org/content/)**     
 
+<br/>
+
+## Desktop environments 
 
 <br/>
 
