@@ -2,7 +2,8 @@
 
 
 # TODO: bugging out when doing init push
-
+# TODO: make sure "git add ." works from 
+#       sub dir
 
 push_msg="$1"
 test -z "$push_msg" && echo "Commit message required." 1>&2 && exit 1
