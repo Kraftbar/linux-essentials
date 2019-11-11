@@ -92,6 +92,8 @@
 ### Gnome shell derivatives
 > **[cinnamon](https://wiki.archlinux.org/index.php/Cinnamon)**    
 > **[pantheon](https://wiki.archlinux.org/index.php/Pantheon)**   
+> **[mate](https://mate-desktop.org/)**   
+
 <br/>
 
 ## :squirrel: Nice to have's :squirrel:
