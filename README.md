@@ -75,6 +75,7 @@
 
 #### Embedded
 > **[zephyr](https://www.zephyrproject.org/)**   
+> **[list](https://www.osrtos.com/)**   
 
 
 
