@@ -73,6 +73,10 @@
 #### Funny
 > **[Source Mage](https://sourcemage.org/)**   
 
+#### Embedded
+> **[zephyr](https://www.zephyrproject.org/)**   
+
+
 
 #### Non-linux
 > **[haikuos](https://www.haiku-os.org)**   
