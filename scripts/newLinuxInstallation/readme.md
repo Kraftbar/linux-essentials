@@ -1,12 +1,13 @@
-* Things to do with a "fresh" linux install
+# Things to do with a "fresh" linux install
 
-<\b>
 
-** many things (tempppp)
+<br/>
 
-..
+## 0. many things (tempppp)
 
-** 1. Get the scripts
+.......
+
+## 1. Get the scripts
 
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
