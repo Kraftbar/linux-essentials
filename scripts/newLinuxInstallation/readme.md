@@ -3,7 +3,7 @@
 
 <br/>
 
-## 0. many things (tempppp)
+## 0. many things (temp)
 
 .......
 
