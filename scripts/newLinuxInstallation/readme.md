@@ -12,3 +12,5 @@
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
+
+## 2. Get the dot files
