@@ -181,7 +181,7 @@
 >    man -k .| dmenu -l 30 | awk '{print $1}' | xargs -r man -Tpdf | zathura - 
 >   ```
 >   ```sh
->    du -d 2 -h /home/nybo | sort -rh | head 
+>    du -d 2 -h /home/"$USER" | sort -rh | head 
 >   ```     
 >   ```sh
 >    git config --global url."git@github.com:".insteadOf "https://github.com/"
