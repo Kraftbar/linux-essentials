@@ -95,7 +95,7 @@
 > **[pantheon](https://wiki.archlinux.org/index.php/Pantheon)**   
 
 
-### Gnome shell derivatives
+### Gnome derivatives
 > **[cinnamon](https://wiki.archlinux.org/index.php/Cinnamon)**    
 > **[mate](https://mate-desktop.org/)**   
 
