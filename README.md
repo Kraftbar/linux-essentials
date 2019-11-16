@@ -186,7 +186,9 @@
 >   ```sh
 >    git config --global url."git@github.com:".insteadOf "https://github.com/"
 >   ```
-
+>   ```sh
+>    touch {1..18}.jpg && rename 's/\d+/sprintf("%05d", $&)/e' *.jpg
+>   ```
 
 <br/>
 
