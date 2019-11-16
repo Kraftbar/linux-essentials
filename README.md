@@ -170,6 +170,17 @@
 
 
 
+
+## Funny
+Audio/)**   
+> **[asciiquarium](https://github.com/cmatsuoka/asciiquarium)**   
+> **[oneko](http://www.daidouji.com/oneko/)**   
+> **[cowsay](https://linux.die.net/man/1/cowsay)**   
+
+
+
+<br/>
+
 ## :crystal_ball: Reverse eng :crystal_ball:
 > **[ghidra](https://ghidra-sre.org/)**   
 > **[ida](https://www.hex-rays.com/products/ida/)**   
