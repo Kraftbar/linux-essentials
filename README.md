@@ -131,6 +131,8 @@
 >  **[eSpeak](https://github.com/espeak-ng/espeak-ng)**    
 >  **[openvpn](https://github.com/angristan/openvpn-install)**    
 >  **[OSTEP](http://pages.cs.wisc.edu/~remzi/OSTEP/)**    
+>  **[libinput-gestures](https://github.com/bulletmark/libinput-gestures)**    
+>  **[PlotJuggler](https://github.com/facontidavide/PlotJuggler)**    
 
 
 
