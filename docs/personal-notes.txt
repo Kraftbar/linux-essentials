@@ -3,3 +3,4 @@ Thing to find out:
 * How the hell do the system decide what editor to open file with
   "sudo apt-get intsall nvim" f.eks overrides all the other editors.
   seems not easy to configure in a convenient way. 
+  f.eks: the csv gets opened in the last program you installed :'-)

@@ -6,7 +6,7 @@ applet-cache-updated=1568969623
 active-display-scale=1
 desktop-effects-map-effect='traditional'
 desktop-effects-close-effect='traditional'
-enabled-desklets=['diskspace@schorschii:11:1675:100', 'notes@schorschii:14:1425:75']
+enabled-desklets=['diskspace@schorschii:11:1675:100', 'notes@schorschii:14:1400:50']
 desktop-effects-unmaximize-time=100
 desktop-effects-map-time=100
 desktop-effects-minimize-effect='traditional'
@@ -53,7 +53,7 @@ drag-threshold=8
 custom-acceleration=true
 motion-acceleration=10.0
 custom-threshold=true
-double-click=400
+double-click=362
 motion-threshold=1
 
 [sounds]
@@ -78,7 +78,7 @@ exec='gnome-calculator'
 exec='terminator'
 
 [desktop/background]
-picture-uri='file:///home/nybo/dev/collection/linuxessentials/wallpapers/7.jpg'
+picture-uri='file:///home/nybo/dev/collection/linuxessentials/wallpapers/007.jpg'
 
 [desktop/background/slideshow]
 image-source='directory:///home/nybo/dev/collection/linuxessentials/wallpapers'
@@ -97,7 +97,7 @@ event-sounds=false
 
 [desktop/wm/preferences]
 theme='Mint-Y'
-num-workspaces=3
+num-workspaces=2
 workspace-names=@as []
 
 [theme]

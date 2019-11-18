@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+# TODO: there is a bug for the hack where 
+#       it produces one more line on the output then desired.
+
+# Copy paste with sed
+file="$1"
+# test -z "$2" && echo 'text of what you want to replace "teststring" with is required' 1>&2 
+
+test -z "$file" && echo 'name the file where you want to replace "teststring" is required' 1>&2 && exit 1
+
+
+echo "This is a test  
+ teststring 
+This is a test" > "$file"
+
+
+newGenerated=$(cat "$file")    
+
+
+## formatting
+## fekin special characters
+newGenerated="$(echo "${newGenerated}" | sed -e 's/[\/&]/\\&/g' )"
+# newline hack, hide them in \f
+newGenerated=`echo "${newGenerated}" | tr '\n' '\f' `
+
+# replacing
+sed -e "s/teststring/${newGenerated}/" $file | tr '\f' '\n' > "out_"$file
+
