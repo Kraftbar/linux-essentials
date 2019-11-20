@@ -33,7 +33,7 @@
 
 ## :fax: Server :fax:
 #### Virtualization
-> **[zcp-ng](https://xcp-ng.com/)**   
+> **[xcp-ng](https://xcp-ng.com/)**   
 >**[xen-orchestra](https://xen-orchestra.com/#!/about)**
 
 #### NAS
