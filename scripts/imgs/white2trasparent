@@ -1,0 +1,3 @@
+#!/bin/bash
+
+convert $1 -fuzz 36% -transparent white output.png
