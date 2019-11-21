@@ -1,4 +1,4 @@
-# Things to do with a "fresh" linux install
+# Things to do with a fresh linux install
 
 
 <br/>
