@@ -142,6 +142,7 @@
 ## Usefull commands
 > **[locate]()**    
 > **[whereis]()**    
+> **[which]()**    
 > **[sed]()**      
 > **[awk]()**    
 > **[pstree]()**    
