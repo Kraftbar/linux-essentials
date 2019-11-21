@@ -80,10 +80,6 @@
 #### Funny
 > **[Source Mage](https://sourcemage.org/)**   
 
-#### Embedded
-> **[zephyr](https://www.zephyrproject.org/)**   
-> **[list](https://www.osrtos.com/)**   
-
 
 
 #### Non-linux
@@ -91,6 +87,10 @@
 > **[reactOS](https://reactos.org)**   
 > **[freebsd](http://www.freebsd.no)**     
 > **[riscos](https://www.riscosopen.org/content/)**     
+
+##### Embedded
+> **[zephyr](https://www.zephyrproject.org/)**   
+> **[list](https://www.osrtos.com/)**   
 
 <br/>
 
