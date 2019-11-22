@@ -6,12 +6,13 @@
 
 ##  :office:  Workflow improvements  :office: 
 #### **The terminal**
-> **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
+>  **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
 >  **[history-search-multi-word](https://github.com/zdharma/history-search-multi-word)**  
-> **[terminator](https://terminator-gtk3.readthedocs.io/en/latest/#)**  
+>  **[terminator](https://terminator-gtk3.readthedocs.io/en/latest/#)**  
 >  **[tmux](https://github.com/tmux/tmux)**   
 >  **[terminal file manager](https://github.com/gokcehan/lf)**   
->    
+>  **[z](https://github.com/rupa/z)**   
+
 #### Git
 > **[ssh](https://kbroman.org/github_tutorial/pages/first_time.html)**  
 > **[smartgit](https://www.syntevo.com/smartgit/)**
