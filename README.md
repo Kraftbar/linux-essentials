@@ -171,11 +171,12 @@
 
 
 ## Good programs
+> **[rawtherapee](https://rawtherapee.com/)**  
 > **[pinta](https://pinta-project.com/)**   
-> **[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)**   
 > **[blender](https://www.blender.org)**   
-> **[freeoffice](https://www.freeoffice.com/en/)**   
-> **[rawtherapee](https://rawtherapee.com/)**   
+> **[kdenlive](https://kdenlive.org/en/)**   
+> **[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)**   
+> **[freeoffice](https://www.freeoffice.com/en/)**    
 
 <br/>
 
