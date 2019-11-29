@@ -110,7 +110,7 @@
 <br/>
 
 ### (wm's)
-> **[https://awesomewm.org/](awesomewm)**    
+> **[awesomewm](https://awesomewm.org/)**    
 > **[i3wm](https://i3wm.org/)**   
 > **[dwm](https://dwm.suckless.org/)**   
 
