@@ -241,6 +241,7 @@
 
 ## Books
 > code complete 2     
+> mythical man month     
 > the c programming language     
 > Compilers: Principles, Techniques, and Tools     
 > The Art of Computer Programming     
