@@ -109,6 +109,14 @@
 
 <br/>
 
+### (wm's)
+> **[https://awesomewm.org/](awesomewm)**    
+> **[i3wm](https://i3wm.org/)**   
+> **[dwm](https://dwm.suckless.org/)**   
+
+
+
+
 ## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
 > **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
