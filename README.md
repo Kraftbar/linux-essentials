@@ -106,13 +106,14 @@
 ### Gnome derivatives
 > **[cinnamon](https://wiki.archlinux.org/index.php/Cinnamon)**    
 > **[mate](https://mate-desktop.org/)**   
-
 <br/>
 
-### (wm's)
+
+## Window managers
 > **[awesomewm](https://awesomewm.org/)**    
 > **[i3wm](https://i3wm.org/)**   
 > **[dwm](https://dwm.suckless.org/)**   
+<br/>
 
 
 
