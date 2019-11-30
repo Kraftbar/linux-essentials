@@ -162,7 +162,7 @@
 
 
 > **[pstree]()**    
-> **[netstat]()**    
+> **[netstat / ss]()**    
 > **[lsof]()**    
 > **[systemctl]()**    
 
