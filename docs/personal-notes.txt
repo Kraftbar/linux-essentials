@@ -1,14 +1,31 @@
 Things to find out:
 -----------------
-* How the hell do the system decide what editor to open file with
+* How the hell do the system decide what editor to open file with.
   "sudo apt-get intsall nvim" f.eks overrides all the other editors.
   seems not easy to configure in a convenient way. 
   f.eks: the csv gets opened in the last program you installed :'-)
-
+* Get non-buggy equalizer to work.
+* Github autoclone one-liner seems to only clone the public repos :)
 
 
 words
 ----------------
 gnu   - recursive acronym "gnu is not unix"
         only unix compatible.
+FOSS  - Free or Open Source Software
+unix  - Multiplexed Information and 
+        Computing Service. Multiplexed
+        because of "time-sharing OS"?.
+        Some ppl think that unix was orignally
+         a play on Multics, i.e “Unics”. Dennis Ritchie
+         states this is a myth.
+        "UNIX is very simple, it just 
+         needs a genius to understand 
+         its simplicity" - Dennis Ritchie. 
+unics  - Un.iplexed I.nformation and C.omputing 
+         S.ervice. it is a pun on Multix.
 
+
+
+
+dragon fly BSD and netBSD - pretty good for routers,better firewall defaults and management
