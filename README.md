@@ -156,10 +156,15 @@
 > **[which]()**    
 > **[sed]()**      
 > **[awk]()**    
-> **[pstree]()**    
 
 > **[Anacron / Cron]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
 > **[ACPI (battery)]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
+
+
+> **[pstree]()**    
+> **[netstat]()**    
+> **[lsof]()**    
+> **[systemctl]()**    
 
 
 
