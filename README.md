@@ -87,7 +87,9 @@
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
 > **[freebsd](http://www.freebsd.no)**     
-> **[riscos](https://www.riscosopen.org/content/)**     
+> **[riscos](https://www.riscosopen.org/content/)**    
+> **[serenity](https://github.com/SerenityOS/serenity)**    
+
 
 ##### Embedded
 > **[zephyr](https://www.zephyrproject.org/)**   
