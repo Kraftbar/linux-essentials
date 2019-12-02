@@ -25,7 +25,10 @@ unix  - Multiplexed Information and
 unics  - Un.iplexed I.nformation and C.omputing 
          S.ervice. it is a pun on Multix.
 
-
+Containers
+    Control groups + name spaces + magic
+container orchestrator
+    tetris with container blocks on wms 
 
 
 dragon fly BSD and netBSD - pretty good for routers,better firewall defaults and management
