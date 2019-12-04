@@ -117,7 +117,13 @@
 > **[dwm](https://dwm.suckless.org/)**   
 <br/>
 
+## package apps
+> **[appimage](https://appimage.org/)**   
+> **[snap](https://snapcraft.io/)**   
+> **[flatpak](https://flatpak.org/)**   
+> **[deb](https://en.wikipedia.org/wiki/Deb_(file_format))**   
 
+<br/>
 
 
 ## :squirrel: Nice to have's :squirrel:
