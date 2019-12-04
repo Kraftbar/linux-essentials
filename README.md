@@ -117,7 +117,7 @@
 > **[dwm](https://dwm.suckless.org/)**   
 <br/>
 
-## package apps
+## App packaging
 > **[appimage](https://appimage.org/)**   
 > **[snap](https://snapcraft.io/)**   
 > **[flatpak](https://flatpak.org/)**   
