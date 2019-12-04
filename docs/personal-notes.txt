@@ -32,3 +32,18 @@ container orchestrator
 
 
 dragon fly BSD and netBSD - pretty good for routers,better firewall defaults and management
+
+
+
+kernels
+------------
+    Non-Mach 
+      microkernel
+
+      monolithic kernel
+        Linux
+    Mach
+      microkernel
+        GNU Hurd 
+      monolithic kernel
+        Apple XNU (3.0)

@@ -97,6 +97,8 @@
 
 <br/>
 
+
+
 ## Desktop environments 
 ### Main
 > **[gnome (gtk)](https://www.gnome.org/)**  
@@ -129,7 +131,16 @@
 ## :squirrel: Nice to have's :squirrel:
 > **[qdirstat](https://github.com/shundhammer/qdirstat)**    
 > **[dpScreenOCR](https://danpla.github.io/dpscreenocr/)**   
+> **[pixelbeat](http://www.pixelbeat.org/fslint/)**   
+
 <br/>
+
+## wops
+> **[supergrubdisk](https://www.supergrubdisk.org/)**    
+> **[xkill](https://linux.die.net/man/1/xkill)**   
+<br/>
+
+
 
 ## :turtle: Guides :turtle:
 > **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
