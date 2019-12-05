@@ -1,12 +1,13 @@
 Things to find out:
 -----------------
-* How the hell do the system decide what editor to open a file with.
+* How the hell do the system decide on what editor to open a file with.
   "sudo apt-get intsall nvim" f.eks overrides all the other editors.
   seems not easy to configure in a convenient way. 
-  f.eks: the csv gets opened in the last program you installed :'-)
+  f.eks: the csv gets opened in the last program installed :'-)
 * Get non-buggy equalizer to work.
 * Github autoclone one-liner seems to only clone the public repos :)
 * What the hell does three fingers "click" on trackpad map to (;
+* more trackpad speed pls?:)
 
 words
 ----------------
