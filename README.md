@@ -72,6 +72,8 @@
 > **[ubuntu](https://ubuntu.com//)**   
 > **[mxlinux](https://mxlinux.org/)**   
 > **[kali](https://www.kali.org/)**   
+> **[deepin](https://www.deepin.org/en/)**   
+
 #### Ubuntu derivatives
 > **[linuxmint](https://linuxmint.com/)**   
 > **[pop!_os](https://system76.com/pop)**   
