@@ -137,12 +137,16 @@
 
 <br/>
 
+
+## Tweak thinks
+> **[dconf](https://wiki.gnome.org/action/show/Projects/dconf?action=show&redirect=dconf)**    
+> **[gnome-tweaks](https://gitlab.gnome.org/GNOME/gnome-tweaks)**   
+<br/>
+
 ## wops
 > **[supergrubdisk](https://www.supergrubdisk.org/)**    
 > **[xkill](https://linux.die.net/man/1/xkill)**   
 <br/>
-
-
 
 ## :turtle: Guides :turtle:
 > **[the-art-of-command-line](https://github.com/jlevy/the-art-of-command-line)**    
