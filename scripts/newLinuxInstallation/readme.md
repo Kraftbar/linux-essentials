@@ -18,13 +18,16 @@ see manual  config - trackpad.txt
 
 
 
-### 4. Get scripts
+### 4. Set up ssh
+
+
+### 5. Get scripts
 ###
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
 
-### 5. Get dot files
+### 6. Get dot files
 
-### 6. Get programs
+### 7. Get programs
 
