@@ -4,7 +4,7 @@
 <br/>
 
 
-### 0. install nvidia drivers so no cpu lockup
+### 0. install nvidia drivers so no cpu lockup at shutdown
 
 ### 1. get the applet that allows for automatic sleep when low battery
 >  [Get BAMS applet](https://cinnamon-spices.linuxmint.com/applets/view/255)      
