@@ -6,17 +6,17 @@ applet-cache-updated=1568969623
 active-display-scale=1
 desktop-effects-map-effect='traditional'
 desktop-effects-close-effect='traditional'
-enabled-desklets=['diskspace@schorschii:11:1675:100', 'notes@schorschii:14:1400:50']
+enabled-desklets=['diskspace@schorschii:11:2525:275', 'notes@schorschii:14:2675:225']
 desktop-effects-unmaximize-time=100
 desktop-effects-map-time=100
 desktop-effects-minimize-effect='traditional'
 desklet-snap-interval=25
-panels-height=['1:34']
+panels-height=['1:32']
 next-applet-id=64
 desktop-effects-map-transition='easeOutQuad'
-desktop-effects-maximize-time=100
 desktop-effects-unmaximize-effect='none'
 panels-enabled=['1:0:top']
+desktop-effects-maximize-time=100
 desktop-effects-tile-transition='easeInQuad'
 desktop-effects-maximize-effect='none'
 enabled-applets=['panel1:left:0:menu@cinnamon.org:0', 'panel1:left:1:show-desktop@cinnamon.org:1', 'panel1:left:2:grouped-window-list@cinnamon.org:2', 'panel1:right:6:systray@cinnamon.org:3', 'panel1:right:11:network@cinnamon.org:9', 'panel1:right:8:sound@cinnamon.org:10', 'panel1:right:9:power@cinnamon.org:11', 'panel1:right:12:calendar@cinnamon.org:12', 'panel1:center:4:weather@mockturtl:13', 'panel1:center:0:temperature@fevimu:16', 'panel1:right:10:batterymonitor@pdcurtis:20', 'panel1:right:5:nvidia-prime@cinnamon.org:32', 'panel1:right:7:blueberry@cinnamon.org:45', 'panel1:center:1:bash-sensors@pkkk:54', 'panel1:center:3:bash-sensors@pkkk:55', 'panel1:right:2:mailnagapplet@ozderya.net:60', 'panel1:right:0:stevedore@centurix:61', 'panel1:center:2:bash-sensors@pkkk:62', 'panel1:right:4:cheaty@centurix:63']
@@ -46,6 +46,8 @@ motion-threshold=1
 orientation-lock=false
 
 [settings-daemon/peripherals/keyboard]
+repeat-interval=uint32 30
+delay=uint32 500
 numlock-state='on'
 
 [settings-daemon/peripherals/mouse]
@@ -61,6 +63,10 @@ login-enabled=false
 logout-enabled=false
 tile-enabled=false
 switch-enabled=false
+
+[muffin]
+tile-hud-threshold=25
+edge-tiling=true
 
 [desktop/media-handling]
 autorun-x-content-start-app=['x-content/unix-software', 'x-content/bootable-media']
@@ -87,6 +93,7 @@ delay=15
 [desktop/interface]
 icon-theme='Mint-X-Blue'
 cursor-size=23
+cursor-blink-time=1200
 clock-show-seconds=false
 first-day-of-week=1
 gtk-theme='Mint-Y-Blue'
@@ -97,7 +104,7 @@ event-sounds=false
 
 [desktop/wm/preferences]
 theme='Mint-Y'
-num-workspaces=2
+num-workspaces=3
 workspace-names=@as []
 
 [theme]

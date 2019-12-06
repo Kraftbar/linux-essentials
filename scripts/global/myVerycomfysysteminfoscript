@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+# crash_fetch - custom sysinfo for *buntus
+
+
+## INFO
+# 99% taken from crashhacker
+# user is already defined
+
+# TODO:
+# - FIX NVIDIA 
+
+os="$(lsb_release -ds)"
+
+kernel="$(uname -sr)"
+uptime="$(uptime -p | sed 's/up //')"
+packages="$(dpkg -l | wc -l)"
+shell="$(basename ${SHELL})"
+cpu="$(sudo dmidecode -s system-product-name)"
+firefox="$(firefox --version)"
+nproc="$(nproc)"
+arch="$(lscpu | grep -oP 'Architecture:\s*\K.+')"
+resolution="$(xdpyinfo | awk '/dimensions/{print $2}')"
+storage="$(du -shx ~/* | sort -rh | head -10)"
+ram="$(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
+gpu="$(cat /proc/driver/nvidia/gpus/0000\:03\:00.0/information  | grep -o 'Model.*' | cut -f2- -d: | awk '{$1=$1};1')"
+temperature="$(sensors | awk '/^Core\ 0/ {print $3}')"
+lsblk="$(lsblk)"
+vendor="$(lscpu | grep -oP 'Vendor\ ID:\s*\K.+')"
+byte="$(lscpu | grep -oP 'Byte\ Order:\s*\K.+')"
+model="$(lscpu | grep -oP 'Model\ name:\s*\K.+')"
+processes="$(ps aux | awk '{print $2, $3, $4, $10, $11}' | sort -k2rn | head -n 10)"
+
+if [ -z "${WM}" ]; then
+	if [ "${XDG_CURRENT_DESKTOP}" ]; then
+		envtype='DE:'
+		WM="${XDG_CURRENT_DESKTOP}"
+	elif [ "${DESKTOP_SESSION}" ]; then
+		envtype='DE:'
+		WM="${DESKTOP_SESSION}"
+	elif [ -f "${HOME}/.xinitrc" ]; then
+		envtype='WM:'
+		WM="$(tail -n 1 "${HOME}/.xinitrc" | cut -d ' ' -f 2)"
+	fi
+else
+	envtype='WM:'
+fi
+
+## DEFINE COLORS
+
+# probably don't change these
+if [ -x "$(command -v tput)" ]; then
+	bold="$(tput bold)"
+	black="$(tput setaf 0)"
+	red="$(tput setaf 1)"
+	green="$(tput setaf 2)"
+	yellow="$(tput setaf 3)"
+	blue="$(tput setaf 4)"
+	magenta="$(tput setaf 5)"
+	cyan="$(tput setaf 6)"
+	white="$(tput setaf 7)"
+	reset="$(tput sgr0)"
+fi
+
+# you can change these
+lc="${reset}${bold}${white}"		# labels
+nc="${reset}${bold}${white}"		# user and hostname
+ic="${reset}${bold}${white}"		# info
+c0="${reset}${bold}${yellow}"		# first color
+
+## OUTPUT
+
+cat <<EOF
+
+${lc}${lc}OS:        ${nc}${os}${reset}
+${lc}${lc}KERNEL:    ${nc}${kernel}${reset}
+${lc}${lc}UPTIME:    ${nc}${uptime}${reset}
+${lc}${lc}PACKAGES:  ${nc}${packages}${reset}
+${lc}${lc}SHELL:     ${nc}${shell}${reset}
+${lc}${lc}${envtype}        ${nc}${WM}${reset}
+${lc}${lc}SYSTEM:    ${nc}${model_name}${reset}
+${lc}${lc}BROWSER:   ${nc}${firefox}${reset}
+${lc}${lc}RES:       ${nc}${resolution}${reset}
+${lc}${lc}RAM:       ${nc}${ram}${reset}
+${lc}${lc}CPU:       ${nc}${cpu}${reset}
+${lc}${lc}GPU:       ${nc}${gpu}${reset}
+${lc}${lc}TEMP:      ${nc}${temperature}${reset}
+${lc}${lc}VENDOR:    ${nc}${vendor}${reset}
+${lc}${lc}PROC:      ${nc}${nproc}${reset}
+${lc}${lc}ARCH:      ${nc}${arch}${reset}
+${lc}${lc}BYTE:      ${nc}${byte}${reset}
+${lc}STORAGE:
+${nc}${storage}${reset}
+${lc}PROCESSES:
+${nc}${processes}${reset}
+${lc}PARTITIONS:
+${nc}${lsblk}
+EOF

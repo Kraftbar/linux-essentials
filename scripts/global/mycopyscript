@@ -4,9 +4,8 @@ sudo cp /usr/local/bin/my* ~/dev/collection/linuxessentials/scripts/global/
 
 sudo cp ~/.latexmkrc ~/dev/collection/latex-r/docs/dots/
 
-sudo cp ~/.emacs.d/init.el ~/dev/collection/linuxessentials/docs/dots/
+sudo cp ~/.emacs.d/init.el ~/dev/collection/linuxessentials/docs/mySetup/dots/
 
-
-sudo dconf dump /org/cinnamon/ >  ~/dev/collection/linuxessentials/docs/dots/de/cinnamon
+sudo dconf dump /org/cinnamon/ >  ~/dev/collection/linuxessentials/docs/mySetup/dots/de/cinnamon
 
 
