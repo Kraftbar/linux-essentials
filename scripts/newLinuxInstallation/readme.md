@@ -1,11 +1,10 @@
-# Things to do with a fresh linux install (mainly)
+# Things i do with a fresh linux install (mainly xps15 9760)
 
 
 <br/>
 
 
 ### 0. install nvidia drivers so no cpu lockup
->  [Get BAMS applet](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 
 ### 1. get the applet that allows for automatic sleep when low battery
 >  [Get BAMS applet](https://cinnamon-spices.linuxmint.com/applets/view/255)      
@@ -15,10 +14,12 @@ see manual  config - trackpad.txt
 
 
 
-### 2. Get the scripts
+### 3. Get scripts
 ###
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
 
-### 2. Get the dot files
+### 4. Get dot files
+
+### 5. Get programs
