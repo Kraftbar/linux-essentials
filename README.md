@@ -106,12 +106,13 @@
 > **[gnome (gtk)](https://www.gnome.org/)**  
 > **[xfce (gtk)](https://www.xfce.org/)**  
 > **[kde-plasma (qt)](https://kde.org/plasma-desktop)**   
-> **[pantheon](https://wiki.archlinux.org/index.php/Pantheon)**   
 
 
-### Gnome derivatives
+### Gnome derivatives/ related
 > **[cinnamon](https://wiki.archlinux.org/index.php/Cinnamon)**    
 > **[mate](https://mate-desktop.org/)**   
+> **[pantheon](https://wiki.archlinux.org/index.php/Pantheon)**   
+
 <br/>
 
 
