@@ -1,8 +1,6 @@
 # Things i do with a fresh linux install (mainly xps15 9760)
 
 
-<br/>
-
 
 ### 0. install nvidia drivers so no cpu lockup at shutdown
 
