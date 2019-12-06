@@ -10,18 +10,21 @@ run script - eduroam-linux-Ntu-N.sh
 ### 1. get the applet that allows for automatic sleep when low battery
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 
-### 2. configure mouse speed (not acc) beyond the gui setting limit
+### 2. config so that windows clock is correct
+dont remember, adding later
+
+### 3. configure mouse speed (not acc) beyond the gui setting limit
 see manual  config - trackpad.txt
 
 
 
-### 3. Get scripts
+### 4. Get scripts
 ###
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
 
-### 4. Get dot files
+### 5. Get dot files
 
-### 5. Get programs
+### 6. Get programs
 
