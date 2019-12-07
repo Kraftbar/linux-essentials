@@ -170,6 +170,7 @@
 >  **[OSTEP](http://pages.cs.wisc.edu/~remzi/OSTEP/)**    
 >  **[libinput-gestures](https://github.com/bulletmark/libinput-gestures)**    
 >  **[PlotJuggler](https://github.com/facontidavide/PlotJuggler)**    
+>  **[wechat](https://github.com/Jactor-Sue/Deepin-Apps-Installation)**    
 
 
 
