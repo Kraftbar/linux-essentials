@@ -106,6 +106,7 @@
 ### Main
 > **[gnome (gtk)](https://www.gnome.org/)**  
 > **[xfce (gtk)](https://www.xfce.org/)**  
+> **[budgie (gtk)](https://github.com/solus-project/budgie-desktop)**   
 > **[kde-plasma (qt)](https://kde.org/plasma-desktop)**   
 
 
