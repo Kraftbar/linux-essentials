@@ -62,11 +62,12 @@
 ## :penguin:	Distros :penguin:
 #### Main
 > **[debian](https://www.debian.org/)**   
+> **[pclinux)](http://www.pclinuxos.com/)**   
 > **[fedora (rehl base)](https://getfedora.org/)**   
 > **[centos (/rhel)](https://www.centos.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
-> **[archlinux](https://www.archlinux.org/)**   
 > **[gentoo](https://www.gentoo.org/)**   :eyes:
+> **[archlinux](https://www.archlinux.org/)**   
 
 #### Debian derivatives
 > **[ubuntu](https://ubuntu.com//)**   
