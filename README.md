@@ -66,7 +66,7 @@
 > **[fedora (rehl base)](https://getfedora.org/)**   
 > **[centos (/rhel)](https://www.centos.org/)**   
 > **[opensuse](https://www.opensuse.org/)**   
-> **[gentoo](https://www.gentoo.org/)**   :eyes:
+> **[gentoo](https://www.gentoo.org/)**   :eyes:         
 > **[archlinux](https://www.archlinux.org/)**   
 
 #### Debian derivatives
