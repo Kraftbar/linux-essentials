@@ -219,6 +219,8 @@
 > **[kdenlive](https://kdenlive.org/en/)**   
 > **[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)**   
 > **[freeoffice](https://www.freeoffice.com/en/)**    
+> **[kicad](https://www.kicad-pcb.org/)**    
+
 
 <br/>
 
