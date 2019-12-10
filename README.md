@@ -228,6 +228,7 @@
 > **[fred's imagemagick scripts](http://www.fmwconcepts.com/imagemagick/index.php)**   
 > **[gigapixel-ai (proprietary)](https://topazlabs.com/gigapixel-ai/)**   
 > **[dcscn-super-resolution (free)](https://github.com/jiny2001/dcscn-super-resolution)**   
+> **[ocr-oc](https://github.com/tesseract-ocr/tesseract)**   
 
 <br/>
 
