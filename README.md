@@ -4,6 +4,14 @@
 
 
 
+<p align="center">
+  <img width="460" height="300" src="pacman.PNG">
+</p>
+
+<br/>
+
+
+
 ##  :office:  Workflow improvements  :office: 
 #### **The terminal**
 >  **[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh)**  
