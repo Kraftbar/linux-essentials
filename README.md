@@ -5,8 +5,8 @@
 
 
 <p align="center">
-  <img width="460"  src="pacman.PNG">
 </p>
+<img width="360"  src="pacman.PNG">
 
 <br/>
 
