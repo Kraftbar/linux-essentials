@@ -86,6 +86,15 @@
 
 
 
+
+#### Mobile
+> **[ubuntutouch](https://ubports.com)**   
+> **[postmarketos](https://postmarketos.org)**   
+> **[phosh](https://puri.sm)**   
+> **[luneos](https://webos-ports.org)**   
+> **[sailfishos_jolla](https://sailfishos.org )**   
+
+
 #### Non-linux
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
@@ -125,17 +134,7 @@
 <br/>
 
 
-## Mobile
-### distros
-> **[ubuntutouch](https://ubports.com)**   
-> **[postmarketos](https://postmarketos.org)**   
-> **[phosh](https://puri.sm)**   
-### hardware
-> **[luneos](https://webos-ports.org)**   
-> **[sailfishos_jolla](https://sailfishos.org )**   
 
-
-<br/>
 ## App packaging
 > **[appimage](https://appimage.org/)**   
 > **[snap](https://snapcraft.io/)**   
