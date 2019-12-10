@@ -5,7 +5,7 @@
 
 
 <p align="center">
-  <img width="460" height="300" src="pacman.PNG">
+  <img width="460"  src="pacman.PNG">
 </p>
 
 <br/>
