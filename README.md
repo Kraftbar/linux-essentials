@@ -87,14 +87,6 @@
 
 
 
-#### Mobile
-> **[ubuntutouch](https://ubports.com)**   
-> **[postmarketos](https://postmarketos.org)**   
-> **[phosh](https://puri.sm)**   
-> **[luneos](https://webos-ports.org)**   
-> **[sailfishos_jolla](https://sailfishos.org )**   
-
-
 #### Non-linux
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
@@ -133,7 +125,19 @@
 > **[dwm](https://dwm.suckless.org/)**   
 <br/>
 
+## Mobile
+### Distros
+> **[ubuntutouch](https://ubports.com)**   
+> **[postmarketos](https://postmarketos.org)**   
+> **[phosh](https://puri.sm)**   
+> **[luneos](https://webos-ports.org)**   
+> **[sailfishos_jolla](https://sailfishos.org )**   
 
+### Hardware
+> **[librem5](https://puri.sm/products/librem-5/)**   
+> **[pinephone](https://www.pine64.org/pinephone/)**   
+
+<br/>
 
 ## App packaging
 > **[appimage](https://appimage.org/)**   
