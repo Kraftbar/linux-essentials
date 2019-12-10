@@ -124,6 +124,17 @@
 > **[dwm](https://dwm.suckless.org/)**   
 <br/>
 
+
+## Mobile
+### distros
+> **[ubuntutouch](https://ubports.com)**   
+> **[postmarketos](https://postmarketos.org)**   
+> **[phosh](https://puri.sm)**   
+## hardware
+> **[luneos](https://webos-ports.org)**   
+> **[sailfishos_jolla](https://sailfishos.org )**   
+
+
 ## App packaging
 > **[appimage](https://appimage.org/)**   
 > **[snap](https://snapcraft.io/)**   
