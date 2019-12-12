@@ -1,6 +1,6 @@
 Things to find out:
 -----------------
-* How the hell do the system decide on what editor to open a file with.
+* How the hell makes the system decide on what editor to open a file with.
   "sudo apt-get intsall nvim" f.eks overrides all the other editors.
   seems not easy to configure in a convenient way. 
   f.eks: the csv gets opened in the last program installed :'-)
