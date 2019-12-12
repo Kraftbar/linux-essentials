@@ -256,6 +256,7 @@
 > **[asciiquarium](https://github.com/cmatsuoka/asciiquarium)**   
 > **[oneko](http://www.daidouji.com/oneko/)**   
 > **[cowsay](https://linux.die.net/man/1/cowsay)**   
+> **[sl](https://github.com/mtoyoda/sl)**   
 
 
 
