@@ -145,6 +145,10 @@
 > **[librem5](https://puri.sm/products/librem-5/)**   
 > **[pinephone](https://www.pine64.org/pinephone/)**   
 
+### misc
+ > **[linuxdeploy](https://github.com/meefik/linuxdeploy)**   
+ > **[termux](https://termux.com/)**   
+
 <br/>
 
 ## App packaging
