@@ -31,3 +31,7 @@ see manual  config - trackpad.txt
 
 ### 7. Get programs
 
+
+
+### Other install things
+[BAMS](https://github.com/spookykidmm/zen_installer)      
