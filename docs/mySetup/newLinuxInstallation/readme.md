@@ -29,6 +29,9 @@ see manual  config - trackpad.txt
 
 ### 6. Get dot files
 
+### 6. Set aliases
+see file
+
 ### 7. Get programs
 
 <br>
