@@ -326,6 +326,7 @@
 > mythical man month     
 > the c programming language     
 > ~~Compilers: Principles, Techniques, and Tools~~     
+> ~~The Design and Implementation of the FreeBSD~~         
 > The Art of Computer Programming     
 > ~~operating system concepts~~     
 
