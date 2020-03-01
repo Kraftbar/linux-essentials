@@ -325,14 +325,14 @@
 > code complete 2     
 > mythical man month     
 > the c programming language     
-> Compilers: Principles, Techniques, and Tools     
+> ~~Compilers: Principles, Techniques, and Tools~~     
 > The Art of Computer Programming     
-> operating system concepts     
+> ~~operating system concepts~~     
 
 
 
 > Structure and Interpretation of Computer Programs     
-> Linux Device Drivers     
+> ~~Linux Device Drivers~~     
 
 
 
