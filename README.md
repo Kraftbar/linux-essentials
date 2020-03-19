@@ -259,6 +259,11 @@
 > **[remmina](https://remmina.org/)**    
 
 
+### editors
+> **[ultraedit](https://remmina.org/)**    
+> **[joe](https://joe-editor.sourceforge.io/)**    
+> **[emacs](https://www.gnu.org/software/emacs/)**    
+
 <br/>
 
 
