@@ -39,5 +39,12 @@ see file
 <br>
 <br>
 
+
+### 8. Get emacs        
+
+Set emacsclient as your default editor, and add (server-start) somewere in your emacs config.
+
+There needs to be a running Emacs instance for emacsclient to work, but if it's a hassle it's possible to have a headless Emacs launched at login.
+
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
