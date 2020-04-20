@@ -44,6 +44,7 @@
 #### Virtualization
 > **[xcp-ng](https://xcp-ng.com/)**   
 >**[xen-orchestra](https://xen-orchestra.com/#!/about)**
+>**[xencenter](https://github.com/xenserver/xenadmin)**            
 
 #### NAS
 > **[freenas](https://www.freenas.org/)**   
