@@ -264,6 +264,10 @@
 > **[wireshark](https://www.wireshark.org/)**    
 > **[remmina](https://remmina.org/)**    
 
+### System mon
+> **[ksystemlog](https://kde.org/applications/system/org.kde.ksystemlog)**    
+> **[hardinfo](https://github.com/lpereira/hardinfo)**    
+> **[nutty](https://babluboy.github.io/nutty)**    
 
 ### editors
 > **[ultraedit](https://remmina.org/)**    
