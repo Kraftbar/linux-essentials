@@ -1,4 +1,4 @@
-#  :sparkles::sparkles: My linux essentials :sparkles::sparkles: # 
+#  :sparkles::sparkles: linux essentials :sparkles::sparkles: # 
 
 <br/>
 
