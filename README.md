@@ -105,6 +105,7 @@
 > **[haikuos](https://www.haiku-os.org)**   
 > **[reactOS](https://reactos.org)**   
 > **[freebsd](http://www.freebsd.no)**     
+> **[Solaris](https://en.wikipedia.org/wiki/Solaris_(operating_system))**     
 > **[riscos](https://www.riscosopen.org/content/)**    
 > **[serenity](https://github.com/SerenityOS/serenity)**    
 
