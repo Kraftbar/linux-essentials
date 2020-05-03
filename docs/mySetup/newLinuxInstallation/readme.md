@@ -27,10 +27,16 @@ see manual  config - trackpad.txt
 >    sudo mv ../global/* /usr/local/bin
 >   ```
 
-### 6. Get dot files
+### 6.1 Get dot files
 
-### 6. Set aliases
+### 6.2 Set aliases
 see file
+
+### 6.3 if on pop os fix scrolling speed    
+#### Run this
+cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
+#### startup
+Add imwheel to startup applications
 
 ### 7. Get programs
 
