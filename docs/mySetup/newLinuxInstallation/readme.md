@@ -32,7 +32,7 @@ see manual  config - trackpad.txt
 ### 6.2 Set aliases
 see file
 
-### 6.3 if on pop os fix scrolling speed    
+### 6.3 if on pop os fix scrolling speed    (bugges forward backward button)
 #### Run this
 cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
 #### startup
