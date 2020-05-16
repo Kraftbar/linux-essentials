@@ -16,7 +16,7 @@ run script - eduroam-linux-Ntu-N.sh
 >   ```
 ### 3. configure mouse speed (not acc) beyond the gui setting limit
 see manual  config - trackpad.txt
-
+actually, dont do this. Breaks some other things...          
 
 
 ### 4. Set up ssh
