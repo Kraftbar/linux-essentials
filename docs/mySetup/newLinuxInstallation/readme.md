@@ -3,7 +3,7 @@
 
 
 ### 0. install nvidia drivers so no cpu lockup at shutdown
-
+also, select intel as gpu so power consumption is not degenerate
 ### 0.1 connect to eduroam
 run script - eduroam-linux-Ntu-N.sh
 
