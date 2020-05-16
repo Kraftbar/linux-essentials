@@ -15,8 +15,7 @@ run script - eduroam-linux-Ntu-N.sh
 >    timedatectl set-local-rtc 1
 >   ```
 ### 3. configure mouse speed (not acc) beyond the gui setting limit
-see manual  config - trackpad.txt        
-actually, dont do this. Breaks some other things...          
+see manual  config - [link](trackpad.md)        
 
 
 ### 4. Set up git ssh
@@ -33,7 +32,7 @@ actually, dont do this. Breaks some other things...
 ### 6.2 Set aliases
 see file
 
-### 6.3 if on pop os fix scrolling speed    (bugges forward backward button)
+### 6.3 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
 #### Run this
 cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
 #### startup
