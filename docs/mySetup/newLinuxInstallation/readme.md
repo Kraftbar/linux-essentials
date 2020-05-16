@@ -40,6 +40,7 @@ Add imwheel to startup applications
 
 ### 7. Get programs
 
+get albert [link](albert.sh)
 <br>
 <br>
 <br>
