@@ -19,8 +19,8 @@ see manual  config - trackpad.txt
 actually, dont do this. Breaks some other things...          
 
 
-### 4. Set up ssh
-
+### 4. Set up git ssh
+[link](shh_git.pdf)
 
 ### 5. Get scripts
 ###
