@@ -58,6 +58,8 @@ get albert [link](install_Albert.sh)
 >   ```
 
 
+reconfigure emacs app to emacsclient            
+
 ~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default           
 
 get init files  
