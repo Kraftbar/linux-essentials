@@ -15,7 +15,7 @@ run script - eduroam-linux-Ntu-N.sh
 >    timedatectl set-local-rtc 1
 >   ```
 ### 3. configure mouse speed (not acc) beyond the gui setting limit
-see manual  config - trackpad.txt
+see manual  config - trackpad.txt        
 actually, dont do this. Breaks some other things...          
 
 
