@@ -47,15 +47,16 @@ get albert [link](install_Albert.sh)
 
 
 <br>
+
 >   ```sh
-> # start emacs server
-> if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
+>   # start emacs server
+>   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
 >     /usr/bin/emacs --daemon 2> /dev/null
-> fi
+>   fi
 > 
-> EDITOR="/usr/bin/emacsclient --quiet --create-frame"
-> VISUAL=$EDITOR
-> export EDITOR VISUAL
+>   EDITOR="/usr/bin/emacsclient --quiet --create-frame"
+>   VISUAL=$EDITOR
+>   export EDITOR VISUAL
 >   ```
 
 
