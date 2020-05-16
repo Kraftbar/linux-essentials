@@ -20,7 +20,7 @@ actually, dont do this. Breaks some other things...
 
 
 ### 4. Set up git ssh
-[link](shh_git.pdf)
+[link](shh_git.md)
 
 ### 5. Get scripts
 ###
