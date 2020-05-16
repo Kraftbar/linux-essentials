@@ -43,9 +43,30 @@ Add imwheel to startup applications
 get albert [link](install_Albert.sh)
 <br>
 <br>
-<br>
+#### 7.1
+
+
 <br>
 
+\# start emacs server
+if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
+    /usr/bin/emacs --daemon 2> /dev/null
+fi
+
+EDITOR="/usr/bin/emacsclient --quiet --create-frame"
+VISUAL=$EDITOR
+export EDITOR VISUAL
+
+
+<br>
+~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default         
+
+
+<br>
+
+get init files 
+<br>
+#### 7.2
 
 ### 8. Get emacs        
 
