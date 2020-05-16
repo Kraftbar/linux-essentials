@@ -40,13 +40,11 @@ Add imwheel to startup applications
 
 ### 7. Get programs
 
+#### 7.1 albert
 get albert [link](install_Albert.sh)
 <br>
 <br>
-#### 7.1
-
-
-<br>
+#### 7.1 emacs 
 
 >   ```sh
 >   # start emacs server
@@ -62,9 +60,12 @@ get albert [link](install_Albert.sh)
 
 ~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default           
 
-get init files         
-<br>
-#### 7.2
+get init files  
+
+
+#### 7.3  
+
+
 
 ### 8. Get emacs        
 
