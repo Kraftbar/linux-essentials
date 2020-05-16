@@ -47,24 +47,21 @@ get albert [link](install_Albert.sh)
 
 
 <br>
-
-\# start emacs server
-if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
-    /usr/bin/emacs --daemon 2> /dev/null
-fi
-
-EDITOR="/usr/bin/emacsclient --quiet --create-frame"
-VISUAL=$EDITOR
-export EDITOR VISUAL
-
-
-<br>
-~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default         
+>   ```sh
+> # start emacs server
+> if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
+>     /usr/bin/emacs --daemon 2> /dev/null
+> fi
+> 
+> EDITOR="/usr/bin/emacsclient --quiet --create-frame"
+> VISUAL=$EDITOR
+> export EDITOR VISUAL
+>   ```
 
 
-<br>
+~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default           
 
-get init files 
+get init files         
 <br>
 #### 7.2
 
