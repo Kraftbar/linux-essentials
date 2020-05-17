@@ -3,12 +3,14 @@
 
 
 ### 0. install nvidia drivers so no cpu lockup at shutdown
-also, select intel as gpu so power consumption is not degenerate
+also, select intel as gpu so power consumption is not degenerate       
+and, fiddle around with vertions, since some are bugged (makes for freeze behavior etc.)         
 ### 0.1 connect to eduroam
 run script - eduroam-linux-Ntu-N.sh
 
 ### 1. get the applet that allows for automatic sleep when low battery
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
+>  or do a simple script (havent had the time)      
 
 ### 2. fix windows clock, so that it is correct
 >   ```sh
