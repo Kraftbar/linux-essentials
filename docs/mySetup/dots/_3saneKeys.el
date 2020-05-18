@@ -33,7 +33,7 @@ Version 2017-11-01"
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; select all
-(global-set-key (kbd "s-a") 'mark-whole-buffer)       
+(global-set-key (kbd "C-a") 'mark-whole-buffer)       
 
 
 ;; select region with shift leftclick
