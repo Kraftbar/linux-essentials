@@ -26,6 +26,20 @@ Version 2017-11-01"
 (global-set-key (kbd "C-n") 'xah-new-empty-buffer) 
 
 
+;; exit buffer
+(global-set-key (kbd "C-w") (lambda () (interactive) (kill-this-buffer) (xah-next-user-buffer)))
+;; exit window
+(global-set-key (kbd "C-S-w") (lambda () (interactive)
+                                  (if (equal 1 (length (window-list)))
+                                      (delete-frame)
+                                    (delete-window))))
+
+
+
+
+
+
+
 ;; on Linux, make Control+wheel do increase/decrease font size
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
