@@ -63,12 +63,3 @@ Version 2016-06-19"
 
 
 
-(global-set-key (kbd "C-w") (lambda () (interactive) (kill-this-buffer) (xah-next-user-buffer)))
-
-;; exit window
-(global-set-key (kbd "C-S-w") (lambda () (interactive)
-                                  (kill-this-buffer)
-                                  (if (equal 1 (length (window-list)))
-                                      (delete-frame)
-                                    (delete-window))))
-
