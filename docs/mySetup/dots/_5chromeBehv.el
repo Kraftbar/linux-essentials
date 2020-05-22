@@ -17,7 +17,6 @@ version 2016-06-18"
       t
       )))
 
-
 (defun user-buffer-p ()
   "Return t if current buffer is a user buffer, else nil."
   (or
@@ -39,8 +38,6 @@ Version 2016-06-19"
                  (setq i (1+ i)))
         (progn (setq i 100))))))
 
-
-
 (defun  xah-previous-emacs-buffer ()
   "Switch to the previous user buffer.
 “user buffer” is determined by `xah-user-buffer-q'.
@@ -54,8 +51,6 @@ Version 2016-06-19"
           (progn (previous-buffer)
                  (setq i (1+ i)))
         (progn (setq i 100))))))
-
-
 
 (global-set-key [C-tab] 'xah-next-user-buffer)
 (global-set-key [C-iso-lefttab] 'xah-previous-emacs-buffer)

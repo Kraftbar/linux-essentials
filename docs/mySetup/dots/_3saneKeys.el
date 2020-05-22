@@ -11,7 +11,6 @@
        ad-do-it))
 
 
-
 ;; on Linux, make Control+wheel do increase/decrease font size
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
@@ -29,8 +28,11 @@
 
 ;; copy, cut, pase, 
 (cua-mode 1)
+;; bug with cuda  
+;; c-back 
 
-;; save buffer
+
+;; Save buffer
 (global-set-key (kbd "C-s") 'save-buffer)      
 
 
@@ -45,20 +47,21 @@
 
 
 
-
-
 ;;; ---------find ------------------
 (global-set-key (kbd "C-f") 'isearch-forward)
 (bind-key "<escape>" 'isearch-exit isearch-mode-map)
 (progn
   ;; set arrow keys in isearch. left/right is backward/forward, up/down is history. press Return to exit
-  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat )
-  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance )
-  (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
+;  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat )
+;  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance )
+;  (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
   (define-key isearch-mode-map (kbd "<return>") 'isearch-repeat-forward)
-  (define-key minibuffer-local-isearch-map (kbd "<left>") 'isearch-reverse-exit-minibuffer)
-  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer))
-
+  (define-key isearch-mode-map (kbd "C-v") 'isearch-yank-kill)
+  (define-key isearch-mode-map (kbd "C-RET") nil)
+  (define-key isearch-mode-map (kbd "C-a") nil)
+;;  (define-key minibuffer-cal-isearch-map (kbd "<left>") 'isearch-reverse-exit-minibuffer)
+;;  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer)
+  )
 
 
 
@@ -76,7 +79,6 @@ Version 2017-11-01"
     (setq buffer-offer-save t)
     $buf))
 (global-set-key (kbd "C-n") 'xah-new-empty-buffer) 
-
 
 
 
@@ -118,11 +120,16 @@ Version 2017-11-01"
     ; else
     (if (use-region-p)    ; tab is pressed is any other buffer -> execute with space insertion
         (indent-region-custom 4) ; region was selected, call indent-region
-        (insert "    ") ; else insert four spaces as expected
+        (insert "    ") ; else insert four spaces  expected
     )))
 )
 (global-set-key (kbd "<backtab>") 'untab-region)
 (global-set-key (kbd "<tab>") 'tab-region)
+
+
+
+;; TODO:
+;; - S-arrows for moving text up and down. 
 
 
 
@@ -131,7 +138,6 @@ Version 2017-11-01"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; misc.                                                                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 ;;; move window
 (global-set-key [M-left] 'windmove-left)          ; move to left window

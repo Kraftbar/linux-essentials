@@ -7,12 +7,14 @@
 ;; saves last state, but prompts
 (desktop-save-mode 1)
 
-
 ;; "smooth" scrolling mouse   
 (setq mouse-wheel-scroll-amount '(2 ((shift) . 1) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 
-
 ;; "smooth" scrolling keyboard 
 (setq scroll-step 1)
+
+;; use esc to close minibuffers 
+(define-key key-translation-map (kbd "ESC") (kbd "C-g"))	
+
 

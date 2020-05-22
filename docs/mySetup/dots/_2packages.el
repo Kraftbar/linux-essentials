@@ -16,9 +16,6 @@
 
 
 
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; which-key                                                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,6 +24,20 @@
   :ensure t
   :config
   (which-key-mode))
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; command-log-mode                                                       ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package command-log-mode
+  :ensure t
+  :config
+  (command-log-mode))
+
+
 
 
 
@@ -53,7 +64,6 @@
 
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; undo-tree                                                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -69,7 +79,6 @@
 
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; popwin                                                                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,3 +89,19 @@
     (push '("*Warnings*" :position bottom :height .3) popwin:special-display-config)
     (push '("*Diff*" :position bottom :height .6) popwin:special-display-config)
     (popwin-mode 1)))
+
+(defun xah-start-command-log ()
+  "Start the `command-log-mode' globally and
+make current buffer the log buffer.
+Version 2020-01-02"
+  (interactive)
+  (command-log-mode)
+  (global-command-log-mode)
+  (clm/open-command-log-buffer)
+  (delete-window)
+  (set-background-color "thistle"))
+
+
+
+
+    
