@@ -28,8 +28,7 @@
 
 ;; copy, cut, pase, 
 (cua-mode 1)
-;; bug with cuda  
-;; c-back 
+
 
 
 ;; Save buffer
@@ -51,10 +50,6 @@
 (global-set-key (kbd "C-f") 'isearch-forward)
 (bind-key "<escape>" 'isearch-exit isearch-mode-map)
 (progn
-  ;; set arrow keys in isearch. left/right is backward/forward, up/down is history. press Return to exit
-;  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat )
-;  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance )
-;  (define-key isearch-mode-map (kbd "<left>") 'isearch-repeat-backward)
   (define-key isearch-mode-map (kbd "<return>") 'isearch-repeat-forward)
   (define-key isearch-mode-map (kbd "C-v") 'isearch-yank-kill)
   (define-key isearch-mode-map (kbd "C-RET") nil)
