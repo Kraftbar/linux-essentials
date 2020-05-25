@@ -31,6 +31,7 @@
 
 
 
+
 ;; Save buffer
 (global-set-key (kbd "C-s") 'save-buffer)      
 
@@ -46,17 +47,20 @@
 
 
 
+
 ;;; ---------find ------------------
-(global-set-key (kbd "C-f") 'isearch-forward)
-(bind-key "<escape>" 'isearch-exit isearch-mode-map)
+(global-set-key (kbd "C-f") 'isearch-edit-string)
 (progn
   (define-key isearch-mode-map (kbd "<return>") 'isearch-repeat-forward)
-  (define-key isearch-mode-map (kbd "C-v") 'isearch-yank-kill)
-  (define-key isearch-mode-map (kbd "C-RET") nil)
-  (define-key isearch-mode-map (kbd "C-a") nil)
-;;  (define-key minibuffer-cal-isearch-map (kbd "<left>") 'isearch-reverse-exit-minibuffer)
-;;  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer)
+  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer)
   )
+
+;;; fine
+ (define-key isearch-mode-map [escape] 'isearch-exit)   ;; isearch
+;;; not fine, get isearch-abort behavior
+;  (define-key isearch-mode-map (kbd "<esc>") 'isearch-exit)
+;  (define-key minibuffer-local-isearch-map (kbd "<esc>") 'isearch-exit)
+
 
 
 
