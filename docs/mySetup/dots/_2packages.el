@@ -66,9 +66,11 @@ Version 2020-01-02"
     (setq helm-ff-skip-boring-files t)
     ;; replace locate with spotlight on Mac
     (setq helm-locate-command "mdfind -name %s %s"))
-  :bind (("M-x"   . helm-M-x)
+  :bind (
+            ("M-x"   . helm-M-x)
 	     ("C-x f" . helm-for-files)
-         ("C-r"   . helm-recentf)))
+             ))
+(global-set-key (kbd "C-r") 'helm-recentf)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
