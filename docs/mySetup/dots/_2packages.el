@@ -101,3 +101,35 @@ Version 2020-01-02"
 
 
     
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CTRLF                                                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                        ; no more isearch pls
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
+
+(use-package ctrlf
+  :straight (:host github
+             :repo "raxod502/ctrlf")
+  :defer t
+  :init (ctrlf-mode +1)
+  :bind (:map minibuffer-local-map
+              ("<escape>" . exit-minibuffer) ;; Consider to also make word selected.
+              ("<return>" . ctrlf-forward-literal)
+              )
+  )
+
+(global-set-key (kbd "C-f") 'ctrlf-forward-literal)

@@ -49,14 +49,16 @@
 
 
 ;;; ---------find ------------------
-(global-set-key (kbd "C-f") 'isearch-edit-string)
-(progn
-  (define-key isearch-mode-map (kbd "<return>") 'isearch-repeat-forward)
-  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer)
-  )
+;; still cant edit after pressing return
+;; -> replaced by CTRLF package
+;(global-set-key (kbd "C-f") 'isearch-edit-string)
+;(progn
+;  (define-key isearch-mode-map (kbd "<return>") 'isearch-repeat-forward)
+;  (define-key minibuffer-local-isearch-map (kbd "<return>") 'isearch-forward-exit-minibuffer)
+;  )
 
 ;;; fine
- (define-key isearch-mode-map [escape] 'isearch-exit)   ;; isearch
+; (define-key isearch-mode-map [escape] 'isearch-exit)   ;; isearch
 ;;; not fine, get isearch-abort behavior
 ;  (define-key isearch-mode-map (kbd "<esc>") 'isearch-exit)
 ;  (define-key minibuffer-local-isearch-map (kbd "<esc>") 'isearch-exit)
@@ -127,9 +129,10 @@ Version 2017-11-01"
 
 
 
+
 ;; TODO:
 ;; - S-arrows for moving text up and down. 
-
+;; - 
 
 
 
