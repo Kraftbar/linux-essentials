@@ -238,7 +238,6 @@
 > **[pstree]()**    
 > **[netstat / ss]()**    
 > **[lsof]()**    
-> **[systemctl]()**    
 
 
 
@@ -279,6 +278,7 @@
 > **[nutty](https://babluboy.github.io/nutty)**    
 > **[glances](https://glances.readthedocs.io/en/stable/#)**    
 > **[ncdu](https://linux.die.net/man/1/ncdu)**    
+> **[chkservice](https://github.com/linuxenko/chkservice)**    
 
 
 
