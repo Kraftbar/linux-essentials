@@ -277,6 +277,7 @@
 > **[ksystemlog](https://kde.org/applications/system/org.kde.ksystemlog)**    
 > **[hardinfo](https://github.com/lpereira/hardinfo)**    
 > **[nutty](https://babluboy.github.io/nutty)**    
+> **[glances](https://glances.readthedocs.io/en/stable/#)**    
 
 ### editors
 > **[ultraedit](https://remmina.org/)**    
