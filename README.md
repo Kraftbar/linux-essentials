@@ -29,7 +29,6 @@
 #### other
 >  **[albert](https://github.com/albertlauncher/albert)**    
 >  **[sxhkd](https://github.com/baskerville/sxhkd)**    
->  **[entr(1) (cmds on filechange)](http://eradman.com/entrproject/)**    
 <br/>
 
 
@@ -232,12 +231,14 @@
 > **[awk]()**    
 
 > **[Anacron / Cron]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
-> **[ACPI (battery)]( https://www.tecmint.com/cron-vs-anacron-schedule-jobs-using-anacron-on-linux/)**    
+>  **[entr(1) (cmds on filechange)](http://eradman.com/entrproject/)**    
+>  **[at](https://en.wikipedia.org/wiki/At_(command))**    
 
 
 > **[pstree]()**    
 > **[netstat / ss]()**    
 > **[lsof]()**    
+> **[ACPI (battery)]( )**    
 
 
 
