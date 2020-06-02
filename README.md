@@ -278,6 +278,9 @@
 > **[hardinfo](https://github.com/lpereira/hardinfo)**    
 > **[nutty](https://babluboy.github.io/nutty)**    
 > **[glances](https://glances.readthedocs.io/en/stable/#)**    
+> **[ncdu](https://linux.die.net/man/1/ncdu)**    
+
+
 
 ### editors
 > **[ultraedit](https://remmina.org/)**    
