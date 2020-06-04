@@ -81,10 +81,15 @@ There needs to be a running Emacs instance for emacsclient to work, but if it's 
 
 get dwm
 
+
+insert the following in .xinitrc
 ```bash
-# intended to be used by dwm
-xrandr --output eDP-1 --mode 1920x1080
-xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
+# used by dwm
+if [ "$GDMSESSION" != "cinnamon" ]; then
+    xrandr --output eDP-1 --mode 1920x1080
+    xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
+    gnome-terminal &
+fi
 ```
 
 
