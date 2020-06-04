@@ -79,7 +79,7 @@ There needs to be a running Emacs instance for emacsclient to work, but if it's 
 
 ### 8. Add dwm        
 
-get dwm
+get dwm, maybe with slstatus     
 
 
 insert the following in .xinitrc
