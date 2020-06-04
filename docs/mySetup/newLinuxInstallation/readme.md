@@ -91,7 +91,9 @@ if [ "$GDMSESSION" != "cinnamon" ]; then
     gnome-terminal &
 fi
 ```
-
+consider to get 
+ - ROFI (missing config file)
+ - sxhkd (missing config file)
 
 
 
