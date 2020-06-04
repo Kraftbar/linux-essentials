@@ -1,4 +1,4 @@
-# Things i do with a fresh linux install (mainly xps15 9760)
+# Things i do with a fresh linux install (mainly for xps15 9760)
 
 
 
@@ -77,5 +77,22 @@ Set emacsclient as your default editor, and add (server-start) somewere in your 
 
 There needs to be a running Emacs instance for emacsclient to work, but if it's a hassle it's possible to have a headless Emacs launched at login.
 
+### 8. Add dwm        
+
+get dwm
+
+```bash
+# intended to be used by dwm
+xrandr --output eDP-1 --mode 1920x1080
+xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
+```
+
+
+
+
+
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
+
+
+
