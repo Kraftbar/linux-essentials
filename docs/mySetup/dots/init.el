@@ -21,7 +21,7 @@
 (global-set-key [(control z)]         'undo)
 (global-set-key "\C-x\C-x"            'execute-extended-command)
 
-(set-frame-font "Roboto Mono Light 10")
+(set-frame-font "Noto Mono Light 10")
 
 (set-frame-parameter (selected-frame) 'internal-border-width 20)
 (setq x-underline-at-descent-line t)

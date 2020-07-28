@@ -77,6 +77,15 @@ Set emacsclient as your default editor, and add (server-start) somewere in your 
 
 There needs to be a running Emacs instance for emacsclient to work, but if it's a hassle it's possible to have a headless Emacs launched at login.
 
+
+
+###
+>   ```sh
+>    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
+>   ```
+
+
+
 ### 8. Add dwm        
 
 get dwm, maybe with slstatus     
