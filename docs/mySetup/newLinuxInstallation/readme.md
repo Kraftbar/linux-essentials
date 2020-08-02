@@ -67,7 +67,7 @@ reconfigure emacs app to emacsclient
 get init files  
 
 
-#### 7.3  
+#### 7.3  ohmyzsh       
 
 
 
