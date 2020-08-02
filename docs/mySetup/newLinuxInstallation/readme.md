@@ -49,7 +49,7 @@ get albert [link](install_Albert.sh)
 #### 7.1 emacs 
 
 >   ```sh
->   # start emacs server
+>   # dont use this with current config 
 >   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
 >     /usr/bin/emacs --daemon 2> /dev/null
 >   fi
@@ -59,30 +59,23 @@ get albert [link](install_Albert.sh)
 >   export EDITOR VISUAL
 >   ```
 
+OR
 
-reconfigure emacs app to emacsclient            
+open menu editor and reconfigure emacs app to Exec=/usr/bin/emacsclient %F            
 
 ~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default           
 
-get init files  
+get files:       
+
+>   ```sh
+>    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
+>   ```
 
 
 #### 7.3  ohmyzsh       
 
 
 
-### 8. Get emacs        
-
-Set emacsclient as your default editor, and add (server-start) somewere in your emacs config.
-
-There needs to be a running Emacs instance for emacsclient to work, but if it's a hassle it's possible to have a headless Emacs launched at login.
-
-
-
-###
->   ```sh
->    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
->   ```
 
 
 
