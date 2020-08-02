@@ -127,10 +127,16 @@ Version 2020-01-02"
              :repo "raxod502/ctrlf")
   :defer t
   :init (ctrlf-mode +1)
+  (setq ctrlf-minibuffer-bindings
+        `(
+          (,(kbd "<return>") . ctrlf-next-match)
+          (,(kbd "<escape>") . exit-minibuffer)))
   )
 
 
 (global-set-key (kbd "C-f") 'ctrlf-forward-literal)
+
+
 
 (defcustom ctrlf-mode-bindings
   '(("C-M-s" . ctrlf-forward-regexp)

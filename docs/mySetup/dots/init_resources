@@ -1,0 +1,29 @@
+
+;; * Searching text
+
+;; ctrlf is the best candidate for searching text.
+
+(use-package ctrlf
+  :init
+  (setq-ns ctrlf
+    mode-bindings '()
+    minibuffer-bindings '())
+  :ryo
+  ("C-f"   ctrlf-forward-fuzzy)
+  ("C-S-f" ctrlf-backward-fuzzy)
+  :config
+  (defun vz/m-search--prompt (_ &rest args)
+    "A function as an advice around `ctrlf--prompt' to
+make a simplified prompt"
+    (format "Search%s: "
+            (if ctrlf--backward-p " Backward" "")))
+  (advice-add 'ctrlf--prompt :around #'vz/m-search--prompt)
+  (ctrlf-mode t)
+  (setq ctrlf-minibuffer-bindings
+        ;; TODO Add search type change functions
+        `(("C-j"             . ctrlf-next-match)
+          (,(kbd "C-k")      . ctrlf-previous-match)
+          (,(kbd "C-u")      . ctrlf-previous-page)
+          (,(kbd "C-d")      . ctrlf-next-page)
+          (,(kbd "<return>") . ctrlf-cancel)
+          (,(kbd "<escape>") . ctrlf-cancel))))
