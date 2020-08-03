@@ -46,7 +46,13 @@ Add imwheel to startup applications
 get albert [link](install_Albert.sh)
 <br>
 <br>
-#### 7.1 emacs 
+
+
+#### 7.3  ohmyzsh       
+
+
+
+### 8. get emacs        
 
 >   ```sh
 >   # dont use this with current config 
@@ -72,14 +78,10 @@ get files:
 >   ```
 
 
-#### 7.3  ohmyzsh       
+Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
 
-
-
-
-
-### 8. Add dwm        
+### 9. Add dwm        
 
 get dwm, maybe with slstatus     
 
