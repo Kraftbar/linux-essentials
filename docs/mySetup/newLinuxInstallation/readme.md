@@ -67,20 +67,20 @@ get albert [link](install_Albert.sh)
 
 OR
 
-open menu editor and reconfigure emacs app to /home/nybo/Desktop/startEmacs.sh %F            
-download startEmacs.sh         
+#### 8.1 download startEmacs.sh         
+#### 8.2 open menu editor and reconfigure emacs app to /home/nybo/Desktop/startEmacs.sh %F            
 
 (~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default         )
 
 
-get files:       
+#### 8.3 get files:       
 
 >   ```sh
 >    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
 >   ```
 
 
-Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
+#### 8.4 Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
 
 ### 9. Add dwm        
