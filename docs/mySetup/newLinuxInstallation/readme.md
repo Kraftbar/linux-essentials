@@ -67,9 +67,11 @@ get albert [link](install_Albert.sh)
 
 OR
 
-open menu editor and reconfigure emacs app to Exec=/usr/bin/emacsclient %F            
+open menu editor and reconfigure emacs app to /home/nybo/Desktop/startEmacs.sh %F            
+download startEmacs.sh         
 
-~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default           
+(~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default         )
+
 
 get files:       
 
