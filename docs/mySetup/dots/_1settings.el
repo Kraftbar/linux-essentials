@@ -17,4 +17,9 @@
 ;; use esc to close minibuffers 
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))	
 
+;; start server if not running
+(load "server")
+(unless (server-running-p) (server-start))
 
+;; save desktop
+(desktop-save-mode 1)
