@@ -77,6 +77,7 @@ OR
 
 >   ```sh
 >    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
+>    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.sh /home/nybo/.emacs.d/
 >   ```
 
 
