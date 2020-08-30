@@ -8,7 +8,7 @@
 (desktop-save-mode 1)
 
 ;; "smooth" scrolling mouse   
-(setq mouse-wheel-scroll-amount '(2 ((shift) . 1) ((control) . nil)))
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 
 ;; "smooth" scrolling keyboard 
