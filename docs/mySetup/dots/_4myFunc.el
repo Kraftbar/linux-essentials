@@ -8,15 +8,15 @@
  
 
 (defun transelate-to-chinese (start end )
-    "missing:
-        - multiline region
-        - no highlight
-"
+    " bug:
+        - pos of cursor at 1
+    "
     (interactive "r")
 
     (goto-char end)
-    (forward-line 1)
-    (while (>= (point) start)
+
+    (while (and    (>= (point) start)
+                   (not (equal  (point) 1) ))
       (shell-command  (concat
                         "~/.emacs.d/__transelate-to-chinese.sh \""
                         (buffer-substring-no-properties       (line-beginning-position)       (line-end-position)     )
@@ -24,11 +24,10 @@
       (kill-line 1)
       (insert-buffer "*Shell Command Output*")
       (forward-line -1)
+      (message "while %s > %s" (point) start)
       )
-
+    
 )
-
-
 
 
 
@@ -217,7 +216,7 @@ Version 2019-06-07"
     (setq $p1 (car $bds))
     (setq $p2 (cdr $bds))
      (if (string= (read-string "Do you want tab separation " "yes") "yes")
-            (setq $sep "    ")
+            (setq $sep "\t")
             (setq $sep (read-string "String for column separation:" ","))
        )
 
@@ -256,7 +255,7 @@ Version 2019-06-07"
           (delete-char 8)
 
           (goto-char (point-min))
-          (insert "<table class=\"nrm\">
+          (insert "<table >
 <tr><td>")
 
           (goto-char (point-max))
