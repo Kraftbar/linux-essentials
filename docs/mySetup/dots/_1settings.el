@@ -21,5 +21,6 @@
 (load "server")
 (unless (server-running-p) (server-start))
 
-;; save desktop
-(desktop-save-mode 1)
+;; Highlight Brackets
+(show-paren-mode 1)
+
