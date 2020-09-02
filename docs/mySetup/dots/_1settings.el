@@ -24,3 +24,5 @@
 ;; Highlight Brackets
 (show-paren-mode 1)
 
+;; Always follow symlink
+(setq vc-follow-symlinks t)

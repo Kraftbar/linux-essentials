@@ -27,8 +27,6 @@
 
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; command-log-mode                                                       ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -72,6 +70,7 @@ Version 2020-01-02"
 (global-set-key (kbd "C-r") 'helm-recentf)
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; undo-tree                                                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,6 +86,7 @@ Version 2020-01-02"
 
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; popwin                                                                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,7 +97,6 @@ Version 2020-01-02"
     (push '("*Warnings*" :position bottom :height .3) popwin:special-display-config)
     (push '("*Diff*" :position bottom :height .6) popwin:special-display-config)
     (popwin-mode 1)))
-
 
 
 
@@ -131,41 +130,13 @@ Version 2020-01-02"
         `(
           (,(kbd "<return>") . ctrlf-next-match)
           (,(kbd "<escape>") . exit-minibuffer)))
+
   )
 
 
-; unbind
-;(setf (cdr <keymap>) nil)
-
-(global-set-key (kbd "C-f") 'ctrlf-forward-literal)
-
-
-
-(defcustom ctrlf-mode-bindings
-  '(("C-M-s" . ctrlf-forward-regexp)
-    ("return" . ctrlf-forward-regexp)
-    ("C-M-r" . ctrlf-backward-regexp))
-  "Keybindings enabled in `ctrlf-mode'. This is not a keymap.
-Rather it is an alist that is converted into a keymap just before
-`ctrlf-mode' is (re-)enabled. The keys are strings or raw key
-events and the values are command symbols.
-These bindings are available globally in Emacs. See also
-`ctrlf-minibuffer-bindings', which defines bindings that are
-active in the minibuffer during a search."
-  :type '(alist
-          :key-type sexp
-          :value-type function)
-  :set (lambda (var val)
-         (set var val)
-         (when (bound-and-true-p ctrlf-mode)
-           (ctrlf-mode +1))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; back and foward                                                        ;;
+;; dont know, used for forward backward funciton                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; backward-forward
 
-
-
-
+(use-package cl :ensure t)
