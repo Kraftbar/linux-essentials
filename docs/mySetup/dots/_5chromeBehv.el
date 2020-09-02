@@ -54,4 +54,3 @@ Version 2016-06-19"
 
 (global-set-key [C-tab] 'xah-next-user-buffer)
 (global-set-key [C-iso-lefttab] 'xah-previous-emacs-buffer)
-

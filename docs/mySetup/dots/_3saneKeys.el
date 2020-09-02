@@ -155,9 +155,6 @@ Version 2017-11-01"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; back and foward                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
 (defun my-syntax-class (char)
   "Return ?s, ?w or ?p depending or whether CHAR is a white-space, word or punctuation character."
   (pcase (char-syntax char)

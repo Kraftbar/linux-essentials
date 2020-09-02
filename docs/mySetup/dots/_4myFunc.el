@@ -1,12 +1,6 @@
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;               useful cnlang functions                                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
- 
-
 (defun transelate-to-chinese (start end )
     " bug:
         - pos of cursor at 1
@@ -31,15 +25,9 @@
 
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                 snippets                              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-
 ;; (cl-case  system-type
 ;;           (cywing  "Running cywing")
 ;;           (darwing "Running Mac Osx")
@@ -53,16 +41,9 @@
 
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;::;;;;;;;;;;;;;;;;;;;;;;
 ;;                 borrowed code                                 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-
-
 (defun xah-get-bounds-of-thing-or-region (@unit)
   "Same as `xah-get-bounds-of-thing', except when (use-region-p) is t, return the region boundary instead.
 Version 2016-10-18"
@@ -83,8 +64,6 @@ Version 2016-10-18T00:23:52-07:00"
          ($bds (xah-get-bounds-of-thing @unit))
          ($p1 (car $bds)) ($p2 (cdr $bds)))
     (vector (buffer-substring-no-properties $p1 $p2) $p1 $p2 )))
-
-
 
 (defun xah-get-bounds-of-thing (@unit )
   "Return the boundary of @UNIT under cursor.
@@ -220,11 +199,7 @@ Version 2019-06-07"
             (setq $sep (read-string "String for column separation:" ","))
        )
 
-
-
-
-
-         
+     
     (when (equal (length $sep) 0) (user-error "separator cannot be empty."))
 
     (save-excursion
