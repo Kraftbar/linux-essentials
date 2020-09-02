@@ -134,6 +134,9 @@ Version 2020-01-02"
   )
 
 
+; unbind
+;(setf (cdr <keymap>) nil)
+
 (global-set-key (kbd "C-f") 'ctrlf-forward-literal)
 
 
@@ -156,5 +159,13 @@ active in the minibuffer during a search."
          (set var val)
          (when (bound-and-true-p ctrlf-mode)
            (ctrlf-mode +1))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; back and foward                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; backward-forward
+
+
 
 

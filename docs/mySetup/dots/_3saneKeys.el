@@ -28,6 +28,8 @@
 
 ;; copy, cut, pase, 
 (cua-mode 1)
+;; keep region
+(setq cua-keep-region-after-copy t) 
 
 
 
@@ -38,7 +40,7 @@
 
 ;; exit buffer
 (global-set-key (kbd "C-w") (lambda () (interactive) (kill-this-buffer) (xah-next-user-buffer)))
-
+    
 ;; exit window or emacs window
 (global-set-key (kbd "C-S-w") (lambda () (interactive)
                                   (if (equal 1 (length (window-list)))
@@ -130,10 +132,6 @@ Version 2017-11-01"
 
 
 
-;; TODO:
-;; - S-arrows for moving text up and down. 
-;; - 
-
 
 
 
@@ -146,7 +144,6 @@ Version 2017-11-01"
 (global-set-key [M-right] 'windmove-right)        ; move to right window
 (global-set-key [M-up] 'windmove-up)              ; move to upper window
 (global-set-key [M-down] 'windmove-down)          ; move to lower window
-
 
 
 
