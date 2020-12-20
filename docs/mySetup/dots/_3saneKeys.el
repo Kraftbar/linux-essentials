@@ -10,8 +10,6 @@
  (let ((last-nonmenu-event nil))
        ad-do-it))
 
-; Gives right-click a context menu
-(global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          
 
 ;; on Linux, make Control+wheel do increase/decrease font size
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-increase)

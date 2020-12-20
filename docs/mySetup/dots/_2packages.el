@@ -107,5 +107,13 @@ Version 2020-01-02"
 
 
 (use-package helm-swoop
+  :ensure t
+
   :bind
-  ("C-f" . helm-swoop))
+  ("C-f" . helm-swoop)
+)
+ 
+(with-eval-after-load 'helm-swoop
+  (define-key helm-swoop-map (kbd "C-g") 'helm-maybe-exit-minibuffer)
+  (define-key helm-swoop-map (kbd "RET") 'helm-swoop-next-line)
+  )
