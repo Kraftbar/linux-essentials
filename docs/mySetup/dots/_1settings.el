@@ -30,3 +30,10 @@
 
 ;; no sound
 (setq visible-bell 1)
+
+; Auto-update buffer if file has changed on disk
+(global-auto-revert-mode t)
+
+; Gives right-click a context menu
+(global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          
+
