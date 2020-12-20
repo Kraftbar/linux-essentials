@@ -26,7 +26,16 @@
 (global-set-key [(control z)]         'undo)
 (global-set-key "\C-x\C-x"            'execute-extended-command)
 
-(set-frame-font "Noto Mono Light 10")
+
+(cond
+ ((string-equal system-type "windows-nt")
+  (progn
+    (set-frame-font "Noto Mono Light 10")))
+ ((string-equal system-type "gnu/linux")
+  (progn
+    (set-frame-font "Lucida Console 10"))))
+
+
 
 (set-frame-parameter (selected-frame) 'internal-border-width 20)
 (setq x-underline-at-descent-line t)
