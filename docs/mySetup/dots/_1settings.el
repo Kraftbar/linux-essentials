@@ -26,3 +26,7 @@
 
 ;; Always follow symlink
 (setq vc-follow-symlinks t)
+
+
+;; no sound
+(setq visible-bell 1)

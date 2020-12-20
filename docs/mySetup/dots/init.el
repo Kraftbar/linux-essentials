@@ -3,8 +3,9 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
 
+
+;;(package-initialize)
 (require 'org)
 
 
@@ -22,10 +23,7 @@
 
 (setq org-confirm-elisp-link-function nil)
       
-				  
-(global-set-key [(control z)]         'undo)
-(global-set-key "\C-x\C-x"            'execute-extended-command)
-
+	
 
 (cond
  ((string-equal system-type "windows-nt")
@@ -158,9 +156,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (ctrlf command-log-mode elpy popwin which-key use-package))))
+ '(package-selected-packages '(ctrlf command-log-mode elpy popwin which-key use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
