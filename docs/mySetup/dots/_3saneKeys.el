@@ -199,7 +199,7 @@ With prefix argument ARG, do it ARG times if positive, or move backwards ARG tim
              (not (eql (my-syntax-class prev-char) ?s))
              (eql (my-syntax-class next-char) ?s))
             )
-         (return))
+         (cl-return))
        )
       (setq count (1- count)))))
 
