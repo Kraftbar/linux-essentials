@@ -142,6 +142,67 @@
 
 
 
+(defun my-syntax-class (char)
+  "Return ?s, ?w or ?p depending or whether CHAR is a white-space, word or punctuation character."
+  (pcase (char-syntax char)
+      (`?\s ?s)
+      (`?w ?w)
+      (`?_ ?w)
+      (_ ?p)))
+
+(defun my-forward-word (&optional arg)
+  "Move point forward a word (simulate behavior of Far Manager's editor).
+With prefix argument ARG, do it ARG times if positive, or move backwards ARG times if negative."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (let* ((backward (< arg 0))
+         (count (abs arg))
+         (char-next
+          (if backward 'char-before 'char-after))
+         (skip-syntax
+          (if backward 'skip-syntax-backward 'skip-syntax-forward))
+         (skip-char
+          (if backward 'backward-char 'forward-char))
+         prev-char next-char)
+    (while (> count 0)
+      (setq next-char (funcall char-next))
+      (cl-loop
+       (if (or                          ; skip one char at a time for whitespace,
+            (eql next-char ?\n)         ; in order to stop on newlines
+            (eql (char-syntax next-char) ?\s))
+           (funcall skip-char)
+         (funcall skip-syntax (char-to-string (char-syntax next-char))))
+       (setq prev-char next-char)
+       (setq next-char (funcall char-next))
+       ;; (message (format "Prev: %c %c %c Next: %c %c %c"
+       ;;                   prev-char (char-syntax prev-char) (my-syntax-class prev-char)
+       ;;                   next-char (char-syntax next-char) (my-syntax-class next-char)))
+       (when
+           (or
+            (eql prev-char ?\n)         ; stop on newlines
+            (eql next-char ?\n)
+            (and                        ; stop on word -> punctuation
+             (eql (my-syntax-class prev-char) ?w)
+             (eql (my-syntax-class next-char) ?p))
+            (and                        ; stop on word -> whitespace
+             this-command-keys-shift-translated ; when selecting
+             (eql (my-syntax-class prev-char) ?w)
+             (eql (my-syntax-class next-char) ?s))
+            (and                        ; stop on whitespace -> non-whitespace
+             (not backward)             ; when going forward
+             (not this-command-keys-shift-translated) ; and not selecting
+             (eql (my-syntax-class prev-char) ?s)
+             (not (eql (my-syntax-class next-char) ?s)))
+            (and                        ; stop on non-whitespace -> whitespace
+             backward                   ; when going backward
+             (not this-command-keys-shift-translated) ; and not selecting
+             (not (eql (my-syntax-class prev-char) ?s))
+             (eql (my-syntax-class next-char) ?s))
+            )
+         (return))
+       )
+      (setq count (1- count)))))
+
 (defun delete-word (&optional arg)
   "Delete characters forward until encountering the end of a word.
 With argument ARG, do this that many times."
@@ -159,8 +220,7 @@ With argument ARG, do this that many times."
   (or arg (setq arg 1))
   (my-forward-word (- arg)))
 
-
-;;(global-set-key (kbd "C-<left>") 'backward-same-syntax)
-;;(global-set-key (kbd "C-<right>") 'forward-same-syntax)
-;;(global-set-key (kbd "C-<delete>") 'delete-word)
-;;(global-set-key (kbd "C-<backspace>") 'backward-delete-word)
+(global-set-key (kbd "C-<left>") 'my-backward-word)
+(global-set-key (kbd "C-<right>") 'my-forward-word)
+(global-set-key (kbd "C-<delete>") 'delete-word)
+(global-set-key (kbd "C-<backspace>") 'backward-delete-word)
