@@ -30,10 +30,10 @@
 (cond
  ((string-equal system-type "windows-nt")
   (progn
-    (set-frame-font "Noto Mono Light 10")))
+    (set-frame-font "Lucida Console 10")))
  ((string-equal system-type "gnu/linux")
   (progn
-    (set-frame-font "Lucida Console 10"))))
+    (set-frame-font "Noto Mono Light 10"))))
 
 
 
