@@ -116,4 +116,7 @@ Version 2020-01-02"
 (with-eval-after-load 'helm-swoop
   (define-key helm-swoop-map (kbd "C-g") 'helm-maybe-exit-minibuffer)
   (define-key helm-swoop-map (kbd "RET") 'helm-swoop-next-line)
-  )
+)
+
+;; wrap search
+(setq helm-move-to-line-cycle-in-source t)
