@@ -9,6 +9,13 @@
   "Simulate invoking menu item as if by the mouse; see `use-dialog-box'."
  (let ((last-nonmenu-event nil))
        ad-do-it))
+;; Save buffer
+(global-set-key (kbd "C-s") 'save-buffer)      
+(defadvice write-file (around find-file-read-args-always-use-dialog-box act)
+  "Simulate invoking menu item as if by the mouse; see `use-dialog-box'."
+ (let ((last-nonmenu-event nil))
+       ad-do-it))
+
 
 
 ;; on Linux, make Control+wheel do increase/decrease font size
@@ -34,8 +41,6 @@
 ;; same as pressing X button 
 (global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal) 
 
-;; Save buffer
-(global-set-key (kbd "C-s") 'save-buffer)      
 
     
 ;; exit window or emacs window
@@ -224,3 +229,33 @@ With argument ARG, do this that many times."
 (global-set-key (kbd "C-<right>") 'my-forward-word)
 (global-set-key (kbd "C-<delete>") 'delete-word)
 (global-set-key (kbd "C-<backspace>") 'backward-delete-word)
+
+
+
+
+
+
+
+
+    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CTRLF                                                                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; todo: dont move before press enter
+
+(use-package helm-swoop
+  :ensure t
+
+  :bind
+  ("C-f" . helm-swoop)
+)
+ 
+(with-eval-after-load 'helm-swoop
+  (define-key helm-swoop-map (kbd "C-g") 'helm-maybe-exit-minibuffer)
+  (define-key helm-swoop-map (kbd "RET") 'helm-swoop-next-line)
+)
+
+;; wrap search
+;; todo: only for this mode
+(setq helm-move-to-line-cycle-in-source t)

@@ -146,6 +146,7 @@
 (load-user-file "_3suppKeys.el")
 (load-user-file "_4myFunc.el")
 (load-user-file "_5chromeBehv.el")
+(load-user-file "_6org.el")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

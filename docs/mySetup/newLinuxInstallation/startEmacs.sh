@@ -10,7 +10,7 @@ emacsclient -a false -e 't'
 
 
 if emacs_server_is_running; then
-    /usr/bin/emacsclient -n "$1"
+    /usr/bin/emacsclient "$1"
 else
     /usr/bin/emacs "$1"
 fi

@@ -1,3 +1,7 @@
+;; todo:
+;;  -
+
+
 ;; disable emacs's automatic "backup~     " files
 (setq make-backup-files nil)
 
@@ -31,9 +35,17 @@
 ;; no sound
 (setq visible-bell 1)
 
-; Auto-update buffer if file has changed on disk
-(global-auto-revert-mode t)
 
-; Gives right-click a context menu
-(global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          
+;; no gui promt
+(desktop-save-mode 0)      ;; save desktop
+(defadvice save-buffers-kill-emacs (around no-y-or-n activate)
+  (cl-flet ((yes-or-no-p (&rest args) t)
+         (y-or-n-p (&rest args) t))
+    ad-do-it))             ;; "modified buffers, are you sure?"
+
+
+
+;; right click
+(global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          ; Gives right-click a context menu
+
 

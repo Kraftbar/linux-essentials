@@ -1,3 +1,5 @@
+
+
 (tab-bar-mode 1)
 
 (global-set-key [(control tab)] 'tab-next)
@@ -65,4 +67,13 @@ Version 2017-11-01"
 
 
 ;; new tab 
- (add-hook 'find-file-hook  (lambda () (tab-new) (switch-to-prev-buffer)) )
+(add-hook 'find-file-hook  (lambda ()
+                             (if (string-equal "*" (substring (buffer-name) 0 1)) 
+                                 ()
+                                 (tab-new)
+                                 (switch-to-prev-buffer)
+                                 (if (string-equal "*" (substring (buffer-name) 0 1))(switch-to-prev-buffer))
+                             )
+))
+
+

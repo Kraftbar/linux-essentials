@@ -1,3 +1,4 @@
+
 ;;; This is all kinds of necessary
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -40,8 +41,6 @@ This includes both `y-or-n-p' and `yes-or-no-p'."
 
 
 
-
-;; orgmode
 
 
 
