@@ -65,6 +65,7 @@ get albert [link](install_Albert.sh)
 >   export EDITOR VISUAL
 >   ```
 
+
 OR
 
 #### 8.1 download startEmacs.sh         
@@ -78,6 +79,11 @@ OR
 >   ```sh
 >    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
 >    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.sh /home/nybo/.emacs.d/
+>   ```
+
+(for windows)
+>   ```CMD
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
 
 
