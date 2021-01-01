@@ -111,8 +111,8 @@ consider to get
 
 
 ### 9. If on gnome and not using cinnamon, set correct keys        
-/usr/share/gnome-control-center/keybindings$         
-
+get files from another mint install stored in /usr/share/gnome-control-center/keybindings         
+copy them over       
 
 
 ### Other install things
