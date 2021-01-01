@@ -110,6 +110,10 @@ consider to get
 
 
 
+### 9. If on gnome and not using cinnamon, set correct keys        
+/usr/share/gnome-control-center/keybindings$         
+
+
 
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
