@@ -110,9 +110,16 @@ consider to get
 
 
 
-### 9. If on gnome and not using cinnamon, set correct keys        
-get files from another mint install stored in /usr/share/gnome-control-center/keybindings         
-copy them over       
+### 9. If on gnome and not using cinnamon, set  keys        
+get file from flie:        
+```bash
+# used by dwm
+cd "install resources"
+# import keys
+./keybindings.pl -i /tmp/keys.csv
+# use "./keybindings.pl -e /tmp/keys.csv" to export
+cd ..
+```
 
 
 ### Other install things
