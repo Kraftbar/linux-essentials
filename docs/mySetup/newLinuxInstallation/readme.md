@@ -110,6 +110,15 @@ consider to get
 
 
 
+### get repositories
+
+curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
+
+
+
+
+
+
 ### 9. If on gnome and not using cinnamon, set  keys        
 get file from flie:        
 ```bash
