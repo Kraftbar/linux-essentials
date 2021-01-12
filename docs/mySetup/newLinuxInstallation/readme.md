@@ -133,6 +133,12 @@ cd ..
 
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
-
+####### seems like a good setup
+```bash
+nybo@pop-os:~$ lsmod | grep -iE "apple|cyapa|sermouse|synap|psmouse|vsxx|bcm"
+btbcm                  16384  1 btusb
+bluetooth             577536  31 btrtl,btintel,btbcm,bnep,btusb,rfcomm
+psmouse               155648  0
+```
 
 
