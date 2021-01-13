@@ -108,6 +108,8 @@ consider to get
  - ROFI (missing config file)
  - sxhkd (missing config file)
 
+### 10 set mouse speed
+xinput --set-prop 14 "Coordinate Transformation Matrix" 2 0 0 0 2 0 0 0 0.5
 
 
 ### get repositories
