@@ -121,7 +121,7 @@ curl -H “Authorization: token MYTOKEN” https://api.github.com/search/reposit
 
 
 
-### 9. If on gnome and not using cinnamon, set  keys        
+### 11. If on gnome and not using cinnamon, set  keys        
 get file from flie:        
 ```bash
 # used by dwm
