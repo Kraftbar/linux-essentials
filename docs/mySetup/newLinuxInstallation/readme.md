@@ -1,4 +1,4 @@
-# Things i do with a fresh linux install (mainly for xps15 9760)
+# Things i do with a fresh linux install (mainly for xps15 9560)
 
 
 
