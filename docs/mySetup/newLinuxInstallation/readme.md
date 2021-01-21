@@ -28,6 +28,8 @@ see manual  config - [link](trackpad.md)
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
+also add     
+pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600         
 
 ### 6.1 Get dot files
 
