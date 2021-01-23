@@ -21,20 +21,8 @@ see manual  config - [link](trackpad.md)
 
 
 ### 4. Set up git ssh
-scrolling faster 
-mouse faster
-
-echo "Installing git and git utils, installation will clear  clipboard "
-read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
-
-
-# installing chrome spotify 
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-# sudo apt install ./google-chrome*.deb
-sudo dpkg -i google-chrome-stable_current_amd64.deb
-
-
-# install 
+scrolling faster     
+mouse faster   
 
 >   ```sh
 >
@@ -48,7 +36,7 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 >sudo dpkg -i google-chrome-stable_current_amd64.deb
 >
 >
-># install 
+># install git icons for nemo 
 >sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
 >pip3 install --user git-nautilus-icons
 >
@@ -69,7 +57,8 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 >
 >google-chrome "https://github.com/settings/ssh/new"
 >
->read -p "Clipboard contains now id_rsa.pub, please input it to browser. Done?  (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+>echo "Clipboard contains now id_rsa.pub, please input it to browser. "
+>read -p "please confirm with enter when done:" confirm 
 >ssh -T git@github.com
 >
 >   ```
