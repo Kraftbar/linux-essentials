@@ -30,19 +30,21 @@ mouse faster
 >read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 >
 >
-># installing chrome spotify 
+># install chrome spotify 
 >wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 ># sudo apt install ./google-chrome*.deb
 >sudo dpkg -i google-chrome-stable_current_amd64.deb
+>rm google-chrome-stable_current_amd64.deb
 >
+>#install git 
+>sudo apt-get install git 
 >
 ># install git icons for nemo 
 >sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
 >pip3 install --user git-nautilus-icons
 >
 >
->
->sudo apt-get install git 
+> # ssh config 
 >git config --global user.name "Kraftbar"
 >git config --global user.email "gautenybo@gmail.com"
 >git config --global color.ui true
@@ -52,7 +54,6 @@ mouse faster
 >
 >sudo apt install xclip
 >alias xclip="xclip -selection c" 
->
 >cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip 
 >
 >google-chrome "https://github.com/settings/ssh/new"
