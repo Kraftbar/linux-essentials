@@ -41,31 +41,29 @@ pip3 install --user git-nautilus-icons
 
 # config ssh
 >   ```sh
-
-sudo apt-get install git 
-git config --global user.name "Kraftbar"
-git config --global user.email "gautenybo@gmail.com"
-git config --global color.ui true
-git config --global core.editor emacs
-
-ssh-keygen -t rsa -C "gautenybo@gmail.com"
-
-
-
-sudo apt install xclip
-alias xclip="xclip -selection c" 
-
-cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip 
-
-google-chrome "https://github.com/settings/ssh/new"
-
-read -p "Clipboard contains now id_rsa.pub, please input it to browser. Done?  (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
-ssh -T git@github.com
-
+>
+>sudo apt-get install git 
+>git config --global user.name "Kraftbar"
+>git config --global user.email "gautenybo@gmail.com"
+>git config --global color.ui true
+>git config --global core.editor emacs
+>
+>ssh-keygen -t rsa -C "gautenybo@gmail.com"
+>
+>sudo apt install xclip
+>alias xclip="xclip -selection c" 
+>
+>cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip 
+>
+>google-chrome "https://github.com/settings/ssh/new"
+>
+>read -p "Clipboard contains now id_rsa.pub, please input it to browser. Done?  (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+>ssh -T git@github.com
+>
 >   ```
 
 
-[link](shh_git.md)
+[link](shh_git.md) (old)
 
 ### 5. Get scripts
 ###
