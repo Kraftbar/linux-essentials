@@ -94,11 +94,11 @@ get albert [link](install_Albert.sh)
 <br>
 
 
-#### 7.3  ohmyzsh       
+#### 7.3  ohmyzsh (needs script)       
 
 
 
-### 8. get emacs        
+### 8. get emacs (needs script)        
 
 >   ```sh
 >   # dont use this with current config 
@@ -154,7 +154,7 @@ consider to get
  - ROFI (missing config file)
  - sxhkd (missing config file)
 
-### 10 set mouse speed
+### 10 set mouse speed (needs script)
 >   ```sh
 >  xinput --set-prop 14 "Coordinate Transformation Matrix" 2 0 0 0 2 0 0 0 0.5
 >   ```
