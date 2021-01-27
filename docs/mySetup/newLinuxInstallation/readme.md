@@ -8,9 +8,11 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 ### 0.1 connect to eduroam
 run script - eduroam-linux-Ntu-N.sh
 
-### 1. get the applet that allows for automatic sleep when low battery
+### 1. get the applet that allows for automatic sleep when low battery (needs script)
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 >  or do a simple script (havent had the time)      
+OR set cinnamon settings see web-r for script to modify
+
 
 ### 2. fix windows clock, so that it is correct
 >   ```sh
