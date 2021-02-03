@@ -138,10 +138,7 @@ OR
 #### 8.4 Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
 
-### 9. Add dwm        
-
-get dwm, maybe with slstatus     
-
+### 9. Add things to xinitrc        
 
 insert the following in .xinitrc
 ```bash
@@ -151,15 +148,17 @@ if [ "$GDMSESSION" != "cinnamon" ]; then
     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
     gnome-terminal &
 fi
+
+# Fix max mousespeed for cinnamon
+if [ "$GDMSESSION" == "cinnamon" ]; then
+    xinput --set-prop 14 "Coordinate Transformation Matrix" 2 0 0 0 2 0 0 0 0.5
+fi
 ```
 consider to get 
  - ROFI (missing config file)
  - sxhkd (missing config file)
 
-### 10 set mouse speed (needs script)
->   ```sh
->  xinput --set-prop 14 "Coordinate Transformation Matrix" 2 0 0 0 2 0 0 0 0.5
->   ```
+
 
 
 ### get repositories
