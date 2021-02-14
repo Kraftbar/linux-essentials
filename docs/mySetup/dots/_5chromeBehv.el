@@ -62,11 +62,7 @@ Version 2017-11-01"
 
 ;; -------------- open files in tabs --------------
 
-
-
-
-
-;; new tab 
+;; new tab
 (add-hook 'find-file-hook  (lambda ()
                              (if (string-equal "*" (substring (buffer-name) 0 1)) 
                                  ()
@@ -77,3 +73,16 @@ Version 2017-11-01"
 ))
 
 
+
+; reopen tabs form emacsclient
+; todo: bug, pretty sure it does not does not trigger on switch-to-buffer
+(add-hook 'after-make-frame-functions
+          (lambda ()
+            (cl-loop for buffer in (buffer-list)
+               if (string-equal "*" (substring (buffer) 0 1))
+               (progn
+                 (tab-new)
+                 (switch-to-buffer buffer)
+            )
+        )
+ )
