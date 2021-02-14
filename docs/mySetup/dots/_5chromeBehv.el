@@ -78,11 +78,22 @@ Version 2017-11-01"
 ; todo: bug, pretty sure it does not does not trigger on switch-to-buffer
 (add-hook 'after-make-frame-functions
           (lambda ()
-            (cl-loop for buffer in (buffer-list)
-               if (string-equal "*" (substring (buffer) 0 1))
-               (progn
-                 (tab-new)
-                 (switch-to-buffer buffer)
-            )
+
+            
+        (dolist ($buf (buffer-list (current-buffer)))
+            (with-current-buffer $buf
+              (when (string-equal "*" (substring ($buf) 0 1))
+                (message "x %s" $buf)))
         )
+
+        
+            
+          )
  )
+
+;(cl-loop for buffer in (buffer-list)
+;   if (string-equal "*" (substring (buffer) 0 1))
+;    collect (progn
+;     (tab-new)
+;     (switch-to-buffer buffer))  
+; )
