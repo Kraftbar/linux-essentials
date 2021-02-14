@@ -75,7 +75,7 @@ Version 2017-11-01"
 
 
 ; reopen tabs form emacsclient
-; todo: bug, pretty sure it does not does not trigger on switch-to-buffer
+; todo: bug, pretty sure it does not does not trigger on after-make-frame-functions
 (add-hook 'after-make-frame-functions
           (lambda ()
 
