@@ -151,7 +151,7 @@ fi
 
 # Fix max mousespeed for cinnamon
 if [ "$GDMSESSION" == "cinnamon" ]; then
-    xinput --set-prop 14 "Coordinate Transformation Matrix" 2 0 0 0 2 0 0 0 0.5
+     var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.5 0 0 0 1.5 0 0 0 0.8
 fi
 ```
 consider to get 
