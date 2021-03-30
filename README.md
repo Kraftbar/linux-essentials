@@ -337,6 +337,7 @@
 
 ## Some decent fonts
 > IBM plex mono        
+> Courier New        
 > libertine       
 > Roboto Mono           
 
