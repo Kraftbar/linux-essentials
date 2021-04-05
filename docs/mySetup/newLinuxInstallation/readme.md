@@ -21,6 +21,7 @@ OR set cinnamon settings see web-r for script to modify
 >    timedatectl set-local-rtc 1
 >   ```
 todo:
+- keyboard shortcut
 - theme - consider dotfile
 - disable sound   - consider dotfile
 
