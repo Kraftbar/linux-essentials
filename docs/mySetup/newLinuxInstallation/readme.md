@@ -76,6 +76,7 @@ mouse faster
 >sudo apt-get install git 
 >
 ># install git icons for nemo 
+>sudo apt-get install pip3
 >sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
 >pip3 install --user git-nautilus-icons
 >
