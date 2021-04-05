@@ -137,11 +137,11 @@ see file
 
 #### 7.1 albert
 get albert [link](install_Albert.sh)
-<br>
-<br>
+#### 7.2 latex
+#### 7.3 sagetex
 
 
-#### 7.3  ohmyzsh [todo: needs script]       
+#### 7.4  ohmyzsh [todo: needs script]       
 
 
 
