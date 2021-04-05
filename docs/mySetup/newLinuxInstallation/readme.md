@@ -131,12 +131,6 @@ pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307
 ### 6.2 Set aliases
 see file
 
-### 6.3 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
-#### Run this
-cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
-#### startup
-Add imwheel to startup applications
-
 
 ---
 ### 7. Get programs
@@ -237,6 +231,12 @@ cd "install resources"
 # use "./keybindings.pl -e /tmp/keys.csv" to export
 cd ..
 ```
+
+### 11.2 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
+#### Run this
+cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
+#### startup
+Add imwheel to startup applications
 
 
 ---
