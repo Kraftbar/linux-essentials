@@ -1,5 +1,5 @@
 # Things i do with a fresh linux install (mainly for xps15 9560)
-
+Todo: find a way to exract bash code from markdown and run it
 
 
 ### 0. install nvidia drivers so no cpu lockup at shutdown
@@ -20,7 +20,9 @@ OR set cinnamon settings see web-r for script to modify
 >   ```sh
 >    timedatectl set-local-rtc 1
 >   ```
-   
+todo:
+- theme - consider dotfile
+- disable sound   - consider dotfile
 
 ---
 ### 3. fix mouse bugginess 
@@ -109,7 +111,6 @@ mouse faster
 >   ```
 
 
-[link](shh_git.md) (old)
 
 
 
@@ -119,8 +120,11 @@ mouse faster
 >   ```sh
 >    sudo mv ../global/* /usr/local/bin
 >   ```
-also add     
-pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600         
+
+
+todo:
+- make custom redshit script: "pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600 "
+- move translate from emacs to global scripts, clean up reference
 
 
 
