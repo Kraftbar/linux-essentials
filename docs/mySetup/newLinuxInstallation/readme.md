@@ -14,6 +14,7 @@ run script - eduroam-linux-Ntu-N.sh
 OR set cinnamon settings see web-r for script to modify
 
 
+---
 ### 2. fix windows clock, so that it is correct
 >   ```sh
 >    timedatectl set-local-rtc 1
