@@ -3,25 +3,31 @@
 
 
 ### 0. install nvidia drivers so no cpu lockup at shutdown
-also, select intel as gpu so power consumption is not degenerate       
+also, select intel as gpu so power consumption is not acting degenerate       
 and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
 ### 0.1 connect to eduroam
 run script - eduroam-linux-Ntu-N.sh
 
-### 1. get the applet that allows for automatic sleep when low battery (needs script)
+---
+### 1. get the applet that allows for automatic sleep when low battery [todo: needs script]
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 >  or do a simple script (havent had the time)      
 OR set cinnamon settings see web-r for script to modify
 
 
+---
 ### 2. fix windows clock, so that it is correct
 >   ```sh
 >    timedatectl set-local-rtc 1
 >   ```
+   
+
+---
 ### 3. fix mouse bugginess 
 #### 3.1 configure mouse speed
 see manual  config - [link](trackpad.md)        
-#### 3.1 configure scrolling speed
+#### 3.1 configure scrolling speed 
+#### (this is a workaround solution, has still somewhat buggy behavior, increases the scroll ticks and not the length of the scrolling)
 Original answer:
 
 Here is a solution which works perfectly (tested recently in Ubuntu 14.04, 18.04, and 20.04):
@@ -56,6 +62,7 @@ Add `imwheel -b "4 5"` to Ubuntu's "Startup Applications" to get it to run eve
 
 
 
+---
 ### 4. Set up git ssh
 scrolling faster     
 mouse faster   
@@ -76,6 +83,7 @@ mouse faster
 >sudo apt-get install git 
 >
 ># install git icons for nemo 
+>sudo apt-get install pip3
 >sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
 >pip3 install --user git-nautilus-icons
 >
@@ -104,6 +112,9 @@ mouse faster
 
 [link](shh_git.md) (old)
 
+
+
+---
 ### 5. Get scripts
 ###
 >   ```sh
@@ -112,30 +123,30 @@ mouse faster
 also add     
 pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600         
 
+
+
+---
 ### 6.1 Get dot files
 
 ### 6.2 Set aliases
 see file
 
-### 6.3 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
-#### Run this
-cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
-#### startup
-Add imwheel to startup applications
 
+---
 ### 7. Get programs
-
-#### 7.1 albert
-get albert [link](install_Albert.sh)
-<br>
-<br>
-
-
-#### 7.3  ohmyzsh (needs script)       
+get albert [link](install_Albert.sh)       
+latex       
+sagetex       
+disc       
+spotify       
 
 
+#### 7.4  ohmyzsh [todo: needs script]       
 
-### 8. get emacs (needs script)        
+
+
+---
+### 8. get emacs [todo: needs script]        
 
 >   ```sh
 >   # dont use this with current config 
@@ -173,6 +184,7 @@ OR
 #### 8.4 Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
 
+---
 ### 9. Add things to xinitrc        
 
 insert the following in .xinitrc
@@ -199,7 +211,7 @@ consider to get
 
 
 
-### get repositories
+### 10 get repositories
 
 curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
 
@@ -208,6 +220,7 @@ curl -H “Authorization: token MYTOKEN” https://api.github.com/search/reposit
 
 
 
+---
 ### 11. If on gnome and not using cinnamon, set  keys        
 get file from flie:        
 ```bash
@@ -219,7 +232,14 @@ cd "install resources"
 cd ..
 ```
 
+### 11.2 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
+#### Run this
+cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
+#### startup
+Add imwheel to startup applications
 
+
+---
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
 ##### seems like a good setup 
@@ -229,6 +249,6 @@ btbcm                  16384  1 btusb
 bluetooth             577536  31 btrtl,btintel,btbcm,bnep,btusb,rfcomm
 psmouse               155648  0
 ```
-##### seems like a good things to add 
+##### seems like a good thing to add 
 touchegg                  
 
