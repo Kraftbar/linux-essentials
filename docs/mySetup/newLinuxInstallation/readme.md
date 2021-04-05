@@ -21,7 +21,8 @@ OR set cinnamon settings see web-r for script to modify
 ### 3. fix mouse bugginess 
 #### 3.1 configure mouse speed
 see manual  config - [link](trackpad.md)        
-#### 3.1 configure scrolling speed
+#### 3.1 configure scrolling speed 
+#### (this workaround solution has still somewhat buggy behavior, increases the scroll ticks not the length of the scrolling)
 Original answer:
 
 Here is a solution which works perfectly (tested recently in Ubuntu 14.04, 18.04, and 20.04):
