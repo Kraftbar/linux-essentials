@@ -32,12 +32,11 @@ Original answer:
 
 Here is a solution which works perfectly (tested recently in Ubuntu 14.04, 18.04, and 20.04):
 
----
+```
 sudo apt update
 sudo apt install imwheel
 gedit ~/.imwheelrc
-
----
+```
 
 Copy and paste the following into the newly-created `.imwheelrc` file (that you just made in your home directory via the `gedit` command above):
 
@@ -209,7 +208,7 @@ consider to get
  - sxhkd (missing config file)
 
 
-
+---
 
 ### 10 get repositories
 
