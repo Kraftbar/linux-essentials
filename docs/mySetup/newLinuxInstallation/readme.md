@@ -54,9 +54,6 @@ Run `imwheel -b "4 5"` to test your settings. When done testing, run `killall
 
 Add `imwheel -b "4 5"` to Ubuntu's "Startup Applications" to get it to run every time the computer starts.
 
-[As](https://askubuntu.com/a/621140/327339)
-
-
 
 
 ### 4. Set up git ssh
