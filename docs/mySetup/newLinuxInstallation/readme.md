@@ -56,11 +56,12 @@ mouse faster
 >
 >sudo apt install xclip
 >alias xclip="xclip -selection c" 
->cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip 
+>cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
 >
 >google-chrome "https://github.com/settings/ssh/new"
 >
 >echo "Clipboard contains now id_rsa.pub, please input it to browser. "
+>echo "When done, close broser to continue!! "
 >read -p "please confirm with enter when done:" confirm 
 >ssh -T git@github.com
 >
