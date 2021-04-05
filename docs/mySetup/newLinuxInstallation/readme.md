@@ -177,15 +177,18 @@ OR
 
 insert the following in .xinitrc
 ```bash
+
+chassis=$(sudo dmidecode --string chassis-type)
+
 # used by dwm
-if [ "$GDMSESSION" != "cinnamon" ]; then
+if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
     xrandr --output eDP-1 --mode 1920x1080
     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
     gnome-terminal &
 fi
 
 # Fix max mousespeed for cinnamon
-if [ "$GDMSESSION" == "cinnamon" ]; then
+if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.5 0 0 0 1.5 0 0 0 0.8
 fi
 ```
