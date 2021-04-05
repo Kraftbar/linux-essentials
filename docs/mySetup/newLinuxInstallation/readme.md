@@ -18,8 +18,45 @@ OR set cinnamon settings see web-r for script to modify
 >   ```sh
 >    timedatectl set-local-rtc 1
 >   ```
-### 3. configure mouse speed (not acc) beyond the gui setting limit
+### 3. fix mouse bugginess 
+#### 3.1 configure mouse speed
 see manual  config - [link](trackpad.md)        
+#### 3.1 configure scrolling speed
+Original answer:
+
+Here is a solution which works perfectly (tested recently in Ubuntu 14.04, 18.04, and 20.04):
+
+```
+sudo apt update
+sudo apt install imwheel
+gedit ~/.imwheelrc
+
+```
+
+Copy and paste the following into the newly-created `.imwheelrc` file (that you just made in your home directory via the `gedit` command above):
+
+```
+".*-chrome*"
+None,      Up,   Button4, 3
+None,      Down, Button5, 3
+Control_L, Up,   Control_L|Button4
+Control_L, Down, Control_L|Button5
+Shift_L,   Up,   Shift_L|Button4
+Shift_L,   Down, Shift_L|Button5
+
+```
+
+`3` is the "scroll speed multiplier." Use a larger number for faster scrolling, or a smaller number for slower scrolling. The `".*-chrome*"` part says to apply these scroll wheel speed increase changes ONLY to chrome.
+
+Run `imwheel -b "4 5"` to test your settings. When done testing, run `killall imwheel` to kill it, then make your edits to `.imwheelrc`, as desired, and run `imwheel -b "4 5"` again for more testing. Be sure to fully close and re-open Chrome each time you restart `imwheel` too, to ensure its new settings take effect. This must be done by right-clicking the little Chrome icon in the top-right of your desktop pane and going to "Exit".
+
+*Also keep in mind that if you are using a cheap mouse, your scroll wheel decoder may be lousy and miss encoder counts when moving the wheel fast. Therefore, in such a case, move the wheel at a reduced speed when testing the effect of imwheel, so that your mouse doesn't miss encoder counts on the scroll wheel, making you think imwheel isn't working right when it's really just your cheap hardware's problem.*
+
+Add `imwheel -b "4 5"` to Ubuntu's "Startup Applications" to get it to run every time the computer starts.
+
+[As](https://askubuntu.com/a/621140/327339)
+
+
 
 
 ### 4. Set up git ssh
