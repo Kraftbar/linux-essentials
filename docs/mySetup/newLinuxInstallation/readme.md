@@ -8,6 +8,7 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 ### 0.1 connect to eduroam
 run script - eduroam-linux-Ntu-N.sh
 
+---
 ### 1. get the applet that allows for automatic sleep when low battery (needs script)
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 >  or do a simple script (havent had the time)      
@@ -19,6 +20,9 @@ OR set cinnamon settings see web-r for script to modify
 >   ```sh
 >    timedatectl set-local-rtc 1
 >   ```
+   
+
+---
 ### 3. fix mouse bugginess 
 #### 3.1 configure mouse speed
 see manual  config - [link](trackpad.md)        
@@ -58,6 +62,7 @@ Add `imwheel -b "4 5"` to Ubuntu's "Startup Applications" to get it to run eve
 
 
 
+---
 ### 4. Set up git ssh
 scrolling faster     
 mouse faster   
@@ -107,6 +112,9 @@ mouse faster
 
 [link](shh_git.md) (old)
 
+
+
+---
 ### 5. Get scripts
 ###
 >   ```sh
@@ -115,6 +123,9 @@ mouse faster
 also add     
 pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600         
 
+
+
+---
 ### 6.1 Get dot files
 
 ### 6.2 Set aliases
@@ -126,6 +137,8 @@ cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup
 #### startup
 Add imwheel to startup applications
 
+
+---
 ### 7. Get programs
 
 #### 7.1 albert
@@ -138,6 +151,7 @@ get albert [link](install_Albert.sh)
 
 
 
+---
 ### 8. get emacs (needs script)        
 
 >   ```sh
@@ -176,6 +190,7 @@ OR
 #### 8.4 Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
 
+---
 ### 9. Add things to xinitrc        
 
 insert the following in .xinitrc
@@ -202,7 +217,7 @@ consider to get
 
 
 
-### get repositories
+### 10 get repositories
 
 curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
 
@@ -211,6 +226,7 @@ curl -H “Authorization: token MYTOKEN” https://api.github.com/search/reposit
 
 
 
+---
 ### 11. If on gnome and not using cinnamon, set  keys        
 get file from flie:        
 ```bash
@@ -223,6 +239,7 @@ cd ..
 ```
 
 
+---
 ### Other install things
 [zen_installer](https://github.com/spookykidmm/zen_installer)      
 ##### seems like a good setup 
