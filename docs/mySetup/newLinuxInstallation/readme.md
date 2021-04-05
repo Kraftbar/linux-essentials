@@ -207,7 +207,7 @@ fi
 # and tap to click
 if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
-         xinput xinput --set-prop $var 323 1
+     xinput --set-prop $var 323 1
 fi
 ```
 consider to get 
