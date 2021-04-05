@@ -134,11 +134,11 @@ see file
 
 ---
 ### 7. Get programs
-
-#### 7.1 albert
-get albert [link](install_Albert.sh)
-#### 7.2 latex
-#### 7.3 sagetex
+get albert [link](install_Albert.sh)       
+latex       
+sagetex       
+disc       
+spotify       
 
 
 #### 7.4  ohmyzsh [todo: needs script]       
