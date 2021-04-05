@@ -9,7 +9,7 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 run script - eduroam-linux-Ntu-N.sh
 
 ---
-### 1. get the applet that allows for automatic sleep when low battery (needs script)
+### 1. get the applet that allows for automatic sleep when low battery [todo: needs script]
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
 >  or do a simple script (havent had the time)      
 OR set cinnamon settings see web-r for script to modify
@@ -147,12 +147,12 @@ get albert [link](install_Albert.sh)
 <br>
 
 
-#### 7.3  ohmyzsh (needs script)       
+#### 7.3  ohmyzsh [todo: needs script]       
 
 
 
 ---
-### 8. get emacs (needs script)        
+### 8. get emacs [todo: needs script]        
 
 >   ```sh
 >   # dont use this with current config 
