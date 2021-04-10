@@ -119,7 +119,7 @@ mouse faster
 ### 5. Get scripts
 ###
 >   ```sh
->    sudo cp ../../../scripts/global//* /usr/local/bin
+>    sudo ln -s ../../../scripts/global/* /usr/local/bin
 >   ```
 
 
@@ -175,8 +175,8 @@ OR
 #### 8.3 get files:       
 
 >   ```sh
->    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.el /home/nybo/.emacs.d/
->    ln -s ~/Documents/github/linuxessentials/docs/mySetup/dots/*.sh /home/nybo/.emacs.d/
+>    mkdir ~/.emacs.d/
+>    ln -s ../dots/*.el /home/nybo/.emacs.d/
 >   ```
 
 (for windows)
