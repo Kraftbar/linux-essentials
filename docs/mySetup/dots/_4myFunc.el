@@ -12,7 +12,7 @@
     (while (and    (>= (point) start)
                    (not (equal  (point) 1) ))
       (shell-command  (concat
-                        "~/.emacs.d/__transelate-to-chinese.sh \""
+                        "mytranselate-to-chinese.sh \""
                         (buffer-substring-no-properties       (line-beginning-position)       (line-end-position)     )
                         "\""      ))
       (kill-line 1)

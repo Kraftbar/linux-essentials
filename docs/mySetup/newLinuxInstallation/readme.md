@@ -119,7 +119,7 @@ mouse faster
 ### 5. Get scripts
 ###
 >   ```sh
->    sudo mv ../global/* /usr/local/bin
+>    sudo cp ../../../scripts/global//* /usr/local/bin
 >   ```
 
 
