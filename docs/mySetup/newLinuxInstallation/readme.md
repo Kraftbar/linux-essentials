@@ -22,6 +22,8 @@ OR set cinnamon settings see web-r for script to modify
 >   ```
 todo:
 - keyboard shortcut
+    -unbind show desklets            
+    -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
 - theme - consider dotfile
 - disable sound   - consider dotfile
 
@@ -132,11 +134,11 @@ mouse faster
 ### 6.2 Set aliases
 
 >   ```sh
-> youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
-> youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
-> youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
-> youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
-> myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 2500'
+> alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
+> alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
+> alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
 > 
 > 
 > # todo: Make this an alias     
@@ -152,7 +154,7 @@ sagetex
 disc       
 spotify       
 gnuplot     
-
+youtube-dl         
 
 #### 7.4  ohmyzsh [todo: needs script]       
 
