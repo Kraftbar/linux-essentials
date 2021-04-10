@@ -119,7 +119,8 @@ mouse faster
 ### 5. Get scripts
 ###
 >   ```sh
->    sudo ln -s ../../../scripts/global/* /usr/local/bin
+>    abspaths=$(readlink -f "../../../scripts/global/*")
+>    sudo ln  -s $abspaths /usr/local/bin/
 >   ```
 
 
@@ -183,7 +184,8 @@ OR
 
 >   ```sh
 >    mkdir ~/.emacs.d/
->    ln -s ../dots/*.el /home/nybo/.emacs.d/
+>    abspaths=$(readlink -f "../dots/*.el")
+>    ln -s $abspaths /home/nybo/.emacs.d/
 >   ```
 
 (for windows)
