@@ -123,10 +123,6 @@ mouse faster
 >   ```
 
 
-todo:
-- make custom redshit script: "pgrep redshift | xargs -n1 kill -9 &&  redshift -l 59.904379299999995:10.7004307 2600 "
-- move translate from emacs to global scripts, clean up reference
-
 
 
 ---
