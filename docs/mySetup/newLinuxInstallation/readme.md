@@ -121,6 +121,10 @@ mouse faster
 ### 5. Get scripts
 ###
 >   ```sh
+>    # Get shell dependencies
+>    sudo apt-get install gnuplot
+>    sudo apt-get install translate-shell      
+>    # symbolic link scripts
 >    abspaths=$(readlink -f "../../../scripts/global/*")
 >    sudo ln  -s $abspaths /usr/local/bin/
 >   ```
