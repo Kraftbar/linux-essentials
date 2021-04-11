@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 
-unicode=($(      echo "sd" | od -t x1 |  head -n 1 | awk '{ print $2 }'       ))
+unicode=($(      echo $1 | od -An -t uC |  head -n 1 | awk '{ print $2 }'       ))
 
 if ((unicode >= 65 && unicode <= 122)); then
     # get trans | delete "(" | delete ")" | replace newline with tab | delete last newline also
@@ -13,9 +13,8 @@ if ((unicode >= 65 && unicode <= 122)); then
     printf "\t"
     echo $1 
 else
-    # get trans | delete "(" | delete ")" | replace newline with tab | delete last newline also
-    trans    -show-prompt-message n -show-languages n -show-original-dictionary N -show-dictionary n -show-alternatives n  zh:en $1 | cut -d "(" -f2 | cut -d ")" -f1 | sed -z 's/\n/\t/g;s/\t$/\n/' 
-    # return pinyin and english 
+    # get trans | delete empty new line | delete "(" | delete ")" | replace newline with tab | delete last newline also
+    trans           -show-prompt-message n -show-languages n -show-original-dictionary N -show-dictionary n -show-alternatives n  zh:en $1 | sed '/^[[:space:]]*$/d' | cut -d "(" -f2 | cut -d ")" -f1 | sed -z 's/\n/\t/g;s/\t$/\n/' 
 fi
 
 
