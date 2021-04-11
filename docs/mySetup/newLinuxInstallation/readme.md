@@ -125,8 +125,8 @@ mouse faster
 >    sudo apt-get install gnuplot
 >    sudo apt-get install translate-shell      
 >    # symbolic link scripts
->    abspaths=$(readlink -f "../../../scripts/global/*")
->    sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "linuxessentials/scripts/global/*") && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "../../../scripts/global/*")        && sudo ln  -s $abspaths /usr/local/bin/
 >   ```
 
 
@@ -191,8 +191,8 @@ OR
 
 >   ```sh
 >    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "../dots/*.el")
->    ln -s $abspaths /home/nybo/.emacs.d/
+>    abspaths=$(readlink -f "linuxessentials/docs/mySetup/dots/*.el") && ln -s $abspaths /home/nybo/.emacs.d/
+>    abspaths=$(readlink -f "../dots/*.el")                           && ln -s $abspaths /home/nybo/.emacs.d/ 
 >   ```
 
 (for windows)
