@@ -159,6 +159,7 @@ disc
 spotify       
 gnuplot     
 youtube-dl         
+imagemagick        
 
 #### 7.4  ohmyzsh [todo: needs script]       
 
