@@ -1,2 +1,0 @@
-# CAREFUL, this command is recursive
-find . -type f -name "*.jpg" -exec exiftran -ai "{}" \;

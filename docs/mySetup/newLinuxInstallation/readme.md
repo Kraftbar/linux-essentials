@@ -125,8 +125,8 @@ mouse faster
 >    sudo apt-get install gnuplot
 >    sudo apt-get install translate-shell      
 >    # symbolic link scripts
->    abspaths=$(readlink -f "linuxessentials/scripts/global/*") && sudo ln  -s $abspaths /usr/local/bin/
->    abspaths=$(readlink -f "../../../scripts/global/*")        && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "../../../scripts/my*")        && sudo ln  -s $abspaths /usr/local/bin/
 >   ```
 
 
