@@ -201,7 +201,7 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 
 
 
-### 9. Add things to xinitrc        
+### 9. Add things to xinitrc  [todo: needs script]               
 
 ```bash
 
