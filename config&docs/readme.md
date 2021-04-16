@@ -249,6 +249,8 @@ todo:
     -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
 - theme - consider dotfile
 - disable sound   - consider dotfile
+- latex setup
+
 
 
 
