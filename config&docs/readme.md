@@ -110,9 +110,8 @@ there are custom applets mode for weather and cpu temp. And nvidia gpu temp is b
 
 
 ---
-### 6.1 Get dot files
 
-### 6.2 Set aliases
+### 6 Set aliases
 
 >   ```sh
 > alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
@@ -131,7 +130,6 @@ there are custom applets mode for weather and cpu temp. And nvidia gpu temp is b
 ### 7. Get programs
 get albert [link](install_Albert.sh)       
 latex       
-sagetex       
 disc       
 spotify       
 gnuplot     
@@ -249,7 +247,7 @@ todo:
     -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
 - theme - consider dotfile
 - disable sound   - consider dotfile
-- latex setup
+- latex and sagetex setup        
 
 
 
