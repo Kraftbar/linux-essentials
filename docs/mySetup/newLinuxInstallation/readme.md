@@ -1,13 +1,6 @@
 # Things i do with a fresh linux install (mainly for xps15 9560)
 Todo: find a way to exract bash code from markdown and run it
 
-
-### 0. install nvidia drivers so no cpu lockup at shutdown
-also, select intel as gpu so power consumption is not acting degenerate       
-and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
-### 0.1 connect to eduroam
-run script - eduroam-linux-Ntu-N.sh
-
 ---
 ### 1. get the applet that allows for automatic sleep when low battery [todo: needs script]
 >  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
@@ -28,48 +21,28 @@ todo:
 - disable sound   - consider dotfile
 
 ---
-### 3. fix mouse bugginess 
-#### 3.1 configure mouse speed
-see manual  config - [link](trackpad.md)        
-#### 3.1 configure scrolling speed 
-#### (this is a workaround solution, has still somewhat buggy behavior, increases the scroll ticks and not the length of the scrolling)
-Original answer:
+### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
+ (this is a workaround solution, has still somewhat buggy behavior, increases the scroll ticks and not the length of the scrolling)
 
-Here is a solution which works perfectly (tested recently in Ubuntu 14.04, 18.04, and 20.04):
+>``` bash
+>  sudo apt update
+>  sudo apt install imwheel
+>```
 
-```
-sudo apt update
-sudo apt install imwheel
-gedit ~/.imwheelrc
-```
-
-Copy and paste the following into the newly-created `.imwheelrc` file (that you just made in your home directory via the `gedit` command above):
-
-```
-".*-chrome*"
-None,      Up,   Button4, 3
-None,      Down, Button5, 3
-Control_L, Up,   Control_L|Button4
-Control_L, Down, Control_L|Button5
-Shift_L,   Up,   Shift_L|Button4
-Shift_L,   Down, Shift_L|Button5
-
-```
-
-`3` is the "scroll speed multiplier." Use a larger number for faster scrolling, or a smaller number for slower scrolling. The `".*-chrome*"` part says to apply these scroll wheel speed increase changes ONLY to chrome.
-
-Run `imwheel -b "4 5"` to test your settings. When done testing, run `killall imwheel` to kill it, then make your edits to `.imwheelrc`, as desired, and run `imwheel -b "4 5"` again for more testing. Be sure to fully close and re-open Chrome each time you restart `imwheel` too, to ensure its new settings take effect. This must be done by right-clicking the little Chrome icon in the top-right of your desktop pane and going to "Exit".
-
-*Also keep in mind that if you are using a cheap mouse, your scroll wheel decoder may be lousy and miss encoder counts when moving the wheel fast. Therefore, in such a case, move the wheel at a reduced speed when testing the effect of imwheel, so that your mouse doesn't miss encoder counts on the scroll wheel, making you think imwheel isn't working right when it's really just your cheap hardware's problem.*
-
-Add `imwheel -b "4 5"` to Ubuntu's "Startup Applications" to get it to run every time the computer starts.
-
-
+>``` bash
+>  # add scrolling speed to imwheelrc
+>  cat <<EOT >> ~/.imwheelrc
+>  rm ~/.imwheelrc
+>  ".*-chrome*"
+>  None,      Up,   Button4, 5
+>  None,      Down, Button5, 5
+>  EOT
+> # add to startup
+>  imwheel -b "4 5"
+>```
 
 ---
 ### 4. Set up git ssh
-scrolling faster     
-mouse faster   
 
 >   ```sh
 >
@@ -168,6 +141,7 @@ imagemagick
 ---
 ### 8. get emacs [todo: needs script]        
 
+
 >   ```sh
 >   # dont use this with  current config
 >   # needs more testing
@@ -181,12 +155,16 @@ imagemagick
 >   ```
 
 
-OR
-
 #### 8.1 mod .desktop entry
 
-emacsnm=$( ls /usr/share/applications/ | grep emacs)
-sudo sed  -i "s/Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/$emacsnm"
+>   ```sh
+>   # needs  testing!"!!
+>   emacsnm=$( ls /usr/share/applications/ | grep emacs)
+>   sudo sed  -i "s/Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/$emacsnm"
+> 
+>   ```
+
+
 
 #### 8.2 consider to make defualt text editor
 
@@ -204,19 +182,27 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 >    abspaths=$(readlink -f "../dots/*.el")                           && ln -s $abspaths /home/nybo/.emacs.d/ 
 >   ```
 
+
 (for windows)
 >   ```CMD
 > FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
 
 
-#### 8.4 Edit files ctrlf downloaded sourcefiles, get rid of the preset hotkeys     
 
+<br/><br/><br/><br/><br/><br/>
 
 ---
+
+
+### 0. install nvidia drivers so no cpu lockup at shutdown
+also, select intel as gpu so power consumption is not acting degenerate       
+and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
+
+
+
 ### 9. Add things to xinitrc        
 
-insert the following in .xinitrc
 ```bash
 
 chassis=$(sudo dmidecode --string chassis-type)
@@ -235,16 +221,18 @@ if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
      xinput --set-prop $var 323 1
 fi
 ```
-consider to get 
- - ROFI (missing config file)
- - sxhkd (missing config file)
 
+
+
+
+<br/><br/><br/><br/><br/><br/>
 
 ---
 
-### 10 get repositories
-
+### 10 get repositories (in the works)
+```bash
 curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
+```
 
 
 
@@ -252,8 +240,7 @@ curl -H “Authorization: token MYTOKEN” https://api.github.com/search/reposit
 
 
 ---
-### 11. If on gnome and not using cinnamon, set  keys        
-get file from flie:        
+### 11. If on gnome and not using cinnamon, set  keys (todo: fix relative paths)
 ```bash
 # used by dwm
 cd "install resources"
@@ -263,11 +250,7 @@ cd "install resources"
 cd ..
 ```
 
-### 11.2 if on pop os fix scrolling speed    (dont do this, bugges forward backward button)
-#### Run this
-cd ~/; wget https://github.com/Kraftbar/linuxessentials/edit/master/docs/mySetup/newLinuxInstallation/imwheel-script.sh -O imwheel-script.sh; chmod +x imwheel-script.sh; sh imwheel-script.sh; sudo rm imwheel-script.sh; exit
-#### startup
-Add imwheel to startup applications
+
 
 
 ---
@@ -280,6 +263,10 @@ btbcm                  16384  1 btusb
 bluetooth             577536  31 btrtl,btintel,btbcm,bnep,btusb,rfcomm
 psmouse               155648  0
 ```
-##### seems like a good thing to add 
+### seems like a good thing to add 
 touchegg                  
 
+
+consider to get 
+ - ROFI (missing config file)
+ - sxhkd (missing config file)
