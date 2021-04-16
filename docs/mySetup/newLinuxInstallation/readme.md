@@ -169,7 +169,8 @@ imagemagick
 ### 8. get emacs [todo: needs script]        
 
 >   ```sh
->   # dont use this with current config 
+>   # dont use this with  current config
+>   # needs more testing
 >   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
 >     /usr/bin/emacs --daemon 2> /dev/null
 >   fi
@@ -182,10 +183,17 @@ imagemagick
 
 OR
 
-#### 8.1 download startEmacs.sh         
-#### 8.2 open menu editor and reconfigure emacs app to /home/nybo/Desktop/startEmacs.sh %F            
+#### 8.1 mod .desktop entry
 
-(~/.config/mimeapps.list     (copy xed settings, replace with emacs) then make default         )
+emacsnm=$( ls /usr/share/applications/ | grep emacs)
+sudo sed  -i "s/Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/$emacsnm"
+
+#### 8.2 consider to make defualt text editor
+
+
+
+
+do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs) 
 
 
 #### 8.3 get files:       
