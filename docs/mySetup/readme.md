@@ -23,12 +23,6 @@ there are custom applets mode for weather and cpu temp. And nvidia gpu temp is b
 >   ```sh
 >    timedatectl set-local-rtc 1
 >   ```
-todo:
-- keyboard shortcut
-    -unbind show desklets            
-    -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
-- theme - consider dotfile
-- disable sound   - consider dotfile
 
 ---
 ### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
@@ -205,6 +199,15 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 >   ```
 
 
+
+
+
+
+
+
+
+
+
 <br/><br/><br/><br/><br/><br/>
 
 ---
@@ -236,6 +239,27 @@ if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
      xinput --set-prop $var 323 1
 fi
 ```
+---
+
+todo:
+- keyboard shortcut
+    -unbind show desklets            
+    -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
+- theme - consider dotfile
+- disable sound   - consider dotfile
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
