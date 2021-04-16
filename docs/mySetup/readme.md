@@ -190,12 +190,14 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 (for windows)
 >   ```CMD
 > REM; symbolic link
-> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) ^
+> DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
 >   ```CMD
 > REM; start emacs
 >tasklist | FIND "emacs" >nul
->if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
+>if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) ^
+> else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
 >   ```
 
 
