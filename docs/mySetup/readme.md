@@ -26,7 +26,7 @@ there are custom applets mode for weather and cpu temp. And nvidia gpu temp is b
 
 ---
 ### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
- (this is a workaround solution, has still somewhat buggy behavior, increases the scroll ticks and not the length of the scrolling)
+ this is a workaround solution. It does still makes for somewhat buggy behavior, this workaround increases the scroll ticks and not the length of the scrolling
 
 >``` bash
 >  sudo apt update
