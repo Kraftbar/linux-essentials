@@ -103,7 +103,7 @@ there are custom applets mode for weather and cpu temp. And nvidia gpu temp is b
 >    sudo apt-get install translate-shell      
 >    # symbolic link scripts
 >    abspaths=$(readlink -f "linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
->    abspaths=$(readlink -f "../../../scripts/my*")        && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "../scripts/my*")        && sudo ln  -s $abspaths /usr/local/bin/
 >   ```
 
 
@@ -182,15 +182,15 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 
 >   ```sh
 >    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "linuxessentials/docs/mySetup/dots/*.el") && ln -s $abspaths /home/nybo/.emacs.d/
->    abspaths=$(readlink -f "../dots/*.el")                           && ln -s $abspaths /home/nybo/.emacs.d/ 
+>    abspaths=$(readlink -f "linuxessentials/config&docs/dots/*.el") && ln -s $abspaths /home/nybo/.emacs.d/
+>    abspaths=$(readlink -f "dots/*.el")                           && ln -s $abspaths /home/nybo/.emacs.d/ 
 >   ```
 
 
 (for windows)
 >   ```CMD
 > REM; symbolic link
-> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) ^
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
 > DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
 >   ```CMD
