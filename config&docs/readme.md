@@ -136,7 +136,7 @@ gnuplot
 youtube-dl         
 imagemagick        
 
-#### 7.4  ohmyzsh [todo: needs script]       
+#### 7.4  ohmyzsh with history enabled [todo: needs script]       
 
 
 
