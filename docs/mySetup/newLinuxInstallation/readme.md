@@ -2,11 +2,21 @@
 Todo: find a way to exract bash code from markdown and run it
 
 ---
-### 1. get the applet that allows for automatic sleep when low battery [todo: needs script]
->  [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
->  or do a simple script (havent had the time)      
+### 1. get the applets
+#### 1.1  that allows for automatic sleep when low battery [todo: needs script]
+ [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
+ OR do a simple script (havent had the time)      
 OR set cinnamon settings see web-r for script to modify
-
+#### 1.2 add some cmd output to make it look fancy
+>   ```sh
+>   rpm
+>    sensors | awk '/^Processor Fan:/ {print $3 }'  
+>   local ip
+>    ip -4 -o addr show wlp2s0: | awk '{print $4}'
+>   mem
+> free -g | awk '/^Mem:/{print $3 "/" $2}'
+>   ```
+there are custom applets mode for weather and cpu temp. And nvidia gpu temp is bugged np
 
 ---
 ### 2. fix windows clock
@@ -185,9 +195,14 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 
 (for windows)
 >   ```CMD
+> REM; symbolic link
 > FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\docs\mySetup\dots\*" ) DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
-
+>   ```CMD
+> REM; start emacs
+>tasklist | FIND "emacs" >nul
+>if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
+>   ```
 
 
 <br/><br/><br/><br/><br/><br/>

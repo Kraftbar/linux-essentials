@@ -1,8 +1,0 @@
-rpm
- sensors | awk '/^Processor Fan:/ {print $3 }'  
-local ip
- ip -4 -o addr show wlp2s0: | awk '{print $4}'
-mem
- free -g | awk '/^Mem:/{print $3 "/" $2}'
-
-there are custom applets mode for weather and cpu temp. And nvidia gpu temp is bugged np
