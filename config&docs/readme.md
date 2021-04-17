@@ -8,7 +8,7 @@ Todo: find a way to exract bash code from markdown and run it
  OR do a simple script (havent had the time)      
 OR set cinnamon settings see web-r for script to modify
 #### 1.2 add some cmd output to make it look fancy
-getting wifi card, untested [ifconfig | grep wlp | awk '{ print substr($1, 1, length($1)-1) }' ]
+getting wifi card, untested [ifconfig | grep wlp | awk '{ print $1}' | sed 's/:$//'  ]
 >   ```sh
 >   rpm
 >    sensors | awk '/^Processor Fan:/ {print $3 }'  
@@ -17,7 +17,7 @@ getting wifi card, untested [ifconfig | grep wlp | awk '{ print substr($1, 1, le
 >   mem
 >    free -g | awk '/^Mem:/{print $3 "/" $2}'
 >   ```
-there are custom applets mode for weather and cpu temp. And nvidia gpu temp is bugged np
+there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is bugged np
 
 ---
 ### 2. fix windows clock
