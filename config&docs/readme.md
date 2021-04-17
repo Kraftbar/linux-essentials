@@ -8,11 +8,11 @@ Todo: find a way to exract bash code from markdown and run it
  OR do a simple script (havent had the time)      
 OR set cinnamon settings see web-r for script to modify
 #### 1.2 add some cmd output to make it look fancy
+getting wifi card, untested [ifconfig | grep wlp | awk '{ print substr($1, 1, length($1)-1) }' ]
 >   ```sh
 >   rpm
 >    sensors | awk '/^Processor Fan:/ {print $3 }'  
 >   local ip
->    # getting wifi card, untested [ifconfig | grep wlp | awk '{ print substr($1, 1, length($1)-1) }' ]
 >    ip -4 -o addr show wlp2s0: | awk '{print $4}'
 >   mem
 >    free -g | awk '/^Mem:/{print $3 "/" $2}'
