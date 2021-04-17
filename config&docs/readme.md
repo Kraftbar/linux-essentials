@@ -14,7 +14,7 @@ OR set cinnamon settings see web-r for script to modify
 >   local ip
 >    ip -4 -o addr show wlp2s0: | awk '{print $4}'
 >   mem
-> free -g | awk '/^Mem:/{print $3 "/" $2}'
+>    free -g | awk '/^Mem:/{print $3 "/" $2}'
 >   ```
 there are custom applets mode for weather and cpu temp. And nvidia gpu temp is bugged np
 
