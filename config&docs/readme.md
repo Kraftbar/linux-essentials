@@ -36,8 +36,8 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 
 >``` bash
 >  # add scrolling speed to imwheelrc
->  cat <<EOT >> ~/.imwheelrc
 >  rm ~/.imwheelrc
+>  cat <<EOT >> ~/.imwheelrc
 >  ".*-chrome*"
 >  None,      Up,   Button4, 5
 >  None,      Down, Button5, 5
