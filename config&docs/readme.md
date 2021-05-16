@@ -48,7 +48,7 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 
 
 #### 3.2 bugges up mouse scroll fix 
-
+<sub><sup>
 We can do the following to start imwheel when the mouse is plugged in, and stopped when the mouse is unplugged.
 I'm on Fedora 33, but a similar solution should work on other distributions.
 This method is assuming you have an imwheel service running on your machine.
@@ -105,7 +105,7 @@ Finally, enable the service so it starts automatically on reboot.
 > systemctl --user daemon-reload
 > systemctl --user enable xinputwatcher.sh
 >```
-
+</sup></sub>
 ---
 ### 4. Set up git ssh
 
