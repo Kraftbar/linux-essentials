@@ -209,7 +209,7 @@ imagemagick
 ---
 ### 8. get emacs [todo: needs script]        
 
-
+Some temp notes on possible approach on beeing able to start emacs in deamon mode without personal starting script :
 >   ```sh
 >   # dont use this with  current config
 >   # needs more testing
