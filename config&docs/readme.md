@@ -26,7 +26,7 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >   ```
 
 ---
-### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
+### <span style="color:blue"> 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup) </span>.
  this is a workaround solution. It does still makes for somewhat buggy behavior, this workaround increases the scroll ticks and not the length of the scrolling
 
 >``` bash
