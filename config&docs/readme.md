@@ -46,6 +46,66 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >  imwheel -b "4 5"
 >```
 
+
+#### 3.2 bugges up mouse scroll fix 
+
+We can do the following to start imwheel when the mouse is plugged in, and stopped when the mouse is unplugged.
+I'm on Fedora 33, but a similar solution should work on other distributions.
+This method is assuming you have an imwheel service running on your machine.
+$HOME/xinputwatcher.sh (remember to chmod +x this file)
+
+>``` bash
+> #!/bin/bash
+> while true
+> do
+>   if [[ $(xinput list --name-only | grep 'Logitech USB-PS/2 Optical Mouse') ]];
+>   then
+>     if [[ $(systemctl --user is-active imwheel) == inactive ]];
+>     then
+>       systemctl --user start --now imwheel
+>       echo "starting imwheel"
+>     else
+>       echo "imwheel already running"
+>     fi
+>   else
+>     if [[ $(systemctl --user is-active imwheel) == active ]];
+>     then
+>       systemctl --user stop --now imwheel
+>       echo "stopping imwheel"
+>     else
+>       echo "imwheel already stopped"
+>     fi
+>   fi
+>   sleep 3
+> done
+>```
+Note, you should replace 'Logical .. Mouse' string with whatever your mouse name is (type xinput to get the list of devices).
+If you have multiple mice, then you want to add an elseif block.
+Note the sleep command; if we unplug the mouse it should take effect within 3 seconds.
+Go ahead and test this script by running ./xinputwatcher.sh. It should start imwheel when you plug in your mouse in, and stop imwheel when you unplug it.
+Now create the service that runs that script automatically at system start.
+
+$HOME/.config/systemd/user/xinputwatcher.service
+
+>``` 
+>[Unit]
+>Description=xinputwatcher
+>
+>[Service]
+>Type=simple
+>ExecStart=$HOME/xinputwatcher.sh
+>KillMode=process
+>
+>[Install]
+>WantedBy=graphical-session.target
+>``` 
+
+Finally, enable the service so it starts automatically on reboot.
+>``` bash
+> systemctl --user daemon-reload
+> systemctl --user enable xinputwatcher.sh
+>```
+
 ---
 ### 4. Set up git ssh
 
@@ -137,9 +197,15 @@ gnuplot
 youtube-dl         
 imagemagick        
 
-#### 7.4  ohmyzsh with history enabled [todo: needs script]       
+#### 7.4  ohmyzsh with history enabled 
 
 
+>   ```sh
+>   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+>   cd ~/.oh-my-zsh/custom/plugins
+>   git clone git@github.com:zdharma/history-search-multi-word.git
+>   sed '/^plugins=(.*/a history-search-multi-word' ~/.zshrc
+>   ```
 
 ---
 ### 8. get emacs [todo: needs script]        

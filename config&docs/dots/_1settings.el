@@ -18,6 +18,12 @@
 ;; "smooth" scrolling keyboard 
 (setq scroll-step 1)
 
+
+;; temp code that might help in writing of proper emacs scroller behavior (emulate cursor off screen)
+;; (advice-add 'mwheel-scroll :before (lambda (arg) (if (not (eq last-command 'mwheel-scroll)) (setq point-before-mwheel-scroll (window-point)))))
+;; (defun jump-back () (goto-char point-before-mwheel-scroll))
+
+
 ;; use esc to close minibuffers 
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))	
 
