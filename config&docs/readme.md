@@ -203,7 +203,7 @@ imagemagick
 >   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 >   cd ~/.oh-my-zsh/custom/plugins
 >   git clone git@github.com:zdharma/history-search-multi-word.git
->   sed '/^plugins=(.*/a history-search-multi-word' ~/.zshrc
+>   sed -i '/^plugins=(.*/a history-search-multi-word' ~/.zshrc
 >   ```
 
 ---
