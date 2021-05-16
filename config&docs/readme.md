@@ -26,7 +26,7 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >   ```
 
 ---
-### <span style="color:blue"> 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup) </span>.
+### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
  this is a workaround solution. It does still makes for somewhat buggy behavior, this workaround increases the scroll ticks and not the length of the scrolling
 
 >``` bash
@@ -86,7 +86,11 @@ Now create the service that runs that script automatically at system start.
 
 $HOME/.config/systemd/user/xinputwatcher.service
 
->``` 
+>```  bash
+>mkdir ~/.config/systemd/
+>mkdir ~/.config/systemd/user
+>touch ~/.config/systemd/user/xinputwatcher.service
+>cat <<EOT >> ~/.config/systemd/user/xinputwatcher.service
 >[Unit]
 >Description=xinputwatcher
 >
@@ -97,6 +101,7 @@ $HOME/.config/systemd/user/xinputwatcher.service
 >
 >[Install]
 >WantedBy=graphical-session.target
+>EOT
 >``` 
 
 Finally, enable the service so it starts automatically on reboot.
