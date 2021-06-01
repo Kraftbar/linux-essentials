@@ -209,6 +209,7 @@ imagemagick
 >   cd ~/.oh-my-zsh/custom/plugins
 >   git clone git@github.com:zdharma/history-search-multi-word.git
 >   sed -i '/^plugins=(.*/a history-search-multi-word' ~/.zshrc
+>   echo 'exec /usr/bin/zsh' >>~/.bashrc
 >   ```
 
 ---
