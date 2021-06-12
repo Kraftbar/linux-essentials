@@ -218,6 +218,7 @@
 >  **[libinput-gestures](https://github.com/bulletmark/libinput-gestures)**    
 >  **[PlotJuggler](https://github.com/facontidavide/PlotJuggler)**    
 >  **[wechat](https://github.com/Jactor-Sue/Deepin-Apps-Installation)**    
+>  **[bit/byte reference](https://en.wikipedia.org/wiki/Orders_of_magnitude_(data))**    
 
 
 
