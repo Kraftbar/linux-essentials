@@ -46,18 +46,20 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >  imwheel -b "4 5"
 >```
 
-  cat <<EOT >> ~/.config/autostart/scrollfix-(imwheel).desktop
-  [Desktop Entry]
-  Type=Application
-  Exec=imwheel -b "4 5"
-  X-GNOME-Autostart-enabled=true
-  NoDisplay=false
-  Hidden=false
-  Name[en_US]=scrollfix-(imwheel)
-  Comment[en_US]=No description
-  X-GNOME-Autostart-Delay=0
-  EOT
-  
+>``` bash
+> cat <<EOT >> ~/.config/autostart/scrollfix-(imwheel).desktop
+> [Desktop Entry]
+> Type=Application
+> Exec=imwheel -b "4 5"
+> X-GNOME-Autostart-enabled=true
+> NoDisplay=false
+> Hidden=false
+> Name[en_US]=scrollfix-(imwheel)
+> Comment[en_US]=No description
+> X-GNOME-Autostart-Delay=0
+> EOT
+>```
+
  
  
 #### 3.2 bugges up mouse scroll - fix 
