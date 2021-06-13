@@ -35,8 +35,6 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >```
 
 >``` bash
-
-
 >  ## add scrolling speed to imwheelrc
 >  USER_HOME=$(eval echo ~${SUDO_USER})
 >  # config
