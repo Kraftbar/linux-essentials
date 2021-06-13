@@ -35,29 +35,33 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >```
 
 >``` bash
->  # add scrolling speed to imwheelrc
->  rm ~/.imwheelrc
->  cat <<EOT >> ~/.imwheelrc
+
+
+>  ## add scrolling speed to imwheelrc
+>  USER_HOME=$(eval echo ~${SUDO_USER})
+>  # config
+>  rm ${USER_HOME}/.imwheelrc
+>  touch ${USER_HOME}/.imwheelrc
+>  cat <<EOT >> ${USER_HOME}/.imwheelrc
 >  ".*-chrome*"
 >  None,      Up,   Button4, 5
 >  None,      Down, Button5, 5
 >  EOT
-> # add to startup
->  imwheel -b "4 5"
->```
-
->``` bash
-> cat <<EOT >> ~/.config/autostart/scrollfix-(imwheel).desktop
-> [Desktop Entry]
-> Type=Application
-> Exec=imwheel -b "4 5"
-> X-GNOME-Autostart-enabled=true
-> NoDisplay=false
-> Hidden=false
-> Name[en_US]=scrollfix-(imwheel)
-> Comment[en_US]=No description
-> X-GNOME-Autostart-Delay=0
-> EOT
+>  
+>  # add to startup
+>  rm ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
+>  touch ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
+>  cat <<EOT >> ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
+>  [Desktop Entry]
+>  Type=Application
+>  Exec=imwheel -b "4 5"
+>  X-GNOME-Autostart-enabled=true
+>  NoDisplay=false
+>  Hidden=false
+>  Name[en_US]=scrollfix-(imwheel)
+>  Comment[en_US]=No description
+>  X-GNOME-Autostart-Delay=0
+>  EOT
 >```
 
  
