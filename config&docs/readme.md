@@ -37,9 +37,11 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >``` bash
 >  ## add scrolling speed to imwheelrc
 >  USER_HOME=$(eval echo ~${SUDO_USER})
+>  
 >  # config
 >  rm ${USER_HOME}/.imwheelrc
 >  touch ${USER_HOME}/.imwheelrc
+>  
 >  cat <<EOT >> ${USER_HOME}/.imwheelrc
 >  ".*-chrome*"
 >  None,      Up,   Button4, 5
@@ -49,6 +51,7 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 >  # add to startup
 >  rm ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
 >  touch ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
+>
 >  cat <<EOT >> ${USER_HOME}/.config/autostart/scrollfix-imwheel.desktop
 >  [Desktop Entry]
 >  Type=Application
