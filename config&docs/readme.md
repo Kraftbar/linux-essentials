@@ -189,8 +189,8 @@ Finally, enable the service so it starts automatically on reboot.
 >    sudo apt-get install gnuplot
 >    sudo apt-get install translate-shell      
 >    # symbolic link scripts
->    abspaths=$(readlink -f "linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
->    abspaths=$(readlink -f "../scripts/my*")        && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
+>
 >   ```
 
 
