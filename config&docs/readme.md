@@ -173,6 +173,8 @@ Finally, enable the service so it starts automatically on reboot.
 >read -p "please confirm with enter when done:" confirm 
 >ssh -T git@github.com
 >
+> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
+>
 >   ```
 
 
