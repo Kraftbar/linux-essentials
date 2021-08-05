@@ -256,8 +256,7 @@ Some temp notes on possible approach on beeing able to start emacs in deamon mod
 
 >   ```sh
 >   # needs  testing!"!!
->   emacsnm=$( ls /usr/share/applications/ | grep emacs)
->   sudo sed  -i "s/Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/$emacsnm"
+>   sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
 > 
 >   ```
 
