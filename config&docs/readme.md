@@ -275,8 +275,7 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 
 >   ```sh
 >    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
->    abspaths=$(readlink -f "dots/*.el")                           && ln -s $abspaths ~/.emacs.d/ 
+>    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
 >   ```
 
 
