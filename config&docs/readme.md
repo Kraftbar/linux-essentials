@@ -130,31 +130,65 @@ Finally, enable the service so it starts automatically on reboot.
 > systemctl --user enable xinputwatcher.sh
 >```
 
+
+
+---
+### 4. Install prerequisite packages 
+
+
+>   ```sh
+> # install git 
+> sudo apt-get install git 
+>
+> # install git icons for nemo 
+> sudo apt-get install pip3
+> sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
+> pip3 install --user git-nautilus-icons
+>
+> # used for ssh config script
+> sudo apt install xclip
+>
+> # used for ssh vscode install
+> sudo apt install software-properties-common apt-transport-https
+>
+> # custom shell script dependencies
+> sudo apt-get install translate-shell 
+> sudo apt-get install gnuplot
+>
+>```
+
+
+
+---
+### 4. Install programs 
+
+
+>   ```sh
+>  # install chrome 
+> wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+> sudo dpkg -i google-chrome-stable_current_amd64.deb
+> rm google-chrome-stable_current_amd64.deb
+> # install  spotify 
+> url -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add - 
+> echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+> sudo apt-get update && sudo apt-get install spotify-client
+> # install vscode 
+> sudo apt update
+> wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+> sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+> sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+> sudo apt update && sudo apt install code
+>```
+
 ---
 ### 4. Set up git ssh
 
 >   ```sh
 >
->echo "Installing git and git utils, installation will clear  clipboard "
+>echo "Running this (configuring ssh) will clear the clipboard "
 >read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 >
 >
-># install chrome spotify 
->wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-># sudo apt install ./google-chrome*.deb
->sudo dpkg -i google-chrome-stable_current_amd64.deb
->rm google-chrome-stable_current_amd64.deb
->
->#install git 
->sudo apt-get install git 
->
-># install git icons for nemo 
->sudo apt-get install pip3
->sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
->pip3 install --user git-nautilus-icons
->
->
-> # ssh config 
 >git config --global user.name "Kraftbar"
 >git config --global user.email "gautenybo@gmail.com"
 >git config --global color.ui true
@@ -162,7 +196,6 @@ Finally, enable the service so it starts automatically on reboot.
 >
 >ssh-keygen -t rsa -C "gautenybo@gmail.com"
 >
->sudo apt install xclip
 >alias xclip="xclip -selection c" 
 >cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
 >
@@ -173,8 +206,6 @@ Finally, enable the service so it starts automatically on reboot.
 >read -p "please confirm with enter when done:" confirm 
 >ssh -T git@github.com
 >
-> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
->
 >   ```
 
 
@@ -182,17 +213,34 @@ Finally, enable the service so it starts automatically on reboot.
 
 
 ---
-### 5. Get scripts
+### 5. Create symbolic links
 ###
 >   ```sh
->    # Get shell dependencies
->    sudo apt-get install gnuplot
->    sudo apt-get install translate-shell      
+> 
+> 
 >    # symbolic link scripts
 >    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
->
+> 
+> 
+>    mkdir ~/.emacs.d/
+>    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
+> 
+> 
 >   ```
 
+
+(for windows)
+>   ```CMD
+> REM; symbolic link
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
+> DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
+>   ```
+>   ```CMD
+> REM; start emacs
+>tasklist | FIND "emacs" >nul
+>if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) ^
+> else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
+>   ```
 
 
 
@@ -238,18 +286,6 @@ imagemagick
 ---
 ### 8. get emacs [todo: needs script]        
 
-Some temp notes on possible approach on beeing able to start emacs in deamon mode without personal starting script :
->   ```sh
->   # dont use this with  current config
->   # needs more testing
->   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
->     /usr/bin/emacs --daemon 2> /dev/null
->   fi
-> 
->   EDITOR="/usr/bin/emacsclient --quiet --create-frame"
->   VISUAL=$EDITOR
->   export EDITOR VISUAL
->   ```
 
 
 #### 8.1 mod .desktop entry
@@ -269,27 +305,6 @@ Some temp notes on possible approach on beeing able to start emacs in deamon mod
 
 do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs) 
 
-
-#### 8.3 get files:       
-
->   ```sh
->    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
->   ```
-
-
-(for windows)
->   ```CMD
-> REM; symbolic link
-> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
-> DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
->   ```
->   ```CMD
-> REM; start emacs
->tasklist | FIND "emacs" >nul
->if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) ^
-> else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
->   ```
 
 
 
@@ -318,18 +333,20 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 
 chassis=$(sudo dmidecode --string chassis-type)
 
+
+# Fix max mousespeed for cinnamon
+# and tap to click
+if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
+     var=$(xinput list --id-only 'DLL07BE:01 06CB:sasd7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
+     xinput --set-prop $var 323 1
+fi
+
+
 # used by dwm
 if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
     xrandr --output eDP-1 --mode 1920x1080
     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
     gnome-terminal &
-fi
-
-# Fix max mousespeed for cinnamon
-# and tap to click
-if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
-     var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
-     xinput --set-prop $var 323 1
 fi
 ```
 ---
@@ -404,3 +421,19 @@ touchegg
 consider to get 
  - ROFI (missing config file)
  - sxhkd (missing config file)
+
+
+##### notes on emacs
+
+Some temp notes on possible approach on beeing able to start emacs in deamon mode without personal starting script :
+>   ```sh
+>   # dont use this with  current config
+>   # needs more testing
+>   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
+>     /usr/bin/emacs --daemon 2> /dev/null
+>   fi
+> 
+>   EDITOR="/usr/bin/emacsclient --quiet --create-frame"
+>   VISUAL=$EDITOR
+>   export EDITOR VISUAL
+>   ```
