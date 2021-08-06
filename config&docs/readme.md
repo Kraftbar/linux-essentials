@@ -19,11 +19,10 @@ getting wifi card, untested [ifconfig | grep wlp | awk '{ print $1}' | sed 's/:$
 >   ```
 there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is bugged np
 
----
-### 2. fix windows clock
->   ```sh
->    timedatectl set-local-rtc 1
->   ```
+
+### 0. install nvidia drivers so no cpu lockup at shutdown
+also, select intel as gpu so power consumption is not acting degenerate       
+and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
 
 ---
 ### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
@@ -131,6 +130,12 @@ Finally, enable the service so it starts automatically on reboot.
 >```
 
 
+---
+### 2. fix windows clock
+>   ```sh
+>    timedatectl set-local-rtc 1
+>   ```
+
 
 ---
 ### 4. Install prerequisite packages 
@@ -155,6 +160,8 @@ Finally, enable the service so it starts automatically on reboot.
 > sudo apt-get install translate-shell 
 > sudo apt-get install gnuplot
 >
+># get zsh
+> sudo apt-get install zsh
 >```
 
 
@@ -164,15 +171,18 @@ Finally, enable the service so it starts automatically on reboot.
 
 
 >   ```sh
->  # install chrome 
+>  # install chrome  #
+>  ###################
 > wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 > sudo dpkg -i google-chrome-stable_current_amd64.deb
 > rm google-chrome-stable_current_amd64.deb
-> # install  spotify 
+> # install  spotify #
+> ####################
 > url -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add - 
 > echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
 > sudo apt-get update && sudo apt-get install spotify-client
-> # install vscode 
+> # install vscode   #
+> ####################
 > sudo apt update
 > wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
 > sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
@@ -181,13 +191,12 @@ Finally, enable the service so it starts automatically on reboot.
 >```
 
 ---
-### 4. Set up git ssh
+### 4. Set up git ssh and download repository
 
 >   ```sh
 >
 >echo "Running this (configuring ssh) will clear the clipboard "
 >read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
->
 >
 >git config --global user.name "Kraftbar"
 >git config --global user.email "gautenybo@gmail.com"
@@ -206,6 +215,10 @@ Finally, enable the service so it starts automatically on reboot.
 >read -p "please confirm with enter when done:" confirm 
 >ssh -T git@github.com
 >
+> 
+> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
+>
+>
 >   ```
 
 
@@ -216,7 +229,6 @@ Finally, enable the service so it starts automatically on reboot.
 ### 5. Create symbolic links
 ###
 >   ```sh
-> 
 > 
 >    # symbolic link scripts
 >    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
@@ -271,11 +283,9 @@ gnuplot
 youtube-dl         
 imagemagick        
 
-#### 7.4  ohmyzsh with history enabled 
-
+#### 7.4  configure zsh
 
 >   ```sh
->   sudo apt-get install zsh
 >   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 >   cd ~/.oh-my-zsh/custom/plugins
 >   git clone git@github.com:zdharma/history-search-multi-word.git
@@ -284,11 +294,7 @@ imagemagick
 >   ```
 
 ---
-### 8. get emacs [todo: needs script]        
-
-
-
-#### 8.1 mod .desktop entry
+### 8. Emacs     
 
 >   ```sh
 >   # needs  testing!"!!
@@ -298,12 +304,11 @@ imagemagick
 
 
 
-#### 8.2 consider to make defualt text editor
+ consider to make defualt text editor       
 
 
-
-
-do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs) 
+do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs)       
+need to configure 
 
 
 
@@ -321,11 +326,6 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 ---
 
 
-### 0. install nvidia drivers so no cpu lockup at shutdown
-also, select intel as gpu so power consumption is not acting degenerate       
-and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
-
-
 
 ### 9. Add things to xinitrc  [todo: needs script]               
 
@@ -337,7 +337,7 @@ chassis=$(sudo dmidecode --string chassis-type)
 # Fix max mousespeed for cinnamon
 # and tap to click
 if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
-     var=$(xinput list --id-only 'DLL07BE:01 06CB:sasd7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
+     var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
      xinput --set-prop $var 323 1
 fi
 
