@@ -1,7 +1,10 @@
 # Things i do with a fresh linux install (mainly for xps15 9560)
 Todo: find a way to exract bash code from markdown and run it
-
-sed -n '/^>.*```/,/^>.*```/ p' < readme.md | sed '/^```/ d'    
+```sh
+ # extract the code
+ sed -n '/^>.*```/,/^>.*```/ p' < readme.md | sed '/^```/ d'    
+ # todo: cut out "```bash", ">" etc.
+```
 docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fenced-code-block-excerpts-from-markdown-file
 
 ---
