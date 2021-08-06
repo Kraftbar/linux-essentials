@@ -24,6 +24,343 @@ there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is 
 also, select intel as gpu so power consumption is not acting degenerate       
 and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
 
+
+---
+### 2. fix windows clock
+>   ```sh
+>    timedatectl set-local-rtc 1
+>   ```
+
+
+---
+### 4. Install prerequisite packages 
+
+
+>   ```sh
+> # install git 
+> sudo apt-get install git 
+>
+> # install git icons for nemo 
+> sudo apt-get install pip3
+> sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
+> pip3 install --user git-nautilus-icons
+>
+> # used for ssh config script
+> sudo apt install xclip
+>
+> # used for ssh vscode install
+> sudo apt install software-properties-common apt-transport-https
+>
+> # custom shell script dependencies
+> sudo apt-get install translate-shell 
+> sudo apt-get install gnuplot
+>
+># get zsh
+> sudo apt-get install zsh
+>```
+
+
+
+---
+### 4. Install programs 
+
+
+>   ```sh
+>  # install chrome  #
+>  ###################
+> wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+> sudo dpkg -i google-chrome-stable_current_amd64.deb
+> rm google-chrome-stable_current_amd64.deb
+>
+> # install  spotify #
+> ####################
+> url -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add - 
+> echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+> sudo apt-get update && sudo apt-get install spotify-client
+>
+> # install vscode   #
+> ####################
+> sudo apt update
+> wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+> sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+> sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+> sudo apt update && sudo apt install code
+>
+> # install emacs    #
+> ####################
+> sudo add-apt-repository ppa:kelleyk/emacs
+> sudo apt update
+> sudo apt install emacs27
+>```
+
+---
+### 4. Set up git ssh and download repository
+
+>   ```sh
+>
+>echo "Running this (configuring ssh) will clear the clipboard "
+>read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+>
+>git config --global user.name "Kraftbar"
+>git config --global user.email "gautenybo@gmail.com"
+>git config --global color.ui true
+>git config --global core.editor emacs
+>
+>ssh-keygen -t rsa -C "gautenybo@gmail.com"
+>
+>alias xclip="xclip -selection c" 
+>cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
+>
+>echo "Clipboard contains now id_rsa.pub, please input it to browser. "
+>echo "When done, close broser to continue!! "
+>google-chrome "https://github.com/settings/ssh/new"
+>
+>read -p "please confirm with enter when done:" confirm 
+>ssh -T git@github.com
+>
+> 
+> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
+>
+>
+>   ```
+
+
+
+
+
+---
+### 5. Create symbolic links
+###
+>   ```sh
+> 
+>    # symbolic link scripts
+>    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
+> 
+> 
+>    mkdir ~/.emacs.d/
+>    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
+> 
+> 
+>   ```
+
+
+(for windows)
+>   ```CMD
+> REM; symbolic link
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
+> DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
+>   ```
+>   ```CMD
+> REM; start emacs
+>tasklist | FIND "emacs" >nul
+>if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) ^
+> else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
+>   ```
+
+
+
+---
+
+### 6 Set aliases
+
+>   ```sh
+> alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
+> alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
+> alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
+> 
+> 
+> # todo: Make this an alias     
+> # youtube-dl-best --output "%(upload_date)s%(title)s.%(ext)s"
+>   ```
+
+
+---
+### 7. Get programs
+get albert [link](install_Albert.sh)       
+latex       
+disc       
+spotify       
+gnuplot     
+youtube-dl         
+imagemagick        
+
+#### 8  Configure zsh
+
+>   ```sh
+>   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+>   cd ~/.oh-my-zsh/custom/plugins
+>   git clone git@github.com:zdharma/history-search-multi-word.git
+>   sed -i 's/plugins=(/ history-search-multi-word & /' ~/.zshrc
+>   echo 'exec /usr/bin/zsh' >>~/.bashrc
+>   ```
+
+---
+### 8. Emacs     
+
+>   ```sh
+>   # needs  testing!"!!
+>   sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
+> 
+>   ```
+
+
+
+consider to make defualt text editor       
+
+do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs)       
+need to configure 
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 9. Add things to xinitrc  [todo: needs script]               
+
+Can consider to make a script and put run it by making a entry in "/home/nybo/.config/autostart"      
+https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
+https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
+
+
+>```bash
+> # Issue: linux mint not recognizing ~/.xinitrc
+> cp /etc/X11/xinit/xinitrc ~/.xinitrc
+>
+>  cat <<EOT >> ${USER_HOME}/.imwheelrc
+>
+>
+> ### Start emacs deamon                  ###
+> ###########################################
+> emacs --daemon
+>
+>
+> ### trackpad sensitivity and dwm config ###
+> ###########################################
+> chassis=$(sudo dmidecode --string chassis-type)
+> 
+> # Fix max mousespeed for cinnamon
+> # and tap to click
+> if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
+>      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') 
+>      xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
+>      xinput --set-prop $var 323 1 
+> fi
+> 
+> # used by dwm
+> if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
+>     xrandr --output eDP-1 --mode 1920x1080
+>     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
+>     gnome-terminal &
+> fi
+>
+> EOT
+>
+>
+>```
+---
+
+<br/><br/><br/><br/><br/><br/>
+
+---
+
+
+### todo:
+- keyboard shortcut
+    -unbind show desklets            
+    -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
+- theme - consider dotfile
+- disable sound   - consider dotfile
+- latex and sagetex setup        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+### 10 get repositories (in the works)
+```bash
+curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
+```
+
+
+
+
+
+
+---
+### 11. If on gnome and not using cinnamon, set  keys (todo: fix relative paths)
+```bash
+# used by dwm
+cd "install resources"
+# import keys
+./keybindings.pl -i /tmp/keys.csv
+# use "./keybindings.pl -e /tmp/keys.csv" to export
+cd ..
+```
+
+
+
+
+---
+### Other install things
+[zen_installer](https://github.com/spookykidmm/zen_installer)      
+##### seems like a good setup 
+```bash
+nybo@pop-os:~$ lsmod | grep -iE "apple|cyapa|sermouse|synap|psmouse|vsxx|bcm"
+btbcm                  16384  1 btusb
+bluetooth             577536  31 btrtl,btintel,btbcm,bnep,btusb,rfcomm
+psmouse               155648  0
+```
+### seems like a good thing to add 
+touchegg                  
+
+
+consider to get 
+ - ROFI (missing config file)
+ - sxhkd (missing config file)
+
+
+##### notes on emacs
+
+Some temp notes on possible approach on beeing able to start emacs in deamon mode without personal starting script :
+>   ```sh
+>   # dont use this with  current config
+>   # needs more testing
+>   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
+>     /usr/bin/emacs --daemon 2> /dev/null
+>   fi
+> 
+>   EDITOR="/usr/bin/emacsclient --quiet --create-frame"
+>   VISUAL=$EDITOR
+>   export EDITOR VISUAL
+>   ```
+
+
+
+
+
 ---
 ### 3. fix mouse bugginess ,configure scrolling speed (todo: autoadd [imwheel -b "4 5"] to startup)
  this is a workaround solution. It does still makes for somewhat buggy behavior, this workaround increases the scroll ticks and not the length of the scrolling
@@ -128,333 +465,3 @@ Finally, enable the service so it starts automatically on reboot.
 > systemctl --user daemon-reload
 > systemctl --user enable xinputwatcher.sh
 >```
-
-
----
-### 2. fix windows clock
->   ```sh
->    timedatectl set-local-rtc 1
->   ```
-
-
----
-### 4. Install prerequisite packages 
-
-
->   ```sh
-> # install git 
-> sudo apt-get install git 
->
-> # install git icons for nemo 
-> sudo apt-get install pip3
-> sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
-> pip3 install --user git-nautilus-icons
->
-> # used for ssh config script
-> sudo apt install xclip
->
-> # used for ssh vscode install
-> sudo apt install software-properties-common apt-transport-https
->
-> # custom shell script dependencies
-> sudo apt-get install translate-shell 
-> sudo apt-get install gnuplot
->
-># get zsh
-> sudo apt-get install zsh
->```
-
-
-
----
-### 4. Install programs 
-
-
->   ```sh
->  # install chrome  #
->  ###################
-> wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-> sudo dpkg -i google-chrome-stable_current_amd64.deb
-> rm google-chrome-stable_current_amd64.deb
-> # install  spotify #
-> ####################
-> url -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add - 
-> echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-> sudo apt-get update && sudo apt-get install spotify-client
-> # install vscode   #
-> ####################
-> sudo apt update
-> wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-> sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-> sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-> sudo apt update && sudo apt install code
-> # install emacs    #
-> ####################
-> sudo add-apt-repository ppa:kelleyk/emacs
-> sudo apt update
-> sudo apt install emacs27
->```
-
----
-### 4. Set up git ssh and download repository
-
->   ```sh
->
->echo "Running this (configuring ssh) will clear the clipboard "
->read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
->
->git config --global user.name "Kraftbar"
->git config --global user.email "gautenybo@gmail.com"
->git config --global color.ui true
->git config --global core.editor emacs
->
->ssh-keygen -t rsa -C "gautenybo@gmail.com"
->
->alias xclip="xclip -selection c" 
->cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
->
->echo "Clipboard contains now id_rsa.pub, please input it to browser. "
->echo "When done, close broser to continue!! "
->google-chrome "https://github.com/settings/ssh/new"
->
->read -p "please confirm with enter when done:" confirm 
->ssh -T git@github.com
->
-> 
-> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
->
->
->   ```
-
-
-
-
-
----
-### 5. Create symbolic links
-###
->   ```sh
-> 
->    # symbolic link scripts
->    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
-> 
-> 
->    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
-> 
-> 
->   ```
-
-
-(for windows)
->   ```CMD
-> REM; symbolic link
-> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
-> DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
->   ```
->   ```CMD
-> REM; start emacs
->tasklist | FIND "emacs" >nul
->if errorlevel 1 (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\runemacs.exe --daemon) ^
-> else (start /B C:\ProgramData\chocolatey\lib\Emacs\tools\emacs\bin\emacsclient.exe -n -c -a "")
->   ```
-
-
-
----
-
-### 6 Set aliases
-
->   ```sh
-> alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
-> alias youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
-> alias youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
-> alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
-> alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
-> 
-> 
-> # todo: Make this an alias     
-> # youtube-dl-best --output "%(upload_date)s%(title)s.%(ext)s"
->   ```
-
-
----
-### 7. Get programs
-get albert [link](install_Albert.sh)       
-latex       
-disc       
-spotify       
-gnuplot     
-youtube-dl         
-imagemagick        
-
-#### 7.4  configure zsh
-
->   ```sh
->   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
->   cd ~/.oh-my-zsh/custom/plugins
->   git clone git@github.com:zdharma/history-search-multi-word.git
->   sed -i 's/plugins=(/ history-search-multi-word & /' ~/.zshrc
->   echo 'exec /usr/bin/zsh' >>~/.bashrc
->   ```
-
----
-### 8. Emacs     
-
->   ```sh
->   # needs  testing!"!!
->   sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
-> 
->   ```
-
-
-
-consider to make defualt text editor       
-
-do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs)       
-need to configure 
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 9. Add things to xinitrc  [todo: needs script]               
-
-Can consider to make a script and put run it by making a entry in "/home/nybo/.config/autostart"      
-https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
-https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
-
-
->```bash
-> # Issue: linux mint not recognizing ~/.xinitrc
-> cp /etc/X11/xinit/xinitrc ~/.xinitrc
->
->  cat <<EOT >> ${USER_HOME}/.imwheelrc
->
->
-> ### Start emacs deamon                  ###
-> ###########################################
-> emacs --daemon
->
->
-> ### trackpad sensitivity and dwm config ###
-> ###########################################
-> chassis=$(sudo dmidecode --string chassis-type)
-> 
-> # Fix max mousespeed for cinnamon
-> # and tap to click
-> if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
->      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') 
->      xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
->      xinput --set-prop $var 323 1
-> fi
-> 
-> # used by dwm
-> if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
->     xrandr --output eDP-1 --mode 1920x1080
->     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
->     gnome-terminal &
-> fi
->
-> EOT
->
->
->```
----
-
-<br/><br/><br/><br/><br/><br/>
-
----
-
-
-### todo:
-- keyboard shortcut
-    -unbind show desklets            
-    -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
-- theme - consider dotfile
-- disable sound   - consider dotfile
-- latex and sagetex setup        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-### 10 get repositories (in the works)
-```bash
-curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
-```
-
-
-
-
-
-
----
-### 11. If on gnome and not using cinnamon, set  keys (todo: fix relative paths)
-```bash
-# used by dwm
-cd "install resources"
-# import keys
-./keybindings.pl -i /tmp/keys.csv
-# use "./keybindings.pl -e /tmp/keys.csv" to export
-cd ..
-```
-
-
-
-
----
-### Other install things
-[zen_installer](https://github.com/spookykidmm/zen_installer)      
-##### seems like a good setup 
-```bash
-nybo@pop-os:~$ lsmod | grep -iE "apple|cyapa|sermouse|synap|psmouse|vsxx|bcm"
-btbcm                  16384  1 btusb
-bluetooth             577536  31 btrtl,btintel,btbcm,bnep,btusb,rfcomm
-psmouse               155648  0
-```
-### seems like a good thing to add 
-touchegg                  
-
-
-consider to get 
- - ROFI (missing config file)
- - sxhkd (missing config file)
-
-
-##### notes on emacs
-
-Some temp notes on possible approach on beeing able to start emacs in deamon mode without personal starting script :
->   ```sh
->   # dont use this with  current config
->   # needs more testing
->   if [ -z "$(/usr/bin/pgrep -u $USER -x -f '/usr/bin/emacs --daemon')" ] ; then
->     /usr/bin/emacs --daemon 2> /dev/null
->   fi
-> 
->   EDITOR="/usr/bin/emacsclient --quiet --create-frame"
->   VISUAL=$EDITOR
->   export EDITOR VISUAL
->   ```
