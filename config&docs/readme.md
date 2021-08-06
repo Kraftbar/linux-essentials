@@ -188,6 +188,11 @@ Finally, enable the service so it starts automatically on reboot.
 > sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
 > sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
 > sudo apt update && sudo apt install code
+> # install emacs    #
+> ####################
+> sudo add-apt-repository ppa:kelleyk/emacs
+> sudo apt update
+> sudo apt install emacs27
 >```
 
 ---
@@ -321,13 +326,20 @@ need to configure
 
 
 
-<br/><br/><br/><br/><br/><br/>
-
----
-
-
 
 ### 9. Add things to xinitrc  [todo: needs script]               
+
+https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
+https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
+
+>```bash
+> # not working
+> cp /etc/X11/xinit/xinitrc ~/.xinitrc
+>
+>
+>```
+
+
 
 ```bash
 
@@ -351,7 +363,12 @@ fi
 ```
 ---
 
-todo:
+<br/><br/><br/><br/><br/><br/>
+
+---
+
+
+### todo:
 - keyboard shortcut
     -unbind show desklets            
     -bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"             
@@ -374,9 +391,6 @@ todo:
 
 
 
-
-
-<br/><br/><br/><br/><br/><br/>
 
 ---
 
