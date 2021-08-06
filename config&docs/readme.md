@@ -41,6 +41,10 @@ docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fen
 >
 ># get zsh
 > sudo apt-get install zsh
+>
+># get latex
+> sudo apt-get install texlive-full
+>
 >```
 
 
@@ -161,7 +165,7 @@ docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fen
 
 
 
-#### 8  Configure zsh
+### 8  Configure zsh
 
 >```sh
 > sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -196,15 +200,15 @@ need to configure
 
 
 
+---
 
 
 
-### 9. Add things to xinitrc  [todo: needs script]               
+### 9. Add things to xinitrc  
 
 Can consider to make a script and put run it by making a entry in "/home/nybo/.config/autostart"      
-https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
-https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
-
+docs: https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
+docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
 
 >```bash
 > # Issue: linux mint not recognizing ~/.xinitrc
