@@ -329,38 +329,45 @@ need to configure
 
 ### 9. Add things to xinitrc  [todo: needs script]               
 
+Can consider to make a script and put run it by making a entry in "/home/nybo/.config/autostart"      
 https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
 https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
 
+
 >```bash
-> # not working
+> # Issue: linux mint not recognizing ~/.xinitrc
 > cp /etc/X11/xinit/xinitrc ~/.xinitrc
+>
+>  cat <<EOT >> ${USER_HOME}/.imwheelrc
+>
+>
+> ### Start emacs deamon                  ###
+> ###########################################
+> emacs --daemon
+>
+>
+> ### trackpad sensitivity and dwm config ###
+> ###########################################
+> chassis=$(sudo dmidecode --string chassis-type)
+> 
+> # Fix max mousespeed for cinnamon
+> # and tap to click
+> if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
+>      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
+>      xinput --set-prop $var 323 1
+> fi
+> 
+> # used by dwm
+> if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
+>     xrandr --output eDP-1 --mode 1920x1080
+>     xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
+>     gnome-terminal &
+> fi
+>
+> EOT
 >
 >
 >```
-
-
-
-```bash
-
-chassis=$(sudo dmidecode --string chassis-type)
-
-
-# Fix max mousespeed for cinnamon
-# and tap to click
-if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
-     var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
-     xinput --set-prop $var 323 1
-fi
-
-
-# used by dwm
-if [ "$GDMSESSION" != "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
-    xrandr --output eDP-1 --mode 1920x1080
-    xinput --set-prop "DLL07BE:01 06CB:7A13 Touchpad" "libinput Natural Scrolling Enabled" 1
-    gnome-terminal &
-fi
-```
 ---
 
 <br/><br/><br/><br/><br/><br/>
