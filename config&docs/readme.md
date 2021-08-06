@@ -309,8 +309,7 @@ imagemagick
 
 
 
- consider to make defualt text editor       
-
+consider to make defualt text editor       
 
 do something in ~/.config/mimeapps.list i think     (copy xed settings, replace with emacs)       
 need to configure 
@@ -353,7 +352,8 @@ https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-s
 > # Fix max mousespeed for cinnamon
 > # and tap to click
 > if [ "$GDMSESSION" == "cinnamon" ] && [ "$chassis" == "Notebook" ]; then
->      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') && xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
+>      var=$(xinput list --id-only 'DLL07BE:01 06CB:7A13 Touchpad') 
+>      xinput --set-prop $var "Coordinate Transformation Matrix" 1.8 0 0 0 1.8 0 0 0 0.8
 >      xinput --set-prop $var 323 1
 > fi
 > 
