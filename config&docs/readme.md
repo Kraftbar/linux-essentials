@@ -7,28 +7,6 @@ Todo: find a way to exract bash code from markdown and run it
 ```
 docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fenced-code-block-excerpts-from-markdown-file
 
----
-### 1. get the applets
-#### 1.1  that allows for automatic sleep when low battery [todo: needs script]
- [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
- OR do a simple script (havent had the time)      
-OR set cinnamon settings see web-r for script to modify
-#### 1.2 add some cmd output to make it look fancy
-getting wifi card, untested [ifconfig | grep wlp | awk '{ print $1}' | sed 's/:$//'  ]
->   ```sh
->   rpm
->    sensors | awk '/^Processor Fan:/ {print $3 }'  
->   local ip
->    ip -4 -o addr show wlp2s0: | awk '{print $4}'
->   mem
->    free -g | awk '/^Mem:/{print $3 "/" $2}'
->   ```
-there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is bugged np
-
-
-### 0. install nvidia drivers so no cpu lockup at shutdown
-also, select intel as gpu so power consumption is not acting degenerate       
-and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
 
 
 ---
@@ -182,15 +160,6 @@ and, fiddle around with versions, since some are bugged (makes for freeze behavi
 >   ```
 
 
----
-### 7. Get programs
-get albert [link](install_Albert.sh)       
-latex       
-disc       
-spotify       
-gnuplot     
-youtube-dl         
-imagemagick        
 
 #### 8  Configure zsh
 
@@ -288,11 +257,38 @@ https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-s
 - latex and sagetex setup        
 
 
+---
+### 7. Get programs
+get albert [link](install_Albert.sh)       
+latex       
+disc       
+youtube-dl         
+imagemagick        
 
 
+---
+### 7. Manual stuff
+#### 1. get the applets
+#### 1.1  that allows for automatic sleep when low battery [todo: needs script]
+ [BAMS](https://cinnamon-spices.linuxmint.com/applets/view/255)      
+ OR do a simple script (havent had the time)      
+OR set cinnamon settings see web-r for script to modify
+#### 1.2 add some cmd output to make it look fancy
+getting wifi card, untested [ifconfig | grep wlp | awk '{ print $1}' | sed 's/:$//'  ]
+>   ```sh
+>   rpm
+>    sensors | awk '/^Processor Fan:/ {print $3 }'  
+>   local ip
+>    ip -4 -o addr show wlp2s0: | awk '{print $4}'
+>   mem
+>    free -g | awk '/^Mem:/{print $3 "/" $2}'
+>   ```
+there are custom applets mode for weather and cpu temp. Note nvidia gpu temp is bugged np
 
 
-
+#### 0. install nvidia drivers so no cpu lockup at shutdown
+also, select intel as gpu so power consumption is not acting degenerate       
+and, fiddle around with versions, since some are bugged (makes for freeze behavior etc.)         
 
 
 
