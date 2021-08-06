@@ -1,6 +1,9 @@
 # Things i do with a fresh linux install (mainly for xps15 9560)
 Todo: find a way to exract bash code from markdown and run it
 
+sed -n '/^>.*```/,/^>.*```/ p' < readme.md | sed '/^```/ d'    
+docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fenced-code-block-excerpts-from-markdown-file
+
 ---
 ### 1. get the applets
 #### 1.1  that allows for automatic sleep when low battery [todo: needs script]
@@ -188,22 +191,22 @@ imagemagick
 
 #### 8  Configure zsh
 
->   ```sh
->   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
->   cd ~/.oh-my-zsh/custom/plugins
->   git clone git@github.com:zdharma/history-search-multi-word.git
->   sed -i 's/plugins=(/ history-search-multi-word & /' ~/.zshrc
->   echo 'exec /usr/bin/zsh' >>~/.bashrc
->   ```
+>```sh
+> sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+> cd ~/.oh-my-zsh/custom/plugins
+> git clone git@github.com:zdharma/history-search-multi-word.git
+> sed -i 's/plugins=(/ history-search-multi-word & /' ~/.zshrc
+> echo 'exec /usr/bin/zsh' >>~/.bashrc
+>```
 
 ---
 ### 8. Emacs     
 
->   ```sh
->   # needs  testing!"!!
->   sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
-> 
->   ```
+>```sh
+>  # needs  testing!"!!
+>  sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
+>
+>```
 
 
 
