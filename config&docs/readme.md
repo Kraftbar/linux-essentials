@@ -211,10 +211,9 @@ docs: https://unix.stackexchange.com/questions/274656/how-to-manually-add-startu
 docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
 
 >```bash
-> # Issue: linux mint not recognizing ~/.xinitrc
-> cp /etc/X11/xinit/xinitrc ~/.xinitrc
+> sudo cp /etc/X11/xinit/xinitrc ~/.xinitrc
 >
->  cat <<EOT >> ${USER_HOME}/.imwheelrc
+> sudo cat <<EOT >> ${USER_HOME}/.imwheelrc
 >
 >
 > ### Start emacs deamon                  ###
