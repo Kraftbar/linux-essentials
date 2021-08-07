@@ -7,7 +7,21 @@ Todo: find a way to exract bash code from markdown and run it
 ```
 docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fenced-code-block-excerpts-from-markdown-file
 
+---
+### 2. fix windows clock
+>   ```sh
+>    timedatectl set-local-rtc 1
+>   ```
 
+---
+### 2. clean install first run
+
+vscode, spotify installerer ikke
+zsh config script stopper når den åpner zsh, vurder å pipe en beskjed
+Emacs config funker ikke når det er emacs27
+xinitrc 
+
+over all: EOT triks evaluerer utrykk 
 
 ---
 ### 2. fix windows clock
