@@ -225,11 +225,9 @@ docs: https://unix.stackexchange.com/questions/274656/how-to-manually-add-startu
 docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
 
 >```bash
-> sudo cp /etc/X11/xinit/xinitrc ~/.xinitrc
->
-> sudo cat <<EOT >> ${USER_HOME}/.imwheelrc
->
 > #!/bin/bash
+>
+>
 > IFS='' read -r -d '' VAR <<'EOF'
 >
 >
