@@ -188,7 +188,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 
 >```sh
 >  # needs  testing!"!!
->  sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" "/usr/share/applications/emacs.desktop"
+>  sudo sed  -i "s/^Exec.*/Exec=mystartEmacs %F/g" /usr/share/applications/emacs*.desktop
 >
 >```
 
