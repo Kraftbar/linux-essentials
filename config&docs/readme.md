@@ -229,6 +229,9 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >
 > sudo cat <<EOT >> ${USER_HOME}/.imwheelrc
 >
+> #!/bin/bash
+> IFS='' read -r -d '' VAR <<'EOF'
+>
 >
 > ### Start emacs deamon                  ###
 > ###########################################
@@ -254,8 +257,10 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >     gnome-terminal &
 > fi
 >
-> EOT
+> EOF
 >
+> touch ~/.xinitrc
+> echo "$VAR" > ~/.xinitrc
 >
 >```
 ---
