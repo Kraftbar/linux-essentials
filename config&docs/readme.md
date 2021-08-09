@@ -39,7 +39,7 @@ over all fail: EOT triks evaluerer utrykk
 > sudo apt-get install git 
 >
 > # install git icons for nemo 
-> sudo apt-get install pip3
+> sudo apt-get install python3-pip
 > sudo apt-get  install python3-gi python3-{nautilus,nemo,caja} python3-pip
 > pip3 install --user git-nautilus-icons
 >
@@ -76,17 +76,13 @@ over all fail: EOT triks evaluerer utrykk
 >
 > # install  spotify #
 > ####################
-> url -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | sudo apt-key add - 
-> echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-> sudo apt-get update && sudo apt-get install spotify-client
+> sudo apt-get install spotify-client
 >
-> # install vscode   #
-> ####################
-> sudo apt update
-> wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-> sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-> sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-> sudo apt update && sudo apt install code
+> # install chrome  #
+> ###################
+> wget -O vscode.deb https://go.microsoft.com/fwlink/?LinkID=760868 
+> sudo dpkg -i vscode.deb
+> rm vscode.deb
 >
 > # install emacs    #
 > ####################
@@ -182,7 +178,8 @@ over all fail: EOT triks evaluerer utrykk
 ### 8  Configure zsh
 
 >```sh
-> sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+> # needs testing
+> echo "exit" | sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 > cd ~/.oh-my-zsh/custom/plugins
 > git clone git@github.com:zdharma/history-search-multi-word.git
 > sed -i 's/plugins=(/ & history-search-multi-word  /' ~/.zshrc
