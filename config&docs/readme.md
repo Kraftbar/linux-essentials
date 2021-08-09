@@ -16,12 +16,9 @@ docs: https://unix.stackexchange.com/questions/61139/extract-triple-backtick-fen
 ---
 ### 2. clean install first run
 
-vscode, spotify installerer ikke
-zsh config script stopper når den åpner zsh, vurder å pipe en beskjed
-Emacs config funker ikke når det er emacs27
-xinitrc, ". /etc/X11/Xsession" exits script
+when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 
-over all fail: EOT triks evaluerer utrykk 
+
 
 ---
 ### 2. fix windows clock
