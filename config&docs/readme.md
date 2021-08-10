@@ -187,7 +187,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 ---
 
 ### 8  Configure latex
-todo: find out why some rc's can have "#!/bin/bash" 
+todo: find out why some latexmkrc's can have "#!/bin/bash" 
 >```bash
 >
 >
