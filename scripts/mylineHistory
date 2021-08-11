@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# how?xD:     90% stolen from https://github.com/kaihendry/graphsloc
+# how?:       90% taken from https://github.com/kaihendry/graphsloc
 # Dependency: gnuplot, git
-# Usage:      make sure to be at the top of the git project
+# Usage:      make sure that your pwd is at the root of the git repo
 
 gitrepo=$(pwd)
 
