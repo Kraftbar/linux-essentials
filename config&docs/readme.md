@@ -325,7 +325,7 @@ todo: git clone all in list
 >```bash
 > 
 >
-> curl -sH "Authorization: token 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" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -e 'git_url*'  
+> curl -sH "Authorization: token MYTOKEN" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -e 'git_url*'  
 >
 >```
 
