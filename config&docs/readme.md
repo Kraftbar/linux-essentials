@@ -325,9 +325,9 @@ todo: git clone all in list
 >```bash
 > 
 >
-> repoList=$(curl -sH "Authorization: token MYTOKENS" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -oP '"ssh_url":\s*"\K[^"]+')
+> repoList=$(curl -sH "Authorization: token MYTOKEN" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -oP '"ssh_url":\s*"\K[^"]+')
 > for i in $repoList; do
->   echo git clone "$i"
+>   git clone "$i"
 > done
 >
 >```
