@@ -313,6 +313,23 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > echo "$VAR" > ~/.xinitrc
 >
 >```
+
+
+
+---
+
+
+
+### 9. Get rest of git repos
+todo: git clone all in list
+>```bash
+> 
+>
+> curl -sH "Authorization: token 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" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -e 'git_url*'  
+>
+>```
+
+
 ---
 
 <br/><br/><br/><br/><br/><br/>
@@ -371,15 +388,6 @@ dconf dump /org/cinnamon/ > dconf.org.cinnamon
 
 
 
-
-
-
----
-
-### 10 get repositories (in the works)
-```bash
-curl -H “Authorization: token MYTOKEN” https://api.github.com/search/repositories?q=user:MYUSERNAME 35
-```
 
 
 
