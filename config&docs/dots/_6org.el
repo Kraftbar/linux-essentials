@@ -12,3 +12,26 @@
 (eval-after-load 'org
   (progn
     (define-key org-mode-map (kbd "<C-tab>") nil)))
+
+
+    ;; no shift or alt with arrows
+    ;(define-key org-mode-map (kbd "<S-left>") nil)
+    ;(define-key org-mode-map (kbd "<S-right>") nil)
+    ;(define-key org-mode-map (kbd "<M-left>") nil)
+    ;(define-key org-mode-map (kbd "<M-right>") nil)
+    ;; no shift-alt with arrows
+    ;(define-key org-mode-map (kbd "<M-S-left>") nil)
+    ;(define-key org-mode-map (kbd "<M-S-right>") nil)
+    ;(define-key org-mode-map (kbd "C-s-<left>") 'org-metaleft)
+    ;(define-key org-mode-map (kbd "C-s-<right>") 'org-metaright)
+
+
+
+
+
+
+
+
+
+
+

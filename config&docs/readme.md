@@ -93,30 +93,45 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 
 >   ```sh
 >
->echo "Running this (configuring ssh) will clear the clipboard "
->read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
->
->git config --global user.name "Kraftbar"
->git config --global user.email "gautenybo@gmail.com"
->git config --global color.ui true
->git config --global core.editor emacs
->
->ssh-keygen -t rsa -C "gautenybo@gmail.com"
->
->alias xclip="xclip -selection c" 
->cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
->
->echo "Clipboard contains now id_rsa.pub, please input it to browser. "
->echo "When done, close broser to continue!! "
->google-chrome "https://github.com/settings/ssh/new"
->
->read -p "please confirm with enter when done:" confirm 
->ssh -T git@github.com
->
+> echo "Running this (configuring ssh) will clear the clipboard "
+> read -p "Continue? (y/n): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+> 
+> git config --global user.name "Kraftbar"
+> git config --global user.email "gautenybo@gmail.com"
+> git config --global color.ui true
+> git config --global core.editor emacs
+> 
+> ssh-keygen -t rsa -C "gautenybo@gmail.com"
+> 
+> alias xclip="xclip -selection c" 
+> cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
+> 
+> echo "Clipboard contains now id_rsa.pub, please input it to browser. "
+> echo "When done, close broser to continue!! "
+> google-chrome "https://github.com/settings/ssh/new"
+> 
+> read -p "please confirm with enter when done:" confirm 
+> ssh -T git@github.com
+> 
+> 
+> 
 > 
 > git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
 >
+> echo "--------------------------------------------"
+> echo "---------------ssh setup done---------------"
+> echo "--------------------------------------------"
+> echo "Github access tolken "
+> echo "Only select repo scope"
+> echo "After generating the tolken and copying it, please close the browser"
 >
+>
+> google-chrome "https://github.com/settings/tokens/new"
+> read -p "Paste token " github_token 
+> echo  "export github_token=$github_token" >> ~\.bashrc
+> echo ""
+> echo "----------- Github config done ------------"
+> echo ""
 >   ```
 
 
@@ -325,7 +340,7 @@ todo: git clone all in list
 >```bash
 > 
 >
-> repoList=$(curl -sH "Authorization: token MYTOKEN" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -oP '"ssh_url":\s*"\K[^"]+')
+> repoList=$(curl -sH "Authorization: token $github_token" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -oP '"ssh_url":\s*"\K[^"]+')
 > for i in $repoList; do
 >   git clone "$i"
 > done
