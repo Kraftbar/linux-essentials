@@ -196,7 +196,8 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > cd ~/.oh-my-zsh/custom/plugins
 > git clone git@github.com:zdharma/history-search-multi-word.git
 > sed -i 's/plugins=(/ & history-search-multi-word  /' ~/.zshrc
-> echo 'exec /usr/bin/zsh' >>~/.bashrc
+> # change shell
+> chsh -s $(which zsh)
 >```
 
 ---
