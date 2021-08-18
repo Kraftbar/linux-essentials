@@ -371,9 +371,9 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 
 
 ### todo:
-- ~~keyboard shortcut~~
-    -~~unbind show desklets~~            
-    -~~bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"~~             
+- ~~keyboard shortcut~~             
+    -~~unbind show desklets~~             
+    -~~bind gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"~~               
 - theme - consider dotfile
 - disable sound   - consider dotfile
 - latex and sagetex setup        
