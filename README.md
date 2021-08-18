@@ -319,16 +319,10 @@
 >    du -d 2 -h /home/"$USER" | sort -rh | head 
 >   ```     
 >   ```sh
->    git config --global url."git@github.com:".insteadOf "https://github.com/"
->   ```
->   ```sh
 >    touch {1..18}.jpg && rename 's/\d+/sprintf("%05d", $&)/e' *.jpg
 >   ```
 >   ```sh
 >    num=0; for i in *; do mv "$i" "$(printf '%04d' $num).${i#*.}"; ((num++)); done
->   ```
->   ```sh
->    curl -s https://api.github.com/users/$(git config user.name)/repos | jq -r ".[].ssh_url" | grep "\-r" | xargs -L1 git clone
 >   ```
 
 
