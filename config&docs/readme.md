@@ -344,7 +344,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >
 > repoList=$(curl -sH "Authorization: token $github_token" https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | grep -oP '"ssh_url":\s*"\K[^"]+')
 > for i in $repoList; do
->   git clone "$i"
+>   git -C ~/Code clone "$i" 
 > done
 >
 >```
