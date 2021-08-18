@@ -101,6 +101,8 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > git config --global color.ui true
 > git config --global core.editor emacs
 > 
+> git config --global url."git@github.com:".insteadOf "https://github.com/"
+>
 > ssh-keygen -t rsa -C "gautenybo@gmail.com"
 > 
 > alias xclip="xclip -selection c" 
