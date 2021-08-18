@@ -343,8 +343,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
 >
 > repoList=$(curl -sH "Authorization: token $github_token" \
->                      https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
->                      | grep -oP '"ssh_url":\s*"\K[^"]+')
+>            https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
+>            | grep -oP '"ssh_url":\s*"\K[^"]+')
 > for i in $repoList; do
 >   git -C ~/Code clone "$i" 
 > done
