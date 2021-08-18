@@ -350,6 +350,19 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >```
 
 
+### 9. set key bindings
+>```bash
+> # need testing!!
+> # set screenshot key
+> gsettings set org.cinnamon.desktop.keybindings.media-keys area-screenshot-clip "['<Super><Shift>s']"
+> # unbind applet key
+> sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' ~/.cinnamon/configs/sound@cinnamon.org
+> 
+> 
+> 
+> 
+> 
+>```
 ---
 
 <br/><br/><br/><br/><br/><br/>
