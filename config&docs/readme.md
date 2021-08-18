@@ -337,8 +337,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 
 
 ### 9. Get rest of git repos
-todo: git clone all in list
 >```bash
+> 
 > mkdir  ~/Code
 > sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
 >
