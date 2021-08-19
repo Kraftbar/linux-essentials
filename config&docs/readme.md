@@ -365,8 +365,14 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >         ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
 > 
 > # search for key bindings in this way:
-> # gsettings list-recursively | grep keybindings
+> # $ gsettings list-recursively | grep keybindings 
 > 
+> # gsettings set org.cinnamon.desktop.keybindings custom-list \
+> ## "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', '__dummy__']"
+> ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xkill'"
+> ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'xkill'"
+> ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Primary>Escape']"
+>
 > 
 >```
 ---
