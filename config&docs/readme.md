@@ -364,8 +364,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' \
 >         ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
 > 
-> 
-> 
+> # search for key bindings in this way:
+> # gsettings list-recursively | grep keybindings
 > 
 > 
 >```
