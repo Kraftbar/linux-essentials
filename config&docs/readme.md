@@ -361,7 +361,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > gsettings set org.cinnamon.desktop.keybindings.media-keys area-screenshot-clip "['<Super><Shift>s']"
 > # unbind applet key
 > # bug: does not work, check before running 
-> sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
+> sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' \
+>         ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
 > 
 > 
 > 
