@@ -382,7 +382,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 - theme - consider dotfile
 - disable sound   - consider dotfile
 - latex and sagetex setup        
-
+- use zenity or xdialog     
 
 ---
 ### 7. Get programs
