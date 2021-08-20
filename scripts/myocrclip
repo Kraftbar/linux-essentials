@@ -1,4 +1,9 @@
+#!/bin/bash
+
 gnome-screenshot -a -f ~/test.png
+if [ ! -f ~/test.png ]; then
+    exit 0 
+fi
 tesseract ~/test.png ~/test
 cat ~/test.txt | xclip -sel clip
 rm ~/test.png ~/test.txt
