@@ -49,6 +49,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > # custom shell script dependencies
 > sudo apt-get install translate-shell 
 > sudo apt-get install gnuplot
+> sudo apt-get install tesseract-ocr
 >
 ># get zsh
 > sudo apt-get install zsh
@@ -89,6 +90,23 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >```
 
 ---
+
+### 6 Set aliases
+
+>   ```sh
+> alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
+> alias youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
+> alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
+> alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
+> 
+> alias xclip="xclip -selection c" 
+> 
+> # todo: Make this an alias     
+> # youtube-dl-best --output "%(upload_date)s%(title)s.%(ext)s"
+>   ```
+
+---
 ### 4. Set up git ssh and download repository
 
 >   ```sh
@@ -105,7 +123,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >
 > ssh-keygen -t rsa -C "gautenybo@gmail.com"
 > 
-> alias xclip="xclip -selection c" 
+> 
 > cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
 > 
 > echo "Clipboard contains now id_rsa.pub, please input it to browser. "
@@ -170,22 +188,6 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >   ```
 
 
-
----
-
-### 6 Set aliases
-
->   ```sh
-> alias youtube-dl-480='youtube-dl -f "bestvideo[height<=480][ext=mp4]+bestaudio[ext=m4a]" '
-> alias youtube-dl-720='youtube-dl -f "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]" '
-> alias youtube-dl-best='youtube-dl -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio" '
-> alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
-> alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
-> 
-> 
-> # todo: Make this an alias     
-> # youtube-dl-best --output "%(upload_date)s%(title)s.%(ext)s"
->   ```
 
 
 ---
@@ -367,8 +369,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > # search for key bindings in this way:
 > # $ gsettings list-recursively | grep keybindings 
 > 
-> # gsettings set org.cinnamon.desktop.keybindings custom-list \
-> ## "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', '__dummy__']"
+> # $ gsettings set org.cinnamon.desktop.keybindings custom-list \
+> # $  "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', '__dummy__']"
 > ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xkill'"
 > ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'xkill'"
 > ## dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Primary>Escape']"
