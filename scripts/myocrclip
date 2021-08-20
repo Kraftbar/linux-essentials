@@ -1,0 +1,4 @@
+gnome-screenshot -a -f ~/test.png
+tesseract ~/test.png ~/test
+cat ~/test.txt | xclip -sel clip
+rm test.png test.txt
