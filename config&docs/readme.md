@@ -143,7 +143,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > echo "--------------------------------------------"
 > echo "Github access tolken "
 > echo "Only select repo scope"
-> echo "After generating the tolken and copying it, please close the browser"
+> echo "After generating the tolken, copying it and then close the browser"
 >
 >
 > google-chrome "https://github.com/settings/tokens/new"
