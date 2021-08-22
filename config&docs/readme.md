@@ -384,8 +384,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>c']"
 >
 >
-> #code "$(locate ~/Code/ | rofi -threads 0 -width 70  -dmenu -i -p "locate:")"
-> 
+> # find ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs -r -0 code;
 >```
 ---
 
