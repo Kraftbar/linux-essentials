@@ -165,12 +165,6 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > mkdir  ~/Code
 > sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
 >
-> repoList=$(curl -sH "Authorization: token $github_token" \
->            https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
->            | grep -oP '"ssh_url":\s*"\K[^"]+')
-> for i in $repoList; do
->   git -C ~/Code clone "$i" 
-> done
 >
 > ##### work in progress,         #####
 > ##### ask user if he wants to   #####
@@ -183,7 +177,15 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >      sort -t$'\t' -k2 -nr  | \
 >      awk ' $2 <= 100000 ' \
 >      >> ~/Code/tmp.txt
+> repoList=$(awk '{print $1}' ~/Code/tmp.tx)
 >
+>
+> repoList=$(curl -sH "Authorization: token $github_token" \
+>            https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
+>            | grep -oP '"ssh_url":\s*"\K[^"]+')
+> for i in $repoList; do
+>   git -C ~/Code clone "$i" 
+> done
 >```
 
 
