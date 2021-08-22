@@ -136,7 +136,6 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > 
 > 
 > 
-> git clone git@github.com:Kraftbar/linuxessentials.git ~/Documents/linuxessentials
 >
 > echo "--------------------------------------------"
 > echo "---------------ssh setup done---------------"
@@ -156,6 +155,33 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 
 
 
+---
+
+
+
+### 9. Get git repos
+>```bash
+> 
+> mkdir  ~/Code
+> sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
+>
+> repoList=$(curl -sH "Authorization: token $github_token" \
+>            https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
+>            | grep -oP '"ssh_url":\s*"\K[^"]+')
+> for i in $repoList; do
+>   git -C ~/Code clone "$i" 
+> done
+>
+> ##### work in progress,         #####
+> ##### ask user if he wants to   #####
+> ##### download the biggest ones #####
+> sed -e 's/[ \t]*"size": \(.*\),,\?/\1/p'   \
+>     -e 's/[ \t]*"ssh_url": "\(.*\)",\?/\1/p' -e d json    \ 
+>      | sed 'N;s/\n/\t/
+>
+>```
+
+
 
 
 ---
@@ -164,11 +190,11 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >   ```sh
 > 
 >    # symbolic link scripts
->    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "$HOME/Code/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
 > 
 > 
 >    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "$HOME/Documents/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
+>    abspaths=$(readlink -f "$HOME/Code/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
 > 
 > 
 >   ```
@@ -334,26 +360,6 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >
 >```
 
-
-
----
-
-
-
-### 9. Get rest of git repos
->```bash
-> 
-> mkdir  ~/Code
-> sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
->
-> repoList=$(curl -sH "Authorization: token $github_token" \
->            https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
->            | grep -oP '"ssh_url":\s*"\K[^"]+')
-> for i in $repoList; do
->   git -C ~/Code clone "$i" 
-> done
->
->```
 
 
 ### 9. set key bindings
