@@ -383,6 +383,8 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'myocrclip'"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>c']"
 >
+>
+> #code "$(locate ~/Code/ | rofi -threads 0 -width 70  -dmenu -i -p "locate:")"
 > 
 >```
 ---
