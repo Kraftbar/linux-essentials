@@ -179,8 +179,9 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >          https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 | \
 >       sed -e 's/[ \t]*"size": \(.*\),,\?/\1/p'   \
 >           -e 's/[ \t]*"ssh_url": "\(.*\)",\?/\1/p' -e d |  \
->       sed 'N;s/\n/\t/'
->
+>       sed 'N;s/\n/\t/' | \
+>       sort -t$'\t' -k2 -nr  | \
+>       awk ' $2 <= 100000 ' 
 >
 >```
 
