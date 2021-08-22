@@ -119,11 +119,8 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > git config --global color.ui true
 > git config --global core.editor emacs
 > 
-> git config --global url."git@github.com:".insteadOf "https://github.com/"
 >
 > ssh-keygen -t rsa -C "gautenybo@gmail.com"
-> 
-> 
 > cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
 > 
 > echo "Clipboard contains now id_rsa.pub, please input it to browser. "
@@ -133,9 +130,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > read -p "please confirm with enter when done:" confirm 
 > ssh -T git@github.com
 > 
-> 
-> 
-> 
+> git config --global url."git@github.com:".insteadOf "https://github.com/"
 >
 > echo "--------------------------------------------"
 > echo "---------------ssh setup done---------------"
