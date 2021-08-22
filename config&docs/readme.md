@@ -175,8 +175,10 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > ##### work in progress,         #####
 > ##### ask user if he wants to   #####
 > ##### download the biggest ones #####
-> sed -e 's/[ \t]*"size": \(.*\),,\?/\1/p'   \
->     -e 's/[ \t]*"ssh_url": "\(.*\)",\?/\1/p' -e d json    \ 
+> curl -sH "Authorization: token $github_token" \
+>           https://api.github.com/search/repositories\?q\=user:kraftbar\&per_page=100 \
+>      | sed -e 's/[ \t]*"size": \(.*\),,\?/\1/p'   \
+>            -e 's/[ \t]*"ssh_url": "\(.*\)",\?/\1/p' -e d    \ 
 >      | sed 'N;s/\n/\t/
 >
 >```
