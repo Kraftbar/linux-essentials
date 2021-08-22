@@ -172,7 +172,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >      sort -t$'\t' -k2 -nr  | \
 >      awk ' $2 <= 100000 ' \
 >      >> ~/Code/tmp.txt
-> repoList=$(awk '{print $1}' ~/Code/tmp.tx)
+> repoList=$(awk '{print $1}' ~/Code/tmp.txt)
 >
 >
 > repoList=$(curl -sH "Authorization: token $github_token" \
