@@ -385,6 +385,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >
 >
 > # find ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs -r -0 code;
+> # ls ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs code;
 >```
 ---
 
