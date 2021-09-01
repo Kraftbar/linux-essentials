@@ -100,7 +100,6 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > alias youtube-dl-mp3='youtube-dl --extract-audio -f bestaudio[ext=mp3] --no-playlist '
 > alias myredshift='pgrep redshift | xargs -n1 kill -9 && redshift -l 59.904379299999995:10.7004307 1800'
 > 
-> alias xclip="xclip -selection c" 
 > 
 > # todo: Make this an alias     
 > # youtube-dl-best --output "%(upload_date)s%(title)s.%(ext)s"
@@ -121,7 +120,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > 
 >
 > ssh-keygen -t rsa -C "gautenybo@gmail.com"
-> cat ~/.ssh/id_rsa.pub | tr -d '\n'  | xclip -sel clip
+> cat ~/.ssh/id_rsa.pub | xclip -selection clipboard -r
 > 
 > echo "Clipboard contains now id_rsa.pub, please input it to browser. "
 > echo "When done, close broser to continue!! "
