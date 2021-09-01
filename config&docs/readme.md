@@ -365,24 +365,29 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 
 ### 9. set key bindings
 >```bash
-> # need testing!!
-> # set screenshot key
-> gsettings set org.cinnamon.desktop.keybindings.media-keys area-screenshot-clip "['<Super><Shift>s']"
+>
+> # search for key bindings in this way:
+> # $ gsettings list-recursively | grep keybindings 
+>
 > # unbind applet key
 > # bug: does not work, check before running 
 > sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' \
 >         ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
-> 
-> # search for key bindings in this way:
-> # $ gsettings list-recursively | grep keybindings 
-> 
+>
+> # set screenshot key,  need testing!!
+> gsettings set org.cinnamon.desktop.keybindings.media-keys area-screenshot-clip "['<Super><Shift>s']"
+>
+>  # set custom keys
 >  gsettings set org.cinnamon.desktop.keybindings custom-list \
 >   "['custom0', 'custom1', 'custom2', 'custom3', 'custom4', '__dummy__']"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'myocrclip'"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'myocrclip'"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>c']"
 >
->
+>  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xclip -o | ~/AWS-scripts/AWS (copy).py '"
+>  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "' my text2speech '"
+>  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>r']"
+>>
 > # find ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs -r -0 code;
 > # ls ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs code;
 >```
