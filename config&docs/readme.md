@@ -60,6 +60,14 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >```
 
 
+>   ```sh
+>
+> # used in aws script
+> sudo pip3 install boto3
+>
+>
+>```
+
 
 ---
 ### 4. Install programs 
