@@ -395,7 +395,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xclip -o | ~/Code/aws-r/aws_txt2speech.py '"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "' my text2speech '"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>r']"
->>
+>
 > # find ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs -r -0 code;
 > # ls ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs code;
 >```
