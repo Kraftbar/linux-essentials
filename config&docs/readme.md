@@ -394,7 +394,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "'myocrclip'"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>c']"
 >
->  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xclip -o | ~/Code/aws-r/aws_txt2speech.py '"
+>  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/command "'xclip -o | python3 ~/Code/aws-r/aws_txt2speech.py '"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/name "' my text2speech '"
 >  dconf write /org/cinnamon/desktop/keybindings/custom-keybindings/custom2/binding "['<Super><Shift>r']"
 > # update (restart cinnamon from bash)
