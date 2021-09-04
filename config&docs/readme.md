@@ -382,7 +382,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > # sed -i 's/sound applet menu.\x22/& , \n        \x22value\x22: \x22::\x22/' \
 > #         ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
 > sed -i 's/<Shift><Super>s/::/' ~/.cinnamon/configs/sound@cinnamon.org/sound@cinnamon.org.json
- 
+>
 >
 > # set screenshot key,  need testing!!
 > gsettings set org.cinnamon.desktop.keybindings.media-keys area-screenshot-clip "['<Super><Shift>s']"
