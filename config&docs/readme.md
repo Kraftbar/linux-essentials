@@ -90,8 +90,8 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > sudo dpkg -i vscode.deb
 > rm vscode.deb
 >
-> # install emacs    #
-> ####################
+> # install emacs   ٩(⁎❛ᴗ❛⁎)۶  #
+> ##############################
 > sudo add-apt-repository ppa:kelleyk/emacs
 > sudo apt update
 > sudo apt install emacs27
