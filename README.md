@@ -6,8 +6,6 @@
 
 <p align="center">
 </p>
-<img width="360"  src="pacman.PNG">
-
 <br/>
 
 
