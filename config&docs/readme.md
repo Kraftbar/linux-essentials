@@ -149,7 +149,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >
 > google-chrome "https://github.com/settings/tokens/new"
 > read -p "Paste token " github_token 
-> echo  "export github_token=$github_token" >> ~\.bashrc
+> echo  "export github_token=$github_token" >> ~/.bashrc
 > echo ""
 > echo "----------- Github config done ------------"
 > echo ""
