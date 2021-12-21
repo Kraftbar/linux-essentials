@@ -165,7 +165,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >```bash
 > 
 > mkdir  ~/Code
-> sed -e 's/Music Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code Code  /' ~/.config/gtk-3.0/bookmarks
+> sed -i 's/Music/&\nfile:\/\/\/home\/'"${USER}"'\/Code/g' ~/.config/gtk-3.0/bookmarks
 >
 > ##
 > # $ repoList=$(curl -sH "Authorization: token $github_token" \
