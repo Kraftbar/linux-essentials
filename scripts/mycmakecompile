@@ -1,0 +1,2 @@
+#!/bin/bash
+cmake -S . -B CMakeCacheFiles && make -C ./CMakeCacheFiles

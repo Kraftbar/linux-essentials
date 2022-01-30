@@ -1,0 +1,69 @@
+#!/bin/bash
+
+
+
+
+mkdir CMakeCacheFiles
+
+IFS='' read -r -d '' VAR <<'EOF'
+
+cmake_minimum_required(VERSION 2.8)
+project( SampleProject )
+
+find_packageOpenCV_placeholder
+find_packageEigen3_placeholder
+find_packageBoost_placeholder
+
+include_directoriesOpenCV_placeholder
+include_directoriesEigen3_placeholder
+include_directoriesBoost_placeholder
+
+add_executable( main main.cpp )
+
+target_link_librariesOpenCV_placeholder
+target_link_librariesEigen3_placeholder
+target_link_librariesBoost_placeholder
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})
+
+EOF
+
+
+touch CMakeLists.txt
+echo "$VAR" > CMakeLists.txt
+
+
+
+if [[ $(grep -r "#include.*opencv2" *.{cpp,h} | grep opencv2) ]]; then
+    sed -i 's/find_packageOpenCV_placeholder/find_package( OpenCV REQUIRED )/g' CMakeLists.txt
+    sed -i 's/include_directoriesOpenCV_placeholder/include_directories( ${OpenCV_INCLUDE_DIRS} )/g' CMakeLists.txt
+    sed -i 's/target_link_librariesOpenCV_placeholder/target_link_libraries( DisplayImage ${OpenCV_LIBS} )/g' CMakeLists.txt
+else
+    sed -i 's/find_packageOpenCV_placeholder//g' CMakeLists.txt
+    sed -i 's/include_directoriesOpenCV_placeholder//g' CMakeLists.txt
+    sed -i 's/target_link_librariesOpenCV_placeholder//g' CMakeLists.txt
+fi
+
+
+
+if [[ $(grep -r "#include.*eigen" *.{cpp,h} | grep eigen) ]]; then
+    sed -i 's/find_packageEigen3_placeholder/find_package (Eigen3 3.3 REQUIRED NO_MODULE)/g' CMakeLists.txt
+    sed -i 's/include_directoriesEigen3_placeholder/include_directories( ${Eigen_INCLUDE_DIRS} )/g' CMakeLists.txt
+    sed -i 's/target_link_librariesEigen3_placeholder/target_link_libraries (DisplayImage ${Eigen_LIBRARIES})/g' CMakeLists.txt
+else
+    sed -i 's/find_packageEigen3_placeholder//g' CMakeLists.txt
+    sed -i 's/include_directoriesEigen3_placeholder//g' CMakeLists.txt
+    sed -i 's/target_link_librariesEigen3_placeholder//g' CMakeLists.txt
+fi
+
+
+
+if [[ $(grep -r "#include.*boost" *.{cpp,h} | grep boost) ]]; then
+    sed -i 's/find_packageBoost_placeholder/find_package( Boost 1.55.0 COMPONENTS program_options REQUIRED )/g' CMakeLists.txt
+    sed -i 's/include_directoriesBoost_placeholder/include_directories( ${Boost_INCLUDE_DIR} )/g' CMakeLists.txt
+    sed -i 's/target_link_librariesBoost_placeholder/target_link_libraries (DisplayImage ${Boost_INCLUDE_DIR})/g' CMakeLists.txt
+else
+    sed -i 's/find_packageBoost_placeholder//g' CMakeLists.txt
+    sed -i 's/include_directoriesBoost_placeholder//g' CMakeLists.txt
+    sed -i 's/target_link_librariesBoost_placeholder//g' CMakeLists.txt
+fi
