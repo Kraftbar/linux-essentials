@@ -417,6 +417,7 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 - disable sound   - consider dotfile
 - latex and sagetex setup        
 - use zenity or xdialog     
+- power managment      
 
 ---
 ### 7. Get programs
