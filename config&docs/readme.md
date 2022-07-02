@@ -306,6 +306,13 @@ todo: find out why some latexmkrc's can have "#!/bin/bash"
 >```
 
 
+### 8. Firefox     
+
+Go to "about:config", in the address bar.
+Search for "browser.tabs.inTitlebar". Set it to 1.
+
+
+
 
 consider to make defualt text editor       
 
