@@ -103,7 +103,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > ]
 > EOF
 > )
-> echo $data > /home/nybo/.config/Code/User/keybindings.json
+> echo "$data" > /home/nybo/.config/Code/User/keybindings.json
 >       
 >
 >
