@@ -90,6 +90,24 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > sudo dpkg -i vscode.deb
 > rm vscode.deb
 >
+> data=$(cat <<EOF
+> [
+>     {
+>         "key": "ctrl+tab",
+>         "command": "workbench.action.nextEditorInGroup"
+>     },
+>     {
+>         "key": "ctrl+shift+tab",
+>         "command": "workbench.action.previousEditorInGroup"
+>     }
+> ]
+> EOF
+> )
+> echo $data > /home/nybo/.config/Code/User/keybindings.json
+>       
+>
+>
+>
 > # install emacs   ٩(⁎❛ᴗ❛⁎)۶  #
 > ##############################
 > sudo add-apt-repository ppa:kelleyk/emacs
