@@ -427,8 +427,23 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 > # find ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs -r -0 code;
 > # ls ~/Code/ | rofi "${ROFI_OPTIONS[@]}" -threads 0 -dmenu -i -p 'locate:' | xargs code;
 >```
+
 ---
 
+
+
+### 10. Patch Ctrl+Q back in to cinnamon
+ 
+find the revert_10031_pull_crlq.diff in the repo.     
+ patch it into /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js
+
+ 
+ 
+---
+
+ 
+ 
+ 
 <br/><br/><br/><br/><br/><br/>
 
 ---
