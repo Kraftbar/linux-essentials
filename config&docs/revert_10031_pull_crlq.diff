@@ -1,0 +1,58 @@
+--- /home/nybo/appSwitcher.js.bak	2023-02-04 13:13:37.481962509 +0100
++++ /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js	2023-02-04 13:15:47.797504081 +0100
+@@ -9,6 +9,8 @@
+ const Main = imports.ui.main;
+ const Cinnamon = imports.gi.Cinnamon;
+ 
++
++const CHECK_DESTROYED_TIMEOUT = 100;
+ const DISABLE_HOVER_TIMEOUT = 500; // milliseconds
+ 
+ function sortWindowsByUserTime(win1, win2) {
+@@ -106,6 +108,7 @@
+         this._haveModal = false;
+         this._destroyed = false;
+         this._motionTimeoutId = 0;
++        this._checkDestroyedTimeoutId = 0;
+         this._currentIndex = this._windows.indexOf(global.display.focus_window);
+         if (this._currentIndex < 0) {
+             this._currentIndex = 0;
+@@ -279,6 +282,14 @@
+                 this._showDesktop();
+                 return true;
+ 
++            case Clutter.KEY_q:
++                case Clutter.KEY_Q:
++                    // Q -> Close window
++                    this._windows[this._currentIndex].delete(global.get_current_time());
++                    this._checkDestroyedTimeoutId = Mainloop.timeout_add(CHECK_DESTROYED_TIMEOUT,
++                            Lang.bind(this, this._checkDestroyed, this._windows[this._currentIndex]));
++                    return true;
++
+             case Clutter.KEY_Right:
+             case Clutter.KEY_Down:
+                 // Right/Down -> navigate to next preview
+@@ -388,7 +399,10 @@
+     _windowDestroyed: function(wm, actor) {
+         this._removeDestroyedWindow(actor.meta_window);
+     },
+-
++    _checkDestroyed: function(window) {
++        this._checkDestroyedTimeoutId = 0;
++        this._removeDestroyedWindow(window);
++    },
+     _removeDestroyedWindow: function(window) {
+         for (let i in this._windows) {
+             if (window == this._windows[i]) {
+@@ -449,7 +463,10 @@
+             Mainloop.source_remove(this._motionTimeoutId);
+             this._motionTimeoutId = 0;
+         }
+-
++        if (this._checkDestroyedTimeoutId != 0) {
++            Mainloop.source_remove(this._checkDestroyedTimeoutId);
++            this._checkDestroyedTimeoutId = 0;
++        }
+         this._windowManager.disconnect(this._dcid);
+         this._windowManager.disconnect(this._mcid);
+     }
