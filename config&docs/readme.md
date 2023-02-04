@@ -90,6 +90,24 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 > sudo dpkg -i vscode.deb
 > rm vscode.deb
 >
+> data=$(cat <<EOF
+> [
+>     {
+>         "key": "ctrl+tab",
+>         "command": "workbench.action.nextEditorInGroup"
+>     },
+>     {
+>         "key": "ctrl+shift+tab",
+>         "command": "workbench.action.previousEditorInGroup"
+>     }
+> ]
+> EOF
+> )
+> echo "$data" > /home/nybo/.config/Code/User/keybindings.json
+>       
+>
+>
+>
 > # install emacs   ٩(⁎❛ᴗ❛⁎)۶  #
 > ##############################
 > sudo add-apt-repository ppa:kelleyk/emacs
@@ -199,11 +217,11 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 >   ```sh
 > 
 >    # symbolic link scripts
->    abspaths=$(readlink -f "$HOME/Code/linuxessentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
+>    abspaths=$(readlink -f "$HOME/Code/linux-essentials/scripts/my*") && sudo ln  -s $abspaths /usr/local/bin/
 > 
 > 
 >    mkdir ~/.emacs.d/
->    abspaths=$(readlink -f "$HOME/Code/linuxessentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
+>    abspaths=$(readlink -f "$HOME/Code/linux-essentials/config&docs/dots/*.el") && ln -s $abspaths ~/.emacs.d/
 > 
 > 
 >   ```
@@ -212,7 +230,7 @@ when doing "cp" xinitrc, ". /etc/X11/Xsession" exits script
 (for windows)
 >   ```CMD
 > REM; symbolic link
-> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linuxessentials\config&docs\dots\*" ) ^
+> FOR %G IN ("C:\Users\nybo\Documents\GitHub\linux-essentials\config&docs\dots\*" ) ^
 > DO mklink C:\Users\nybo\AppData\Roaming\.emacs.d\%~nxG %G
 >   ```
 >   ```CMD
