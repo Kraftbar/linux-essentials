@@ -359,9 +359,12 @@ docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at
 >```bash
 > #!/bin/bash
 >
->
+> 
 > IFS='' read -r -d '' VAR <<'EOF'
->
+> ### Increase the size of the history    ###
+> ###########################################
+> export HISTSIZE=10000
+> export HISTFILESIZE=20000
 >
 > ### Start emacs deamon                  ###
 > ###########################################
