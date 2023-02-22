@@ -338,6 +338,9 @@ do something in ~/.config/mimeapps.list i think     (copy xed settings, replace 
 need to configure 
 
 
+dconf write /org/cinnamon/desktop/keybindings/wm/'switch-to-workspace-1' "['<Shift><Alt>exclam']"      
+dconf write /org/cinnamon/desktop/keybindings/wm/'switch-to-workspace-2' "['<Shift><Alt>quotedbl']"       
+ dconf write /org/cinnamon/desktop/keybindings/wm/'switch-to-workspace-3' "['<Shift><Alt>numbersign']"      
 
 
 
