@@ -358,6 +358,13 @@ dconf write /org/cinnamon/desktop/keybindings/wm/'switch-to-workspace-2' "['<Shi
 Can consider to make a script and put run it by making a entry in "/home/nybo/.config/autostart"      
 docs: https://unix.stackexchange.com/questions/274656/how-to-manually-add-startup-applications-on-mint-17-3
 docs: https://developer.toradex.com/knowledge-base/how-to-autorun-application-at-the-start-up-in-linux
+xserver-xorg-input-all
+DEVICE=11
+xinput --set-prop "$DEVICE" "Synaptics Noise Cancellation" 0 0
+xinput --set-prop "$DEVICE" "Device Accel Profile" 6
+xinput --set-prop "$DEVICE" "Device Accel Velocity Scaling" 50
+xinput --set-prop "$DEVICE" "Device Accel Constant Deceleration" 12
+
 
 >```bash
 > #!/bin/bash
