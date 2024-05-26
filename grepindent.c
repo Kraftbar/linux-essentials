@@ -1,22 +1,22 @@
 /*
- * igrep.c
+ * grepindent.c
  * 
  * This program reads from standard input and extracts a block of text that
- * matches a given keyword (SSID) and continues printing lines with the same
+ * matches a given keyword and continues printing lines with the same
  * or greater indentation level. It stops when a line with less indentation
  * is encountered.
  *
  * Compilation:
- * gcc -o igrep igrep.c
+ * gcc -o grepindent grepindent.c
  * 
  * Usage:
- * sudo iw dev $(ip -o link show | awk -F': ' '{print $2}' | grep wl) scan | ./igrep "60:b9"
+ * sudo iw dev $(ip -o link show | awk -F': ' '{print $2}' | grep wl) scan | ./grepindent "60:b9"
  * 
  * Installation:
- * sudo mv igrep /usr/local/bin/
+ * sudo mv grepindent /usr/local/bin/
  * 
  * After installation, you can use the program with:
- * sudo iw dev $(ip -o link show | awk -F': ' '{print $2}' | grep wl) scan | igrep "60:b9"
+ * sudo iw dev $(ip -o link show | awk -F': ' '{print $2}' | grep wl) scan | grepindent "60:b9"
  */
 
 #include <stdio.h>
