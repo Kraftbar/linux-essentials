@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#    Command: sudo nano /usr/local/bin/c
+#    Command: sudo chmod +x /usr/local/bin/c
+#    Command: export PATH=$PATH:/usr/local/bin
+
+
+# Create a temporary file to store the C code
+TEMP_C_FILE=$(mktemp /tmp/temp_program.XXXXXX.c)
+EXEC_FILE="compiled_program"
+
+echo "Please paste your C code below. End with Ctrl+D:"
+
+
+# Read the C program from user input until EOF (Ctrl+D)
+cat > $TEMP_C_FILE
+
+# Compile the C program
+gcc $TEMP_C_FILE -o $EXEC_FILE
+
+if [ $? -eq 0 ]; then
+    echo "Compilation failed. Error output:"
+    gcc $TEMP_C_FILE -o $EXEC_FILE 2>&1
+fi
+
+# Clean up the temporary C file but leave the compiled executable
+rm $TEMP_C_FILE
+echo "Run as ./compiled_program"
