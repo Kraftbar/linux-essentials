@@ -25,40 +25,42 @@
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
 
-(defvar my-select-all-overlay nil
-  "Overlay used to fake the select all behavior.")
-
-(defvar my-selected-text nil
-  "Variable to store the selected text.")
 
 (defun my-select-all-fake ()
   "Fake a select all behavior where all text is visually highlighted but the cursor returns to the original position."
   (interactive)
-  (when (not my-select-all-overlay)
-    (let ((initial-point (point)))
-      ;; Create and set overlay to highlight the entire buffer
-      (setq my-select-all-overlay (make-overlay (point-min) (point-max)))
-      (overlay-put my-select-all-overlay 'face 'region)
-      ;; Store the entire buffer's text in the variable
-      (setq my-selected-text (buffer-substring-no-properties (point-min) (point-max)))
-      ;; Move to the beginning of the buffer to simulate select all
-      (goto-char (point-min))
-      ;; Restore the original cursor position
-      (goto-char initial-point)
-      ;; Wait for user input to handle selection or copy
-      (message "Press Ctrl+C to copy, any other key to clear selection.")
-      (let ((key (read-key)))
-        (if (equal key ?\C-c)
-            (progn
-              ;; Copy the selected text to the clipboard
-              (kill-new my-selected-text)
-              (message "Text copied to clipboard."))
-          ;; For any other key, just clear the overlay and message
-          (message "Selection cleared.")))
-      ;; Clean up by deleting the overlay and resetting variables
-      (delete-overlay my-select-all-overlay)
-      (setq my-select-all-overlay nil)
-      (setq my-selected-text nil))))
+  (let ((my-select-all-overlay nil)
+        (my-selected-text nil)
+        (initial-point (point)))
+    ;; Create and set overlay to highlight the entire buffer
+    (setq my-select-all-overlay (make-overlay (point-min) (point-max)))
+    (overlay-put my-select-all-overlay 'face 'region)
+    ;; Store the entire buffer's text in the variable
+    (setq my-selected-text (buffer-substring-no-properties (point-min) (point-max)))
+    ;; Move to the beginning of the buffer to simulate select all
+    (goto-char (point-min))
+    ;; Restore the original cursor position
+    (goto-char initial-point)
+    ;; Wait for user input to handle selection, copy, or delete
+    (message "Press Ctrl+C to copy, Del or Backspace to delete, any other key to clear selection.")
+    (let ((key (read-key)))
+      (cond
+       ((equal key ?\C-c)
+        ;; Copy the selected text to the clipboard
+        (kill-new my-selected-text)
+        (message "Text copied to clipboard."))
+       ((or (equal key ?\177)                ;; Backspace
+            (equal key (kbd "<delete>")))    ;; Delete key on some systems
+        ;; Delete the entire buffer
+        (setf (buffer-string) "")
+        (message "Buffer content deleted."))
+       (t
+        ;; For any other key, just clear the overlay and message
+        (message "Selection cleared."))))
+    ;; Clean up by deleting the overlay and resetting variables
+    (delete-overlay my-select-all-overlay)
+    (setq my-select-all-overlay nil)
+    (setq my-selected-text nil)))
 
 ;; Bind Ctrl+A to this function
 (global-set-key (kbd "C-a") 'my-select-all-fake)
