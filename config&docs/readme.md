@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 
 # Update package lists and install git
@@ -271,3 +272,5 @@ echo "Restarting Cinnamon to apply changes..."
 cinnamon --replace &
 
 echo "Setup complete!"
+
+```
