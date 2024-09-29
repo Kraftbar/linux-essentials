@@ -3,7 +3,13 @@
 
 # Update package lists and install git
 sudo apt update
+sudo apt upgrade
+
 sudo apt install -y git
+sudo apt install openssh-server
+sudo systemctl start ssh
+sudo systemctl enable ssh
+sudo systemctl status ssh
 
 # Exit if running over SSH
 if [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ]; then
