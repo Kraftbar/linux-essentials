@@ -69,7 +69,8 @@ fi
 echo "Setting up Linux for desktop"
 
 # Install required packages
-sudo apt install -y python3-pip python3-gi python3-{nautilus,nemo,caja} xclip software-properties-common translate-shell gnuplot tesseract-ocr texlive-full jq
+sudo apt install -y python3-pip python3-gi python3-{nautilus,nemo,caja} xclip \
+software-properties-common translate-shell gnuplot tesseract-ocr texlive-full jq
 
 # Install git-nautilus-icons
 pip3 install --user git-nautilus-icons
@@ -238,14 +239,20 @@ gsettings set org.cinnamon.desktop.keybindings.media-keys.area-screenshot-clip "
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1']"
 
 # Custom keybinding 0: myocrclip
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ name 'myocrclip'
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ command 'myocrclip'
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom0/ binding "['<Super><Shift>c']"
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom0/ name 'myocrclip'
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom0/ command 'myocrclip'
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom0/ binding "['<Super><Shift>c']"
 
 # Custom keybinding 1: my text2speech
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom1/ name 'my text2speech'
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom1/ command "sh -c 'xclip -o | python3 $HOME/Code/aws-r/aws_txt2speech.py'"
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom1/ binding "['<Super><Shift>r']"
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom1/ name 'my text2speech'
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom1/ command "sh -c 'xclip -o | python3 $HOME/Code/aws-r/aws_txt2speech.py'"
+gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
+keybindings/custom-keybindings/custom1/ binding "['<Super><Shift>r']"
 
 # Restart Cinnamon
 cinnamon --replace &
@@ -254,7 +261,8 @@ cinnamon --replace &
 echo "Applying patch to appSwitcher.js"
 
 # Backup original file
-sudo cp /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js.bak
+sudo cp /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js \
+        /usr/share/cinnamon/js/ui/appSwitcher/appSwitcher.js.bak
 
 # Create patch file
 patch_content=$(cat <<'EOF'
