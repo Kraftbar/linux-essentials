@@ -263,10 +263,19 @@
 (cua-mode 1)
 (setq cua-keep-region-after-copy t)
 (global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal)
-(global-set-key (kbd "C-S-w") (lambda () (interactive)
-                                  (if (equal 1 (length (window-list)))
-                                      (delete-frame)
-                                    (delete-window))))
+(global-set-key (kbd "C-S-w")
+                (lambda ()
+                  (interactive)
+                  (cond
+                   ;; In minibuffer/helm, keep editing semantics
+                   ((or (minibufferp (current-buffer))
+                        (bound-and-true-p helm-major-mode))
+                    (call-interactively 'backward-kill-word))
+                   ;; If there is another window in this frame, close just this split
+                   ((> (length (window-list)) 1)
+                    (delete-window))
+                   ;; Otherwise, don't nuke the frame; just close the buffer
+                   (t (kill-this-buffer)))))
 (defun indent-region-custom (numSpaces)
   (setq regionStart (line-beginning-position))
   (setq regionEnd (line-end-position))
@@ -337,11 +346,100 @@
   (define-key helm-swoop-map (kbd "RET") 'helm-swoop-next-line))
 (setq helm-move-to-line-cycle-in-source t)
 
-;; Chrome-like behavior (from _5chromeBehv.el)
-(tab-bar-mode 1)
-(global-set-key [(control tab)] 'tab-next)
-(global-set-key [(control shift tab)] 'tab-previous)
-(global-set-key (kbd "C-w") (lambda () (interactive) (kill-this-buffer) (tab-close)))
+;; Tabs per pane (Notepad++-like) using tab-line
+;; Shows buffer tabs in each window; Ctrl-Tab cycles within the pane.
+(global-tab-line-mode 1)
+;; Filter tabs to "real" buffers (no star buffers) and keep a stable order
+(defun my-tab--filtered-window-buffers ()
+  (let ((bufs (tab-line-tabs-window-buffers)))
+    (cl-remove-if (lambda (b)
+                    (let ((n (buffer-name b)))
+                      (or (null n) (string-prefix-p "*" n))))
+                  bufs)))
+
+(defun my-tab--get-ordered-list ()
+  "Return window-local ordered buffer list for tab-line, keeping order stable."
+  (let* ((win (selected-window))
+         (ordered (window-parameter win 'my-tab-ordered))
+         (filtered (my-tab--filtered-window-buffers)))
+    ;; Initialize on first use
+    (unless ordered
+      (setq ordered (copy-sequence filtered)))
+    ;; Remove dead or no longer filtered buffers
+    (setq ordered (cl-remove-if (lambda (b) (or (not (buffer-live-p b)) (not (memq b filtered)))) ordered))
+    ;; Append any new filtered buffers at the end
+    (dolist (b filtered)
+      (unless (memq b ordered)
+        (setq ordered (append ordered (list b)))))
+    ;; Ensure current buffer is present
+    (unless (memq (current-buffer) ordered)
+      (setq ordered (append ordered (list (current-buffer)))))
+    (set-window-parameter win 'my-tab-ordered ordered)
+    ordered))
+
+(defun my-tab-line-tabs-ordered ()
+  (my-tab--get-ordered-list))
+
+(setq tab-line-tabs-function #'my-tab-line-tabs-ordered)
+;; Slightly wider tabs by padding names and adding a wider separator
+(defun my-tab-line-tab-name-buffer (buffer &optional _buffers)
+  (concat " " (buffer-name buffer) " "))
+(setq tab-line-tab-name-function #'my-tab-line-tab-name-buffer)
+(setq tab-line-separator "  ")
+;; Make tab line visually taller and clearer
+(set-face-attribute 'tab-line nil :height 100 :background "white" :foreground "#666666")
+(set-face-attribute 'tab-line-tab-current nil :foreground "black" :background "#f0f0f0" :weight 'regular)
+(set-face-attribute 'tab-line-tab-inactive nil :foreground "#aaaaaa" :background "white" :weight 'light)
+;; Custom wrap-around tab cycling to avoid odd edge behavior
+(defun my-tab-line--buffers ()
+  (my-tab--get-ordered-list))
+(defun my-tab-line-next ()
+  (interactive)
+  (let* ((buffers (my-tab-line--buffers))
+         (len (length buffers)))
+    (when (> len 1)
+      (let* ((cur (current-buffer))
+             (idx (or (cl-position cur buffers) 0))
+             (next (nth (mod (1+ idx) len) buffers)))
+        (set-window-buffer (selected-window) next)
+        ;; Keep order stable; no rotation needed
+        (my-tab--get-ordered-list)))))
+(defun my-tab-line-prev ()
+  (interactive)
+  (let* ((buffers (my-tab-line--buffers))
+         (len (length buffers)))
+    (when (> len 1)
+      (let* ((cur (current-buffer))
+             (idx (or (cl-position cur buffers) 0))
+             (prev (nth (mod (1- idx) len) buffers)))
+        (set-window-buffer (selected-window) prev)
+        (my-tab--get-ordered-list)))))
+;; Bind Ctrl-Tab in multiple forms for compatibility
+(global-set-key [(control tab)] 'my-tab-line-next)
+(global-set-key (kbd "<C-tab>") 'my-tab-line-next)
+(global-set-key [(control shift tab)] 'my-tab-line-prev)
+(global-set-key (kbd "<C-S-tab>") 'my-tab-line-prev)
+(global-set-key (kbd "<C-S-iso-lefttab>") 'my-tab-line-prev)
+;; Also match Chrome/Notepad++ Ctrl-PageDown/Up
+(global-set-key (kbd "<C-next>") 'my-tab-line-next)     ;; PageDown
+(global-set-key (kbd "<C-prior>") 'my-tab-line-prev)    ;; PageUp
+
+;; Close current tab (buffer) only — but be polite in minibuffer/helm
+(defun my-close-buffer-smart ()
+  (interactive)
+  (cond
+   ;; In minibuffer or prompts, keep editing behavior (delete word)
+   ((minibufferp (current-buffer))
+    (call-interactively 'backward-kill-word))
+   ;; In Helm/completion UIs, don't kill buffers; treat as word delete
+   ((or (bound-and-true-p helm-major-mode)
+        (string-match-p "^\*Completions\*$" (buffer-name (current-buffer))))
+    (call-interactively 'backward-kill-word))
+   (t
+    (kill-this-buffer))))
+(global-set-key (kbd "C-w") 'my-close-buffer-smart)
+
+;; New empty buffer as a new tab in the current pane
 (defun xah-new-empty-buffer ()
   (interactive)
   (let (($buf (generate-new-buffer "untitled")))
@@ -349,22 +447,13 @@
     (funcall initial-major-mode)
     (setq buffer-offer-save t)
     $buf))
-(global-set-key (kbd "C-n") (lambda () (interactive)  (tab-new) (xah-new-empty-buffer)))
+(global-set-key (kbd "C-n") 'xah-new-empty-buffer)
 (defvar killed-file-list nil "List of recently killed files.")
 (defun add-file-to-killed-file-list () (when buffer-file-name (push buffer-file-name killed-file-list)))
 (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
 (defun reopen-killed-file () (interactive) (when killed-file-list (find-file (pop killed-file-list))))
-(global-set-key (kbd "C-S-t") (lambda () (interactive) (tab-new) (reopen-killed-file)))
-(defun my--open-file-in-new-tab (orig-fun &rest args)
-  (let* ((filename (car args)) (wildcards (cadr args)))
-    (if (and wildcards filename (string-match-p "[\\*?]" filename))
-        (apply orig-fun args)
-      (let ((buf (find-file-noselect filename wildcards)))
-        (when (and (buffer-live-p buf) (with-current-buffer buf buffer-file-name))
-          (tab-new)
-          (switch-to-buffer buf))
-        buf))))
-(advice-add 'find-file :around #'my--open-file-in-new-tab)
+(global-set-key (kbd "C-S-t") 'reopen-killed-file)
+;; No special tab-bar open behavior; use pane-local tabs now
 
 ;; Org tweaks (from _6org.el)
 (setq org-support-shift-select t)
