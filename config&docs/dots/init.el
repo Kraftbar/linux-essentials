@@ -1,3 +1,13 @@
+;; =============================================================================
+;; Emacs Config (single-file)
+;; - Minimal UI, Windows-like word nav/delete
+;; - Notepad++-style keys where sensible
+;; - Chrome-like tabs (C-Tab/CS-Tab, C-n new tab, C-w close)
+;; - Helm + helm-swoop (C-f), undo-tree (C-z/C-S-z), popwin
+;; - Org shift-select integration with CUA
+;; - Runtime files under var/ (recentf, places, server, autosaves, undo)
+;; - Custom UI writes to var/custom.el (keeps init.el clean)
+;; =============================================================================
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
@@ -95,8 +105,17 @@
 (set-face-attribute 'org-verbatim nil
 		    :foreground "dark blue")
 (set-face-attribute 'bold nil
- 		    :foreground "black"
+		    :foreground "black"
 		    :weight 'regular)
+;; Dim line numbers to reduce visual weight vs code
+(set-face-attribute 'line-number nil
+                    :foreground "#cccccc"
+                    :background "#ffffff"
+                    :weight 'light)
+(set-face-attribute 'line-number-current-line nil
+                    :foreground "#888888"
+                    :background "#ffffff"
+                    :weight 'regular)
 
 
 (setq-default mode-line-format   "")
@@ -108,6 +127,7 @@
                     :foreground "black"
 		    :background "white"
                     :box `(:line-width 3 :color "white" :style nil))
+(global-display-line-numbers-mode 1)
 (set-face-attribute 'mode-line nil
                     :height 10
                     :underline "black"
@@ -166,6 +186,7 @@
 (recentf-mode 1)
 (setq recentf-max-saved-items 200)
 (save-place-mode 1)
+(delete-selection-mode 1)
 
 ;; Packages (from _2packages.el)
 (require 'package)
@@ -183,7 +204,9 @@
   (let ((qs-file (expand-file-name "package-quickstart.el" user-emacs-directory)))
     (unless (file-exists-p qs-file)
       (ignore-errors (package-quickstart-refresh)))))
+;; which-key: show possible key continuations
 (use-package which-key :ensure t :config (which-key-mode))
+;; command-log-mode: log commands (handy for demos/debug)
 (use-package command-log-mode :ensure t)
 (defun xah-start-command-log ()
   (interactive)
@@ -191,6 +214,7 @@
   (global-command-log-mode)
   (clm/open-command-log-buffer)
   (delete-window))
+;; helm: completion and narrowing UI
 (use-package helm
   :ensure t
   :init (setq helm-candidate-number-limit 100
@@ -199,6 +223,7 @@
   :bind (("M-x" . helm-M-x)
          ("C-x f" . helm-for-files)
          ("C-r" . helm-recentf)))
+;; undo-tree: linear+tree undo with persistent history
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode
@@ -210,6 +235,7 @@
   (global-undo-tree-mode 1)
   :config (defalias 'redo 'undo-tree-redo)
   :bind (("C-z" . undo) ("C-S-z" . redo)))
+;; popwin: tame special buffers into popups
 (use-package popwin
   :ensure t
   :config (progn
@@ -217,7 +243,7 @@
             (push '("*Diff*" :position bottom :height .6) popwin:special-display-config)
             (popwin-mode 1)))
 
-;; Keybindings (from _3saneKeys.el)
+;; Keybindings: file dialogs, save, zoom
 (global-set-key (kbd "C-o") 'menu-find-file-existing)
 (defun my--find-file-read-args-dialog (orig-fun &rest args)
   (let ((last-nonmenu-event nil)) (apply orig-fun args)))
@@ -230,28 +256,10 @@
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 (global-set-key (kbd "C-+") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
-(defun my-select-all-fake ()
-  (interactive)
-  (let ((my-select-all-overlay nil)
-        (my-selected-text nil)
-        (initial-point (point)))
-    (setq my-select-all-overlay (make-overlay (point-min) (point-max)))
-    (overlay-put my-select-all-overlay 'face 'region)
-    (setq my-selected-text (buffer-substring-no-properties (point-min) (point-max)))
-    (goto-char (point-min))
-    (goto-char initial-point)
-    (message "Press Ctrl+C to copy, Ctrl+X to cut, Del/Backspace to delete, any other key to clear selection.")
-    (let ((key (read-key)))
-      (cond
-       ((equal key ?\C-c) (kill-new my-selected-text) (message "Text copied to clipboard."))
-       ((equal key ?\C-x) (kill-new my-selected-text) (erase-buffer) (message "Text cut to clipboard."))
-       ((or (equal key ?\177) (equal key (kbd "<delete>"))) (erase-buffer) (message "Buffer content deleted."))
-       (t (message "Selection cleared."))))
-    (delete-overlay my-select-all-overlay)
-    (setq my-select-all-overlay nil)
-    (setq my-selected-text nil)))
-(global-set-key (kbd "C-a") 'my-select-all-fake)
-(define-key global-map (kbd "<S-down-mouse-1>") 'mouse-save-then-kill)
+;; Use built-in whole-buffer selection for C-a
+(global-set-key (kbd "C-a") 'mark-whole-buffer)
+;; Keep Shift+mouse selection behavior native
+(define-key global-map (kbd "<S-down-mouse-1>") nil)
 (cua-mode 1)
 (setq cua-keep-region-after-copy t)
 (global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal)
@@ -322,6 +330,7 @@
 (global-set-key (kbd "C-<right>") 'my-forward-word)
 (global-set-key (kbd "C-<delete>") 'delete-word)
 (global-set-key (kbd "C-<backspace>") 'backward-delete-word)
+;; helm-swoop: inline search, bound to C-f
 (use-package helm-swoop :ensure t :bind (("C-f" . helm-swoop)))
 (with-eval-after-load 'helm-swoop
   (define-key helm-swoop-map (kbd "C-g") 'helm-maybe-exit-minibuffer)
