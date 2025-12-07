@@ -414,8 +414,23 @@
 (use-package git-gutter
   :ensure t
   :init
-  (global-git-gutter-mode 1)
+  ;; Performance: disable live idle-timer updates; we'll update on events
+  (setq git-gutter:live-update nil)
+  ;; Only use Git backend to avoid calling external "diff" for other VCs
+  (setq git-gutter:handled-backends '(git))
+  ;; Do NOT enable globally — only enable in Git buffers to avoid calling `diff`
+  ;; on non-repo files (Windows often lacks a `diff` program)
   :config
+  ;; Belt-and-suspenders: prevent the live-update timer from ever starting,
+  ;; and make the live-update callback a no-op if some timer still fires.
+  (with-eval-after-load 'git-gutter
+    (advice-add 'git-gutter:start-update-timer :override (lambda (&rest _) nil))
+    (defun git-gutter:live-update () "Disabled live update callback." nil)
+    (when (boundp 'git-gutter:update-timer)
+      (ignore-errors (cancel-timer git-gutter:update-timer))))
+  ;; If any timer started before, cancel it explicitly
+  (when (fboundp 'git-gutter:cancel-update-timer)
+    (ignore-errors (git-gutter:cancel-update-timer)))
   ;; Use simple, visible signs; color by face
   (setq git-gutter:added-sign "|"
         git-gutter:modified-sign "|"
@@ -426,6 +441,11 @@
   (set-face-foreground 'git-gutter:added   "#2ea043")
   (set-face-foreground 'git-gutter:modified "#388bfd")
   (set-face-foreground 'git-gutter:deleted  "#f85149")
+  ;; Windows: ensure a usable diff executable if anything falls back to it
+  (when (eq system-type 'windows-nt)
+    (let ((git-diff "C:/Program Files/Git/usr/bin/diff.exe"))
+      (when (file-executable-p git-diff)
+        (setq diff-command git-diff))))
   ;; Silence temp-file write-region spam during gutter updates
   (defun my--silence-messages-around (fn &rest args)
     (let ((inhibit-message t)
@@ -438,6 +458,22 @@
                git-gutter:update-current-buffer
                git-gutter))
     (advice-add f :around #'my--silence-messages-around))
+
+  ;; Helper: enable git-gutter only in Git repos
+  (defun my--buffer-in-git-repo-p ()
+    (and buffer-file-name
+         (or (and (fboundp 'vc-backend) (eq (vc-backend buffer-file-name) 'Git))
+             (locate-dominating-file default-directory ".git"))))
+  (defun my--git-gutter-maybe-enable ()
+    (when buffer-file-name
+      (if (my--buffer-in-git-repo-p)
+          (progn (git-gutter-mode 1) (ignore-errors (git-gutter)))
+        (when (bound-and-true-p git-gutter-mode)
+          (git-gutter-mode -1)))))
+  ;; Update strategy without timer: on find-file, save, and revert
+  (add-hook 'find-file-hook #'my--git-gutter-maybe-enable)
+  (add-hook 'after-save-hook (lambda () (when (bound-and-true-p git-gutter-mode) (git-gutter))))
+  (add-hook 'after-revert-hook (lambda () (when (bound-and-true-p git-gutter-mode) (git-gutter))))
   ;; Helpful diagnostics
   (defun my-git-gutter-diagnose ()
     (interactive)
