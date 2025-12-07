@@ -483,3 +483,84 @@
 
 
 ;; Custom UI writes go to var/custom.el (see custom-file above)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Git helpers: quick diff, commit, push (simple)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Resolve repository root for current buffer/default-directory
+(defun my-git--repo-root ()
+  (or (and (fboundp 'magit-toplevel) (ignore-errors (magit-toplevel)))
+      (and (fboundp 'vc-root-dir) (vc-root-dir))
+      (locate-dominating-file default-directory ".git")
+      default-directory))
+
+(defun my-git-status ()
+  "Open Git status for the current repo (Magit if available, else vc-dir)."
+  (let ((root (my-git--repo-root)))
+    (cond
+     ((and (fboundp 'magit-status) root)
+      (magit-status root))
+     (root (vc-dir root))
+     (t (user-error "Not in a Git repo")))))
+
+(defun my-git-diff ()
+  "Show working tree diff (Magit if available, else vc-diff)."
+  (if (and (fboundp 'magit-diff-working-tree) (my-git--repo-root))
+      (magit-diff-working-tree)
+    (vc-diff)))
+
+(defun my-git--call-sync (root &rest args)
+  "Run git ARGS in ROOT, returning (exit-code . output)."
+  (let ((default-directory root))
+    (with-temp-buffer
+      (let ((code (apply #'process-file "git" nil t nil args))
+            (out (buffer-string)))
+        (cons code out)))))
+
+(defun my-git--changes-p (root)
+  "Return non-nil if there are staged/unstaged changes."
+  (let* ((res (my-git--call-sync root "status" "--porcelain"))
+         (out (cdr res)))
+    (and out (> (length (string-trim out)) 0))))
+
+(defun my-git-commit-all (msg)
+  "Commit all changes in repo with message MSG."
+  (let ((root (my-git--repo-root)))
+    (unless root (user-error "Not in a Git repo"))
+    (save-some-buffers t)
+    (when (my-git--changes-p root)
+      (my-git--call-sync root "add" "-A"))
+    (let* ((res (my-git--call-sync root "commit" "-m" msg))
+           (code (car res)) (out (cdr res)))
+      (if (= code 0)
+          (message "Committed: %s" msg)
+        (if (string-match-p "nothing to commit" out)
+            (message "Nothing to commit")
+          (user-error "git commit failed: %s" (string-trim out)))))))
+
+(defun my-git-push ()
+  "Push current branch to its upstream."
+  (let ((root (my-git--repo-root)))
+    (unless root (user-error "Not in a Git repo"))
+    (let* ((res (my-git--call-sync root "push"))
+           (code (car res)) (out (cdr res)))
+      (if (= code 0)
+          (message "Pushed successfully")
+        (user-error "git push failed: %s" (string-trim out))))))
+
+(defun my-git-review-commit-push ()
+  "Review diff, then commit all and push if confirmed."
+  (interactive)
+  (let ((root (my-git--repo-root)))
+    (unless root (user-error "Not in a Git repo"))
+    ;; Show diff for review
+    (my-git-diff)
+    (when (y-or-n-p "Commit and push these changes? ")
+      (let ((msg (read-string "Commit message: ")))
+        (my-git-commit-all msg)
+        (my-git-push)))))
+
+;; Simple alias for easy M-x access
+(defalias 'git-review-commit-push 'my-git-review-commit-push)
