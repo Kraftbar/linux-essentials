@@ -51,11 +51,13 @@
 (setq-default line-spacing 0)
 (set-default 'cursor-type  '(hbar . 2))
 (blink-cursor-mode 1)
+;; Hide fringes; we rely on margin indicators for diff-hl
 (fringe-mode '(0 . 0))
 
 (setq frame-background-mode 'light)
 (set-background-color "#ffffff")
 (set-foreground-color "#666666")
+(set-face-attribute 'fringe nil :background "#ffffff" :foreground "#666666")
 
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
@@ -265,6 +267,244 @@
             (push '("*Warnings*" :position bottom :height .3) popwin:special-display-config)
             (push '("*Diff*" :position bottom :height .6) popwin:special-display-config)
             (popwin-mode 1)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; VCS Gutter Indicators (diff-hl + git-gutter)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STATUS NOTE (read me):
+;; - On this Windows build, diff-hl's fringe colors render gray (faces nil) and
+;;   margin backgrounds can be ignored; this made diff-hl unreliable/blank.
+;; - We keep diff-hl configured (margin mode, right side, ASCII glyphs) but we
+;;   rely on git-gutter as the primary, reliable gutter.
+;; - To try diff-hl in GUI: enable fringes `(fringe-mode '(8 . 8))`, then
+;;   `(diff-hl-margin-mode -1)`. Toggle `my-diff-hl-debug` to `t` to log state.
+;; - To stick with margins: keep fringes hidden and `(diff-hl-margin-mode 1)`.
+;; - LF/CRLF prompts are unrelated to the gutter and can be tuned later.
+;; Shows green for added lines, blue for modified, red for deleted
+(use-package diff-hl
+  :ensure t
+  :init
+  ;; Enable globally at init and after init; also enable immediately if reloading
+  (global-diff-hl-mode 1)
+  (add-hook 'after-init-hook #'global-diff-hl-mode)
+  (when (boundp 'after-init-time)
+    (when after-init-time (global-diff-hl-mode 1)))
+  :config
+  ;; Ensure flydiff is active whenever diff-hl-mode is enabled
+  (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode)
+  ;; Prefer margins for reliability across ports; use RIGHT margin to avoid line-number collisions
+  (setq diff-hl-margin-side 'right)
+  ;; Use visible ASCII glyphs (not spaces) so color shows reliably in margins
+  (setq diff-hl-margin-symbols-alist
+        '((insert . "||") (change . "||") (delete . "||") (unknown . "?") (ignored . " ")))
+  (diff-hl-margin-mode 1)
+  ;; Make fringe rendering (if used) cleaner and remove gray borders
+  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+  (setq diff-hl-draw-borders nil)
+  ;; Allow diff-hl on TRAMP/remote files (use at your own risk performance-wise)
+  (setq diff-hl-disable-on-remote nil)
+  ;; Make sure VC recognizes Git; some setups clear this variable
+  (when (boundp 'vc-handled-backends)
+    (unless (memq 'Git vc-handled-backends)
+      (push 'Git vc-handled-backends)))
+  ;; Ensure mode is active in file buffers; reserve chosen margin; refresh
+  (add-hook 'find-file-hook (lambda ()
+                              (when buffer-file-name
+                                (diff-hl-mode 1)
+                                (when (vc-backend buffer-file-name)
+                                  (my--ensure-margin-for-diff-hl)
+                                  (diff-hl-update)
+                                  (when (bound-and-true-p my-diff-hl-debug)
+                                    (my-diff-hl-diagnose "find-file"))))))
+  (add-hook 'window-setup-hook #'my--ensure-margin-for-diff-hl)
+  (add-hook 'window-size-change-functions #'my--ensure-margin-for-diff-hl)
+  ;; Colors similar to VSCode
+  (set-face-attribute 'diff-hl-insert nil :inherit nil :foreground "#2ea043")
+  (set-face-attribute 'diff-hl-change nil :inherit nil :foreground "#388bfd")
+  (set-face-attribute 'diff-hl-delete nil :inherit nil :foreground "#f85149")
+  ;; Style margin faces with strong foreground colors (background may be ignored in margins)
+  (ignore-errors
+    (set-face-attribute 'diff-hl-margin-insert nil :inherit nil :foreground "#2ea043" :background 'unspecified :weight 'bold)
+    (set-face-attribute 'diff-hl-margin-change nil :inherit nil :foreground "#388bfd" :background 'unspecified :weight 'bold)
+    (set-face-attribute 'diff-hl-margin-delete nil :inherit nil :foreground "#f85149" :background 'unspecified :weight 'bold))
+  ;; And the fringe faces when using fringes
+  (ignore-errors
+    (set-face-attribute 'diff-hl-fringe-insert nil :inherit nil :foreground "#2ea043" :background "#2ea043")
+    (set-face-attribute 'diff-hl-fringe-change nil :inherit nil :foreground "#388bfd" :background "#388bfd")
+    (set-face-attribute 'diff-hl-fringe-delete nil :inherit nil :foreground "#f85149" :background "#f85149"))
+
+  ;; Diagnostics and quick toggles to help troubleshoot themes/TTY
+  (defun my-diff-hl--face-summary (face)
+    (list face
+          :fg (ignore-errors (face-attribute face :foreground nil))
+          :bg (ignore-errors (face-attribute face :background nil))
+          :inh (ignore-errors (face-attribute face :inherit nil))))
+
+  (defun my-diff-hl-diagnose (&optional ctx)
+    "Show current diff-hl/margin/VC state for debugging. Optional CTX notes where it ran."
+    (interactive)
+    (let* ((vc (and buffer-file-name (vc-backend buffer-file-name)))
+           (state (and buffer-file-name vc (ignore-errors (vc-state buffer-file-name))))
+           (wm (window-margins))
+           (fr (fringe-mode))
+           (msg (format "diff-hl%s: global=%s, buffer=%s, margin=%s/%s, vc=%s, state=%s, margins=%S, graphic=%s, fringe=%S, bmp=%S, borders=%s, fringe-face=%S"
+                        (if ctx (format "[%s]" ctx) "")
+                        (bound-and-true-p global-diff-hl-mode)
+                        (bound-and-true-p diff-hl-mode)
+                        (bound-and-true-p diff-hl-margin-mode)
+                        diff-hl-margin-side vc state wm (display-graphic-p)
+                        fr (and (boundp 'diff-hl-fringe-bmp-function) diff-hl-fringe-bmp-function)
+                        (and (boundp 'diff-hl-draw-borders) diff-hl-draw-borders)
+                        (my-diff-hl--face-summary 'fringe))))
+      (message "%s" msg)
+      (message "faces: %S %S %S | fringe: %S %S %S"
+               (my-diff-hl--face-summary 'diff-hl-fringe-insert)
+               (my-diff-hl--face-summary 'diff-hl-fringe-change)
+               (my-diff-hl--face-summary 'diff-hl-fringe-delete)
+               (my-diff-hl--face-summary 'diff-hl-margin-insert)
+               (my-diff-hl--face-summary 'diff-hl-margin-change)
+               (my-diff-hl--face-summary 'diff-hl-margin-delete))))
+
+  (defvar my-diff-hl-debug nil "If non-nil, log diff-hl updates to *Messages*.")
+  (defun my--diff-hl-update-log (&rest _)
+    (when my-diff-hl-debug
+      (my-diff-hl-diagnose "update")))
+  (advice-add 'diff-hl-update :after #'my--diff-hl-update-log)
+
+  (defun my-diff-hl-use-fringe ()
+    "Disable margin mode and enable fringes for diff-hl to test visibility."
+    (interactive)
+    (diff-hl-margin-mode -1)
+    (fringe-mode '(8 . 8))
+    ;; Use stock bitmaps and remove borders so color stands out
+    (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
+    (setq diff-hl-draw-borders nil)
+    (when (bound-and-true-p my-diff-hl-debug)
+      (my-diff-hl-diagnose "use-fringe-before"))
+    (diff-hl-mode 1)
+    (diff-hl-update)
+    (when (bound-and-true-p my-diff-hl-debug)
+      (my-diff-hl-diagnose "use-fringe-after")))
+
+  (defun my-diff-hl-use-margin ()
+    "Enable margin mode and ensure right margin is visible."
+    (interactive)
+    (diff-hl-margin-mode 1)
+    (setq diff-hl-margin-side 'left)
+    (my--ensure-margin-for-diff-hl)
+    (when (bound-and-true-p my-diff-hl-debug)
+      (my-diff-hl-diagnose "use-margin-before"))
+    (diff-hl-update)
+    (when (bound-and-true-p my-diff-hl-debug)
+      (my-diff-hl-diagnose "use-margin-after")))
+  ;; Keep in sync with Magit refreshes if Magit is used
+  (with-eval-after-load 'magit
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Primary Gutter: git-gutter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; - Rationale: diff-hl's fringe faces stayed nil; margin backgrounds were
+;;   ignored on this Windows build, making markers gray/invisible. git-gutter
+;;   draws consistent signs across ports.
+;; - Colors: green added, blue modified, red deleted.
+;; - Noise control: update calls are silenced to avoid write-region spam.
+;; - To revert to diff-hl: disable `global-git-gutter-mode`, enable fringes, and
+;;   disable diff-hl margin mode.
+(use-package git-gutter
+  :ensure t
+  :init
+  (global-git-gutter-mode 1)
+  :config
+  ;; Use simple, visible signs; color by face
+  (setq git-gutter:added-sign "|"
+        git-gutter:modified-sign "|"
+        git-gutter:deleted-sign "|"
+        git-gutter:ask-p nil
+        git-gutter:verbosity 0
+        git-gutter:update-interval 0.5)
+  (set-face-foreground 'git-gutter:added   "#2ea043")
+  (set-face-foreground 'git-gutter:modified "#388bfd")
+  (set-face-foreground 'git-gutter:deleted  "#f85149")
+  ;; Silence temp-file write-region spam during gutter updates
+  (defun my--silence-messages-around (fn &rest args)
+    (let ((inhibit-message t)
+          (message-log-max nil))
+      (apply fn args)))
+  ;; NOTE: This suppresses messages emitted during background updates.
+  ;; Disable these advices if you need to debug gutter issues.
+  (dolist (f '(git-gutter:update-all-windows
+               git-gutter:update-buffer
+               git-gutter:update-current-buffer
+               git-gutter))
+    (advice-add f :around #'my--silence-messages-around))
+  ;; Helpful diagnostics
+  (defun my-git-gutter-diagnose ()
+    (interactive)
+    (message "git-gutter: on=%s, vc=%s, signs=(%s %s %s)"
+             (bound-and-true-p git-gutter-mode)
+             (and buffer-file-name (vc-backend buffer-file-name))
+             git-gutter:added-sign git-gutter:modified-sign git-gutter:deleted-sign))
+  (add-hook 'find-file-hook (lambda ()
+                              (when buffer-file-name
+                                (when (fboundp 'git-gutter)
+                                  (git-gutter-mode 1)
+                                  (git-gutter)))))
+  ;; No startup message; keep quiet
+  )
+
+;; Reapply diff-hl faces after theme changes so colors don't get reset
+  (defun my-diff-hl-apply-faces ()
+    (interactive)
+    (ignore-errors
+    (set-face-attribute 'diff-hl-insert nil :inherit nil :foreground "#2ea043")
+    (set-face-attribute 'diff-hl-change nil :inherit nil :foreground "#388bfd")
+    (set-face-attribute 'diff-hl-delete nil :inherit nil :foreground "#f85149")
+    (set-face-attribute 'diff-hl-margin-insert nil :foreground "#2ea043" :weight 'bold)
+    (set-face-attribute 'diff-hl-margin-change nil :foreground "#388bfd" :weight 'bold)
+    (set-face-attribute 'diff-hl-margin-delete nil :foreground "#f85149" :weight 'bold)
+    (set-face-attribute 'diff-hl-fringe-insert nil :inherit nil :foreground "#2ea043" :background "#2ea043")
+    (set-face-attribute 'diff-hl-fringe-change nil :inherit nil :foreground "#388bfd" :background "#388bfd")
+    (set-face-attribute 'diff-hl-fringe-delete nil :inherit nil :foreground "#f85149" :background "#f85149"))
+    (when (featurep 'diff-hl)
+      (diff-hl-update))
+    )
+
+(when (boundp 'after-load-theme-hook)
+  (add-hook 'after-load-theme-hook #'my-diff-hl-apply-faces))
+(advice-add 'load-theme :after (lambda (&rest _) (my-diff-hl-apply-faces)))
+;; Apply faces once after init too, and log
+(add-hook 'after-init-hook (lambda ()
+                             (my-diff-hl-apply-faces)
+                             (when (and (featurep 'diff-hl) (bound-and-true-p my-diff-hl-debug))
+                               (my-diff-hl-diagnose "after-init"))))
+
+;; Proactively refresh indicators on save and focus
+(with-eval-after-load 'diff-hl
+  (add-hook 'after-save-hook #'diff-hl-update)
+  (add-hook 'after-revert-hook #'diff-hl-update)
+  (add-hook 'focus-in-hook #'diff-hl-update))
+
+;; Ensure the right margin exists so indicators are visible even when
+;; other packages resize margins. Keeps left margin untouched (line numbers).
+(defvar my-diff-hl-margin-width 3
+  "Minimum width to reserve for diff-hl in the selected margin.")
+(defun my--ensure-margin-for-diff-hl (&rest _)
+  (when (bound-and-true-p diff-hl-margin-mode)
+    (walk-windows
+     (lambda (w)
+       (with-selected-window w
+         (let* ((m (window-margins w))
+                (lm (or (car m) 0))
+                (rm (or (cdr m) 0)))
+           (pcase diff-hl-margin-side
+             ('left  (when (< lm my-diff-hl-margin-width)
+                       (set-window-margins w my-diff-hl-margin-width rm)))
+             ('right (when (< rm my-diff-hl-margin-width)
+                       (set-window-margins w lm my-diff-hl-margin-width)))))))
+     nil t)))
+(add-hook 'window-configuration-change-hook #'my--ensure-margin-for-diff-hl)
+(add-hook 'buffer-list-update-hook #'my--ensure-margin-for-diff-hl)
 
 ;; Keybindings: file dialogs, save, zoom
 (global-set-key (kbd "C-o") 'menu-find-file-existing)
