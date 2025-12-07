@@ -205,6 +205,12 @@
 (save-place-mode 1)
 (delete-selection-mode 1)
 
+;; Auto-revert also checks VC info to reflect Git changes
+(setq auto-revert-verbose nil)
+(setq auto-revert-check-vc-info t)
+(setq auto-revert-interval 2)
+(global-auto-revert-mode 1)
+
 ;; Packages (from _2packages.el)
 (require 'package)
 (unless package-archive-contents (package-refresh-contents))
@@ -525,6 +531,17 @@
          (out (cdr res)))
     (and out (> (length (string-trim out)) 0))))
 
+;; Refresh VC state and header line for all buffers in ROOT
+(defun my-git--refresh-all-buffers (root)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and buffer-file-name
+                 (ignore-errors (string-prefix-p (file-truename root)
+                                                 (file-truename buffer-file-name))))
+        (when (fboundp 'vc-file-clearprops) (vc-file-clearprops buffer-file-name))
+        (when (fboundp 'vc-refresh-state) (ignore-errors (vc-refresh-state)))
+        (force-mode-line-update t)))))
+
 (defun my-git-commit-all (msg)
   "Commit all changes in repo with message MSG."
   (let ((root (my-git--repo-root)))
@@ -535,9 +552,13 @@
     (let* ((res (my-git--call-sync root "commit" "-m" msg))
            (code (car res)) (out (cdr res)))
       (if (= code 0)
-          (message "Committed: %s" msg)
+          (progn
+            (my-git--refresh-all-buffers root)
+            (message "Committed: %s" msg))
         (if (string-match-p "nothing to commit" out)
-            (message "Nothing to commit")
+            (progn
+              (my-git--refresh-all-buffers root)
+              (message "Nothing to commit"))
           (user-error "git commit failed: %s" (string-trim out)))))))
 
 (defun my-git-push ()
@@ -547,7 +568,9 @@
     (let* ((res (my-git--call-sync root "push"))
            (code (car res)) (out (cdr res)))
       (if (= code 0)
-          (message "Pushed successfully")
+          (progn
+            (my-git--refresh-all-buffers root)
+            (message "Pushed successfully"))
         (user-error "git push failed: %s" (string-trim out))))))
 
 (defun my-git-review-commit-push ()
@@ -562,7 +585,11 @@
         (my-git-commit-all msg)
         (my-git-push)))))
 
+;; Also refresh VC/cache when Emacs regains focus (external tools might change repo)
+(defun my-git--refresh-on-focus-in ()
+  (let ((root (ignore-errors (my-git--repo-root))))
+    (when root (my-git--refresh-all-buffers root))))
+(add-hook 'focus-in-hook #'my-git--refresh-on-focus-in)
+
 ;; Simple alias for easy M-x access
 (defalias 'git-review-commit-push 'my-git-review-commit-push)
-
-
