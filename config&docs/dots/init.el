@@ -75,18 +75,35 @@
     (format (format "%%s %%%ds" available-width) left right)))
 
 
+;; Helper: detect if current buffer differs from Git (vc) state
+(defun my--buffer-vc-dirty-p ()
+  (when (and buffer-file-name (vc-backend buffer-file-name))
+    (let ((st (vc-state buffer-file-name)))
+      (memq st '(edited added removed needs-merge needs-update needs-checkin conflicting)))))
+
+;; Helper: propertize buffer name by state
+(defun my--buffer-name-with-state-face ()
+  (let* ((name (buffer-name))
+         (face (cond
+                ((and buffer-file-name (buffer-modified-p))
+                 '(:weight regular :foreground "#cc3333"))  ;; unsaved to disk => red
+                ((my--buffer-vc-dirty-p)
+                 '(:weight regular :foreground "#ff8800"))  ;; differs from Git => orange
+                (t '(:weight regular :foreground "black")))))
+    (propertize name 'face face)))
+
 (setq-default header-line-format
   '(:eval (mode-line-render
 
    (format-mode-line
     (list
      (propertize "File " 'face `(:weight regular))
-     "%b "
+     '(:eval (my--buffer-name-with-state-face))
+     " "
      '(:eval (if (and buffer-file-name (buffer-modified-p))
-         (propertize "(modified)" 
-		     'face `(:weight light
-			     :foreground "#aaaaaa"))))))
-   
+                 (propertize "(modified)"
+                             'face `(:weight light :foreground "#aaaaaa"))))))
+
    (format-mode-line
     (propertize "%3l:%2c "
 	'face `(:weight light :foreground "#aaaaaa"))))))
