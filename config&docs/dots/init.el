@@ -66,7 +66,9 @@
 ;; (menu-bar-mode 0)                  ;; Show/hide menubar
 (tool-bar-mode 0)                  ;; Show/hide toolbar
 (tooltip-mode  0)                  ;; Show/hide tooltip
-(scroll-bar-mode 0)                ;; Show/hide scrollbar
+;; Enable a right-hand scroll bar for quick navigation
+(set-scroll-bar-mode 'right)
+(scroll-bar-mode 1)
 
 
 
