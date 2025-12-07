@@ -566,5 +566,3 @@
 (defalias 'git-review-commit-push 'my-git-review-commit-push)
 
 
-
-;; test 
