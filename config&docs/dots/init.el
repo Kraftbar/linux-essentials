@@ -50,7 +50,7 @@
 (setq initial-major-mode 'text-mode)
 (setq-default line-spacing 0)
 (set-default 'cursor-type  '(hbar . 2))
-(blink-cursor-mode 0)
+(blink-cursor-mode 1)
 (fringe-mode '(0 . 0))
 
 (setq frame-background-mode 'light)
@@ -366,7 +366,8 @@
 (use-package helm-swoop :ensure t :bind (("C-f" . helm-swoop)))
 (with-eval-after-load 'helm-swoop
   (define-key helm-swoop-map (kbd "C-g") 'helm-maybe-exit-minibuffer)
-  (define-key helm-swoop-map (kbd "RET") 'helm-swoop-next-line))
+  ;; Enter should just close and keep point where it was
+  (define-key helm-swoop-map (kbd "RET") 'helm-keyboard-quit))
 (setq helm-move-to-line-cycle-in-source t)
 
 ;; Tabs per pane (Notepad++-like) using tab-line
