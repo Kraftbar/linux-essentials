@@ -742,7 +742,28 @@
         (string-match-p "^\*Completions\*$" (buffer-name (current-buffer))))
     (call-interactively 'backward-kill-word))
    (t
-    (kill-this-buffer))))
+    ;; Prefer right neighbor; if none, go left. Then kill current.
+    (let* ((win (selected-window))
+           (cur (current-buffer))
+           (buffers (my-tab-line--buffers))
+           (len (length buffers))
+           (idx (or (cl-position cur buffers) 0))
+           (target (cond
+                    ((and (> len 1) (< idx (1- len))) (nth (1+ idx) buffers))
+                    ((> len 1) (nth (1- idx) buffers))
+                    (t nil))))
+      (when (buffer-live-p target)
+        (set-window-buffer win target))
+      (when (buffer-live-p cur)
+        (kill-buffer cur))
+      ;; Clean window-local order so wrap indices stay correct
+      (let ((ordered (window-parameter win 'my-tab-ordered)))
+        (when ordered
+          (set-window-parameter win 'my-tab-ordered
+                                 (cl-remove-if (lambda (b)
+                                                 (or (eq b cur)
+                                                     (not (buffer-live-p b))))
+                                               ordered))))))))
 (global-set-key (kbd "C-w") 'my-close-buffer-smart)
 
 ;; New empty buffer as a new tab in the current pane
