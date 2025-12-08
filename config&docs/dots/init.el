@@ -17,7 +17,7 @@
 
 
 ;; TODO: verify the ctrl+f functionallity. Suspecting that it might be buggy now
-
+;; TODO: the git-sidebar thing status, does not check when git status changes 
 
 ;;(package-initialize)
 (require 'org)
