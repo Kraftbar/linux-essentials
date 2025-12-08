@@ -15,6 +15,10 @@
 ;; You may delete these explanatory comments.
 
 
+
+;; TODO: verify the ctrl+f functionallity. Suspecting that it might be buggy now
+
+
 ;;(package-initialize)
 (require 'org)
 
