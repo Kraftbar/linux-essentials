@@ -20,7 +20,7 @@
 ;; TODO: the git-sidebar thing status, does not check when git status changes 
 
 ;;(package-initialize)
-(require 'org)
+;; Keep Org lazy at startup; the variables below can be set before Org loads.
 
 
 
@@ -121,14 +121,17 @@
 (set-face-attribute 'highlight nil
 		    :foreground "black"
 		    :background "#f0f0f0")
-(set-face-attribute 'org-level-1 nil
-		    :foreground "black"
-		    :weight 'regular)
-(set-face-attribute 'org-link nil
-		    :underline nil
-		    :foreground "dark blue")
-(set-face-attribute 'org-verbatim nil
-		    :foreground "dark blue")
+(defun my-apply-org-faces ()
+  (set-face-attribute 'org-level-1 nil
+		      :foreground "black"
+		      :weight 'regular)
+  (set-face-attribute 'org-link nil
+		      :underline nil
+		      :foreground "dark blue")
+  (set-face-attribute 'org-verbatim nil
+		      :foreground "dark blue"))
+(when (featurep 'org)
+  (my-apply-org-faces))
 (set-face-attribute 'bold nil
 		    :foreground "black"
 		    :weight 'regular)
@@ -221,14 +224,28 @@
 
 ;; Packages (from _2packages.el)
 (require 'package)
-(unless package-archive-contents (package-refresh-contents))
-(unless (assoc 'helm-swoop package-archive-contents)
-  (ignore-errors (package-refresh-contents)))
+
+(defun my-bootstrap-packages ()
+  "Refresh package metadata and install any startup dependencies that are missing."
+  (interactive)
+  (package-refresh-contents)
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (when (and (not (package-installed-p 'helm-swoop))
+             (fboundp 'package-vc-install))
+    (package-vc-install "https://github.com/emacsorphanage/helm-swoop"))
+  (when (and (boundp 'package-quickstart) package-quickstart
+             (fboundp 'package-quickstart-refresh))
+    (ignore-errors (package-quickstart-refresh))))
+
 (unless (package-installed-p 'use-package)
+  ;; Keep startup fast in the common case; only hit the network once when bootstrapping.
   (package-refresh-contents)
   (package-install 'use-package))
+(require 'use-package)
 (when (and (not (package-installed-p 'helm-swoop))
            (fboundp 'package-vc-install))
+  ;; helm-swoop is sourced from Git when missing; avoid repeated archive refreshes.
   (ignore-errors (package-vc-install "https://github.com/emacsorphanage/helm-swoop")))
 (when (and (boundp 'package-quickstart) package-quickstart
            (fboundp 'package-quickstart-refresh))
@@ -236,9 +253,14 @@
     (unless (file-exists-p qs-file)
       (ignore-errors (package-quickstart-refresh)))))
 ;; which-key: show possible key continuations
-(use-package which-key :ensure t :config (which-key-mode))
+(use-package which-key
+  :ensure t
+  :defer 1
+  :config (which-key-mode))
 ;; command-log-mode: log commands (handy for demos/debug)
-(use-package command-log-mode :ensure t)
+(use-package command-log-mode
+  :ensure t
+  :commands (command-log-mode global-command-log-mode clm/open-command-log-buffer))
 (defun xah-start-command-log ()
   (interactive)
   (command-log-mode)
@@ -248,6 +270,7 @@
 ;; helm: completion and narrowing UI
 (use-package helm
   :ensure t
+  :defer 1
   :init (setq helm-candidate-number-limit 100
               helm-ff-skip-boring-files t)
   :config (helm-mode 1)
@@ -257,18 +280,21 @@
 ;; undo-tree: linear+tree undo with persistent history
 (use-package undo-tree
   :ensure t
+  :defer 1
   :diminish undo-tree-mode
   :init
   (let ((dir (expand-file-name "var/undo-tree-history" user-emacs-directory)))
     (setq undo-tree-history-directory-alist `(("." . ,dir)))
     (setq undo-tree-auto-save-history t)
     (unless (file-directory-p dir) (make-directory dir t)))
+  :config
   (global-undo-tree-mode 1)
-  :config (defalias 'redo 'undo-tree-redo)
+  (defalias 'redo 'undo-tree-redo)
   :bind (("C-z" . undo) ("C-S-z" . redo)))
 ;; popwin: tame special buffers into popups
 (use-package popwin
   :ensure t
+  :defer 1
   :config (progn
             (push '("*Warnings*" :position bottom :height .3) popwin:special-display-config)
             (push '("*Diff*" :position bottom :height .6) popwin:special-display-config)
@@ -289,12 +315,7 @@
 ;; Shows green for added lines, blue for modified, red for deleted
 (use-package diff-hl
   :ensure t
-  :init
-  ;; Enable globally at init and after init; also enable immediately if reloading
-  (global-diff-hl-mode 1)
-  (add-hook 'after-init-hook #'global-diff-hl-mode)
-  (when (boundp 'after-init-time)
-    (when after-init-time (global-diff-hl-mode 1)))
+  :defer 1
   :config
   ;; Ensure flydiff is active whenever diff-hl-mode is enabled
   (add-hook 'diff-hl-mode-hook #'diff-hl-flydiff-mode)
@@ -322,6 +343,10 @@
                                   (diff-hl-update)
                                   (when (bound-and-true-p my-diff-hl-debug)
                                     (my-diff-hl-diagnose "find-file"))))))
+  (when (and buffer-file-name (vc-backend buffer-file-name))
+    (diff-hl-mode 1)
+    (my--ensure-margin-for-diff-hl)
+    (diff-hl-update))
   (add-hook 'window-setup-hook #'my--ensure-margin-for-diff-hl)
   (add-hook 'window-size-change-functions #'my--ensure-margin-for-diff-hl)
   ;; Colors similar to VSCode
@@ -419,6 +444,7 @@
 ;;   disable diff-hl margin mode.
 (use-package git-gutter
   :ensure t
+  :defer 1
   :init
   ;; Performance: disable live idle-timer updates; we'll update on events
   (setq git-gutter:live-update nil)
@@ -480,6 +506,8 @@
   (add-hook 'find-file-hook #'my--git-gutter-maybe-enable)
   (add-hook 'after-save-hook (lambda () (when (bound-and-true-p git-gutter-mode) (git-gutter))))
   (add-hook 'after-revert-hook (lambda () (when (bound-and-true-p git-gutter-mode) (git-gutter))))
+  (when buffer-file-name
+    (my--git-gutter-maybe-enable))
   ;; Helpful diagnostics
   (defun my-git-gutter-diagnose ()
     (interactive)
@@ -487,11 +515,6 @@
              (bound-and-true-p git-gutter-mode)
              (and buffer-file-name (vc-backend buffer-file-name))
              git-gutter:added-sign git-gutter:modified-sign git-gutter:deleted-sign))
-  (add-hook 'find-file-hook (lambda ()
-                              (when buffer-file-name
-                                (when (fboundp 'git-gutter)
-                                  (git-gutter-mode 1)
-                                  (git-gutter)))))
   ;; No startup message; keep quiet
   )
 
@@ -561,12 +584,128 @@
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-decrease)
 (global-set-key (kbd "C-+") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
-;; Use built-in whole-buffer selection for C-a
-(global-set-key (kbd "C-a") 'mark-whole-buffer)
+(defvar my-select-all-overlay nil
+  "Overlay used to emulate whole-buffer selection without moving point.")
+(defun my-select-all-active-p ()
+  (and (overlayp my-select-all-overlay)
+       (eq (overlay-buffer my-select-all-overlay) (current-buffer))))
+(defun my-clear-select-all-state ()
+  (when (overlayp my-select-all-overlay)
+    (delete-overlay my-select-all-overlay))
+  (setq my-select-all-overlay nil))
+(defun my-select-all-copy ()
+  (interactive)
+  (when (my-select-all-active-p)
+    (kill-ring-save (point-min) (point-max))))
+(defun my-select-all-cut ()
+  (interactive)
+  (when (my-select-all-active-p)
+    (my-clear-select-all-state)
+    (kill-region (point-min) (point-max))))
+(defun my-select-all-delete ()
+  (interactive)
+  (when (my-select-all-active-p)
+    (my-clear-select-all-state)
+    (delete-region (point-min) (point-max))
+    (goto-char (point-min))))
+(defun my-select-all-quit ()
+  (interactive)
+  (my-clear-select-all-state)
+  (keyboard-quit))
+(defun my-select-all-replace-command-p (cmd)
+  (or (eq cmd 'self-insert-command)
+      (get cmd 'delete-selection)
+      (memq cmd '(newline newline-and-indent
+                  yank yank-pop clipboard-yank cua-paste quoted-insert
+                  org-self-insert-command))))
+(defun my-select-all-dispatch ()
+  (interactive)
+  (let* ((keys (this-command-keys-vector))
+         (cmd (let ((overriding-terminal-local-map nil)
+                    (overriding-local-map nil))
+                (key-binding keys t))))
+    (my-clear-select-all-state)
+    (cond
+     ((null cmd) nil)
+     ((my-select-all-replace-command-p cmd)
+      (delete-region (point-min) (point-max))
+      (goto-char (point-min))
+      (call-interactively cmd))
+     ((commandp cmd)
+      (call-interactively cmd)))))
+(defvar my-select-all-transient-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c") #'my-select-all-copy)
+    (define-key map (kbd "C-x") #'my-select-all-cut)
+    (define-key map (kbd "C-v") #'my-select-all-dispatch)
+    (define-key map (kbd "<S-insert>") #'my-select-all-dispatch)
+    (define-key map (kbd "<delete>") #'my-select-all-delete)
+    (define-key map (kbd "<backspace>") #'my-select-all-delete)
+    (define-key map (kbd "DEL") #'my-select-all-delete)
+    (define-key map (kbd "<left>") #'my-left-or-clear-selection)
+    (define-key map (kbd "<right>") #'my-right-or-clear-selection)
+    (define-key map (kbd "<up>") #'my-up-or-clear-selection)
+    (define-key map (kbd "<down>") #'my-down-or-clear-selection)
+    (define-key map (kbd "<prior>") #'my-page-up-or-clear-selection)
+    (define-key map (kbd "<next>") #'my-page-down-or-clear-selection)
+    (define-key map (kbd "C-g") #'my-select-all-quit)
+    (define-key map [escape] #'my-select-all-quit)
+    (define-key map [t] #'my-select-all-dispatch)
+    map)
+  "Transient keymap active while the custom whole-buffer selection is shown.")
+(defun my-select-all ()
+  (interactive)
+  (my-clear-select-all-state)
+  (setq my-select-all-overlay (make-overlay (point-min) (point-max) (current-buffer) nil t))
+  (overlay-put my-select-all-overlay 'face 'region)
+  (overlay-put my-select-all-overlay 'priority 1000)
+  (overlay-put my-select-all-overlay 'evaporate t)
+  (set-transient-map my-select-all-transient-map #'my-select-all-active-p #'my-clear-select-all-state))
+;; Windows-style select all for C-a, keeping the viewport steady on selection.
+(global-set-key (kbd "C-a") 'my-select-all)
 ;; Keep Shift+mouse selection behavior native
 (define-key global-map (kbd "<S-down-mouse-1>") nil)
 (cua-mode 1)
-(setq cua-keep-region-after-copy t)
+(setq cua-keep-region-after-copy t
+      ;; A tiny positive delay keeps CUA cut/copy reliable on current Emacs builds.
+      cua-prefix-override-inhibit-delay 0.05
+      ;; Avoid extra Windows clipboard readback before replacing it.
+      save-interprogram-paste-before-kill nil)
+(defun my-deactivate-selection ()
+  (cond
+   ((my-select-all-active-p)
+    (my-clear-select-all-state)
+    (goto-char (point-min)))
+   ((use-region-p)
+    (deactivate-mark))))
+(defun my-collapse-selection-and-move (_direction fallback)
+  (if (or (my-select-all-active-p) (use-region-p))
+      (my-deactivate-selection)
+    (funcall fallback)))
+(defun my-left-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'left #'left-char))
+(defun my-right-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'right #'right-char))
+(defun my-up-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'up #'previous-line))
+(defun my-down-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'down #'next-line))
+(defun my-page-up-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'page-up #'scroll-down-command))
+(defun my-page-down-or-clear-selection ()
+  (interactive)
+  (my-collapse-selection-and-move 'page-down #'scroll-up-command))
+(global-set-key [left] #'my-left-or-clear-selection)
+(global-set-key [right] #'my-right-or-clear-selection)
+(global-set-key [up] #'my-up-or-clear-selection)
+(global-set-key [down] #'my-down-or-clear-selection)
+(global-set-key [prior] #'my-page-up-or-clear-selection)
+(global-set-key [next] #'my-page-down-or-clear-selection)
 (global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-S-w")
                 (lambda ()
@@ -788,8 +927,10 @@
   (ignore _args)
   (when (and cua-mode org-support-shift-select (not (use-region-p)))
     (cua-set-mark)))
-(advice-add 'org-call-for-shift-select :before #'my--org-shift-select-cua)
-(with-eval-after-load 'org (define-key org-mode-map (kbd "<C-tab>") nil))
+(with-eval-after-load 'org
+  (my-apply-org-faces)
+  (advice-add 'org-call-for-shift-select :before #'my--org-shift-select-cua)
+  (define-key org-mode-map (kbd "<C-tab>") nil))
 
 
 ;; Custom UI writes go to var/custom.el (see custom-file above)
