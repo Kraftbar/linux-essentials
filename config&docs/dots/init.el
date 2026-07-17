@@ -1230,7 +1230,12 @@ START overrides `window-start' — required when called from
     (unless root (user-error "Not in a Git repo"))
     (save-some-buffers t)
     (when (my-git--changes-p root)
-      (my-git--call-sync root "add" "-A"))
+      ;; add -A aborts wholesale if ANY file is unreadable (e.g. a state file
+      ;; another tool holds a Windows lock on) — don't ignore that silently
+      (let* ((res (my-git--call-sync root "add" "-A"))
+             (code (car res)) (out (cdr res)))
+        (unless (= code 0)
+          (user-error "git add failed (nothing staged): %s" (string-trim out)))))
     (let* ((res (my-git--call-sync root "commit" "-m" msg))
            (code (car res)) (out (cdr res)))
       (if (= code 0)
