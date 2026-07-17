@@ -1,9 +1,15 @@
+
 ;; =============================================================================
 ;; Emacs Config (single-file)
 ;; - Minimal UI, Windows-like word nav/delete
 ;; - Notepad++-style keys where sensible
 ;; - Chrome-like tabs (C-Tab/CS-Tab, C-n new tab, C-w close)
 ;; - Helm + helm-swoop (C-f), undo-tree (C-z/C-S-z), popwin
+
+
+
+
+
 ;; - Org shift-select integration with CUA
 ;; - Runtime files under var/ (recentf, places, server, autosaves, undo)
 ;; - Custom UI writes to var/custom.el (keeps init.el clean)
@@ -39,40 +45,47 @@
       
 	
 
-(cond
- ((string-equal system-type "windows-nt")
-  (progn
-    (set-frame-font "Lucida Console 10")))
- ((string-equal system-type "gnu/linux")
-  (progn
-    (set-frame-font "Noto Mono Light 10"))))
+(defun my-apply-graphical-frame-settings (&optional frame)
+  "Apply GUI-only appearance settings to FRAME."
+  (when (display-graphic-p frame)
+    (with-selected-frame (or frame (selected-frame))
+      (cond
+       ((eq system-type 'windows-nt)
+        (ignore-errors (set-frame-font "Lucida Console 10" nil t)))
+       ((eq system-type 'gnu/linux)
+        (ignore-errors (set-frame-font "Noto Mono Light 10" nil t))))
+      (set-frame-parameter nil 'internal-border-width 20)
+      (fringe-mode '(0 . 0))
+      (setq frame-background-mode 'light)
+      (set-background-color "#ffffff")
+      (set-foreground-color "#666666")
+      (set-face-attribute 'fringe nil :background "#ffffff" :foreground "#666666")
+      (when (fboundp 'tool-bar-mode)
+        (tool-bar-mode 0))
+      (when (fboundp 'tooltip-mode)
+        (tooltip-mode 0))
+      (when (fboundp 'set-scroll-bar-mode)
+        (set-scroll-bar-mode 'right))
+      (when (fboundp 'scroll-bar-mode)
+        (scroll-bar-mode 1)))))
 
+(my-apply-graphical-frame-settings)
+(add-hook 'after-make-frame-functions #'my-apply-graphical-frame-settings)
 
-
-(set-frame-parameter (selected-frame) 'internal-border-width 20)
 (setq x-underline-at-descent-line t)
 (setq initial-major-mode 'text-mode)
 (setq-default line-spacing 0)
 (set-default 'cursor-type  '(hbar . 2))
 (blink-cursor-mode 1)
 ;; Hide fringes; we rely on margin indicators for diff-hl
-(fringe-mode '(0 . 0))
-
-(setq frame-background-mode 'light)
-(set-background-color "#ffffff")
-(set-foreground-color "#666666")
-(set-face-attribute 'fringe nil :background "#ffffff" :foreground "#666666")
+(when (display-graphic-p)
+  (fringe-mode '(0 . 0)))
 
 (setq inhibit-startup-screen t)
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)   ;; Show/hide startup page
 (setq initial-scratch-message nil) ;; Show/hide *scratch* buffer message
 ;; (menu-bar-mode 0)                  ;; Show/hide menubar
-(tool-bar-mode 0)                  ;; Show/hide toolbar
-(tooltip-mode  0)                  ;; Show/hide tooltip
-;; Enable a right-hand scroll bar for quick navigation
-(set-scroll-bar-mode 'right)
-(scroll-bar-mode 1)
 
 
 
@@ -181,31 +194,46 @@
 
 ;; Lightweight settings previously in _1settings.el
 (require 'cl-lib)
+(require 'subr-x)
+(defun my-ensure-private-dir (dir)
+  "Create DIR if needed and keep it private for Emacs runtime files."
+  (unless (file-directory-p dir)
+    (make-directory dir t))
+  ;; Native Windows filesystems do not always honor Unix mode bits cleanly.
+  (ignore-errors (set-file-modes dir #o700))
+  dir)
+
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (setq mouse-wheel-scroll-amount '(6 ((shift) . 1) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 (setq scroll-step 1)
+(setq scroll-preserve-screen-position t
+      scroll-error-top-bottom t)
 (global-set-key [escape] 'keyboard-escape-quit)
 
 ;; Centralize runtime files under var/
 (defconst user-var-dir (expand-file-name "var/" user-emacs-directory))
-(unless (file-directory-p user-var-dir) (make-directory user-var-dir t))
+(my-ensure-private-dir user-var-dir)
 (setq recentf-save-file (expand-file-name "recentf" user-var-dir))
 (setq save-place-file (expand-file-name "places" user-var-dir))
 ;; Auto-save list directory
 (let ((asdir (expand-file-name "auto-save-list" user-var-dir)))
-  (unless (file-directory-p asdir) (make-directory asdir t))
+  (my-ensure-private-dir asdir)
   (setq auto-save-list-file-prefix (concat asdir "/saves-")))
 ;; Server socket dir
 (let ((server-dir (expand-file-name "server" user-var-dir)))
   (setq server-socket-dir server-dir)
-  (unless (file-directory-p server-dir) (make-directory server-dir t)))
+  (my-ensure-private-dir server-dir))
 ;; Keep Custom UI writes out of init.el
 (setq custom-file (expand-file-name "custom.el" user-var-dir))
 (when (file-exists-p custom-file) (load custom-file))
 (load "server")
-(unless (server-running-p) (server-start))
+(unless (or noninteractive (server-running-p))
+  (condition-case err
+      (server-start)
+    (error
+     (message "Skipping server start: %s" (error-message-string err)))))
 (show-paren-mode 1)
 (setq vc-follow-symlinks t)
 (setq visible-bell 1)
@@ -306,11 +334,11 @@
 ;; STATUS NOTE (read me):
 ;; - On this Windows build, diff-hl's fringe colors render gray (faces nil) and
 ;;   margin backgrounds can be ignored; this made diff-hl unreliable/blank.
-;; - We keep diff-hl configured (margin mode, right side, ASCII glyphs) but we
-;;   rely on git-gutter as the primary, reliable gutter.
-;; - To try diff-hl in GUI: enable fringes `(fringe-mode '(8 . 8))`, then
-;;   `(diff-hl-margin-mode -1)`. Toggle `my-diff-hl-debug` to `t` to log state.
-;; - To stick with margins: keep fringes hidden and `(diff-hl-margin-mode 1)`.
+;; - git-gutter is the ONLY auto-enabled gutter. diff-hl stays installed and
+;;   configured but is opt-in: run `my-diff-hl-use-margin` or
+;;   `my-diff-hl-use-fringe` to try it in a buffer. Previously both gutters
+;;   auto-enabled on find-file, giving double indicators (left | and right ||).
+;; - Toggle `my-diff-hl-debug` to `t` to log state.
 ;; - LF/CRLF prompts are unrelated to the gutter and can be tuned later.
 ;; Shows green for added lines, blue for modified, red for deleted
 (use-package diff-hl
@@ -324,7 +352,9 @@
   ;; Use visible ASCII glyphs (not spaces) so color shows reliably in margins
   (setq diff-hl-margin-symbols-alist
         '((insert . "||") (change . "||") (delete . "||") (unknown . "?") (ignored . " ")))
-  (diff-hl-margin-mode 1)
+  ;; Margin mode is enabled on demand by `my-diff-hl-use-margin' (git-gutter is
+  ;; the primary gutter; enabling this globally reserved a right margin in
+  ;; every window and doubled the indicators).
   ;; Make fringe rendering (if used) cleaner and remove gray borders
   (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
   (setq diff-hl-draw-borders nil)
@@ -334,19 +364,7 @@
   (when (boundp 'vc-handled-backends)
     (unless (memq 'Git vc-handled-backends)
       (push 'Git vc-handled-backends)))
-  ;; Ensure mode is active in file buffers; reserve chosen margin; refresh
-  (add-hook 'find-file-hook (lambda ()
-                              (when buffer-file-name
-                                (diff-hl-mode 1)
-                                (when (vc-backend buffer-file-name)
-                                  (my--ensure-margin-for-diff-hl)
-                                  (diff-hl-update)
-                                  (when (bound-and-true-p my-diff-hl-debug)
-                                    (my-diff-hl-diagnose "find-file"))))))
-  (when (and buffer-file-name (vc-backend buffer-file-name))
-    (diff-hl-mode 1)
-    (my--ensure-margin-for-diff-hl)
-    (diff-hl-update))
+  ;; No find-file auto-enable: git-gutter owns the gutter by default.
   (add-hook 'window-setup-hook #'my--ensure-margin-for-diff-hl)
   (add-hook 'window-size-change-functions #'my--ensure-margin-for-diff-hl)
   ;; Colors similar to VSCode
@@ -420,8 +438,10 @@
   (defun my-diff-hl-use-margin ()
     "Enable margin mode and ensure right margin is visible."
     (interactive)
+    ;; Keep RIGHT side: left margin would collide with git-gutter/line numbers
+    (setq diff-hl-margin-side 'right)
     (diff-hl-margin-mode 1)
-    (setq diff-hl-margin-side 'left)
+    (diff-hl-mode 1)
     (my--ensure-margin-for-diff-hl)
     (when (bound-and-true-p my-diff-hl-debug)
       (my-diff-hl-diagnose "use-margin-before"))
@@ -544,11 +564,14 @@
                              (when (and (featurep 'diff-hl) (bound-and-true-p my-diff-hl-debug))
                                (my-diff-hl-diagnose "after-init"))))
 
-;; Proactively refresh indicators on save and focus
+;; Proactively refresh indicators on save and focus (only where diff-hl is on)
+(defun my--diff-hl-update-if-enabled ()
+  (when (bound-and-true-p diff-hl-mode)
+    (diff-hl-update)))
 (with-eval-after-load 'diff-hl
-  (add-hook 'after-save-hook #'diff-hl-update)
-  (add-hook 'after-revert-hook #'diff-hl-update)
-  (add-hook 'focus-in-hook #'diff-hl-update))
+  (add-hook 'after-save-hook #'my--diff-hl-update-if-enabled)
+  (add-hook 'after-revert-hook #'my--diff-hl-update-if-enabled)
+  (add-hook 'focus-in-hook #'my--diff-hl-update-if-enabled))
 
 ;; Ensure the right margin exists so indicators are visible even when
 ;; other packages resize margins. Keeps left margin untouched (line numbers).
@@ -570,6 +593,170 @@
      nil t)))
 (add-hook 'window-configuration-change-hook #'my--ensure-margin-for-diff-hl)
 (add-hook 'buffer-list-update-hook #'my--ensure-margin-for-diff-hl)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Minimap (VSCode-like code overview, with edit marks)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; - Right-hand miniature of the buffer; toggle with C-c m (or M-x minimap-mode).
+;;   OFF by default — see the edit overview ruler below for whole-file marks.
+;; - Changed lines (from git-gutter's hunk data) are tinted in the minimap:
+;;   green = added, blue = modified, red = hunks with deletions. The minimap is
+;;   an indirect buffer, so gutter margins/overlays don't carry over — we mirror
+;;   the hunks as our own overlays inside the minimap buffer.
+(use-package minimap
+  :ensure t
+  :defer 1
+  :init
+  (setq minimap-window-location 'right
+        minimap-width-fraction 0.10
+        minimap-minimum-width 14
+        minimap-update-delay 0.3
+        minimap-hide-fringes t
+        minimap-major-modes '(prog-mode text-mode conf-mode))
+  :config
+  (ignore-errors
+    (set-face-attribute 'minimap-active-region-background nil
+                        :background "#f0f0f0"))
+  (defvar-local my-minimap--last-hunks 'unset
+    "Hunk list last rendered in the minimap buffer, to skip redundant refreshes.")
+  (defun my-minimap--edit-face (type)
+    (pcase type
+      ('added   '(:background "#c6f0cd" :extend t))
+      ('deleted '(:background "#ffd0cc" :extend t))
+      (_        '(:background "#cfe3ff" :extend t))))
+  (defun my-minimap-refresh-edit-marks (&rest _)
+    "Tint lines changed per git-gutter inside the minimap buffer."
+    (when (and (boundp 'minimap-buffer-name)
+               (fboundp 'git-gutter-hunk-start-line))
+      (let ((mmbuf (get-buffer minimap-buffer-name)))
+        (when (buffer-live-p mmbuf)
+          (let* ((base (buffer-base-buffer mmbuf))
+                 (hunks (and base (buffer-local-value 'git-gutter:diffinfos base))))
+            (with-current-buffer mmbuf
+              (unless (equal hunks my-minimap--last-hunks)
+                (setq my-minimap--last-hunks hunks)
+                (remove-overlays (point-min) (point-max) 'my-minimap-edit t)
+                (save-excursion
+                  (dolist (h hunks)
+                    (let* ((sl (git-gutter-hunk-start-line h))
+                           (el (max sl (or (git-gutter-hunk-end-line h) sl)))
+                           (beg (progn (goto-char (point-min))
+                                       (forward-line (1- sl))
+                                       (point)))
+                           (end (progn (goto-char (point-min))
+                                       (forward-line el)
+                                       (point)))
+                           (ov (make-overlay beg end)))
+                      (overlay-put ov 'my-minimap-edit t)
+                      (overlay-put ov 'priority 100)
+                      (overlay-put ov 'face
+                                   (my-minimap--edit-face (git-gutter-hunk-type h)))))))))))))
+  (advice-add 'minimap-update :after #'my-minimap-refresh-edit-marks)
+  (add-hook 'after-save-hook #'my-minimap-refresh-edit-marks)
+  (add-hook 'after-revert-hook #'my-minimap-refresh-edit-marks))
+;; Minimap is OFF by default (it scrolls with long files, so far-away edits
+;; vanish from it — the edit ruler below solves that). Toggle with C-c m.
+(global-set-key (kbd "C-c m") 'minimap-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Edit overview ruler (VSCode scrollbar-marks style)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Colored marks in the RIGHT margin showing where your edits are in the WHOLE
+;; file, scaled like VSCode's overview ruler — visible no matter where you are
+;; scrolled. Data comes from git-gutter's hunks (updates on save/revert/open).
+;; C-c n / C-c p jump to the next/previous edited hunk.
+(defvar my-edit-ruler-width 1
+  "Right-margin columns reserved for the edit overview ruler.")
+(defface my-edit-ruler-added    '((t :foreground "#2ea043")) "Ruler mark for added lines.")
+(defface my-edit-ruler-modified '((t :foreground "#388bfd")) "Ruler mark for modified lines.")
+(defface my-edit-ruler-deleted  '((t :foreground "#f85149")) "Ruler mark for deleted lines.")
+
+(defun my-edit-ruler--face (type)
+  (pcase type
+    ('added 'my-edit-ruler-added)
+    ('deleted 'my-edit-ruler-deleted)
+    (_ 'my-edit-ruler-modified)))
+
+(defun my-edit-ruler--clear-window (win buf)
+  (with-current-buffer buf
+    (dolist (ov (overlays-in (point-min) (point-max)))
+      (when (and (overlay-get ov 'my-edit-ruler)
+                 (eq (overlay-get ov 'window) win))
+        (delete-overlay ov)))))
+
+(defun my-edit-ruler-refresh-window (win &optional start)
+  "Redraw whole-file edit marks in WIN's right margin.
+START overrides `window-start' — required when called from
+`window-scroll-functions', where `window-start' is not yet updated."
+  (when (and (window-live-p win)
+             (fboundp 'git-gutter-hunk-start-line))
+    (let ((buf (window-buffer win)))
+      (when (buffer-local-value 'git-gutter-mode buf)
+        (my-edit-ruler--clear-window win buf)
+        (with-current-buffer buf
+          (let ((hunks (bound-and-true-p git-gutter:diffinfos)))
+            (when hunks
+              ;; Reserve a slim right margin in this window
+              (let ((m (window-margins win)))
+                (when (< (or (cdr m) 0) my-edit-ruler-width)
+                  (set-window-margins win (car m) my-edit-ruler-width)))
+              ;; Marks can only render on rows that contain buffer lines, so
+              ;; when end-of-buffer is on screen (fewer lines than window rows)
+              ;; compress the whole-file scale into the rows that exist —
+              ;; otherwise marks below EOB would silently vanish.
+              (save-excursion
+                (goto-char (or start (window-start win)))
+                (forward-line 0)
+                (let* ((total (max 1 (count-lines (point-min) (point-max))))
+                       (h (max 1 (window-body-height win)))
+                       (nrows (max 1 (min h (count-lines (point) (point-max)))))
+                       (rows (make-vector nrows nil)))
+                  ;; Map each hunk's buffer lines onto ruler rows (whole-file scale)
+                  (dolist (hk hunks)
+                    (let* ((sl (git-gutter-hunk-start-line hk))
+                           (el (max sl (or (git-gutter-hunk-end-line hk) sl)))
+                           (type (git-gutter-hunk-type hk))
+                           (r1 (min (1- nrows) (/ (* (1- sl) nrows) total)))
+                           (r2 (min (1- nrows) (/ (* (1- el) nrows) total))))
+                      (cl-loop for r from r1 to r2
+                               do (aset rows r (or (aref rows r) type)))))
+                  ;; Attach one margin mark per marked row, on the visible lines
+                  (cl-loop for r from 0 below nrows
+                           do (let ((type (aref rows r)))
+                                (when type
+                                  (let ((ov (make-overlay (point) (point))))
+                                    (overlay-put ov 'my-edit-ruler t)
+                                    (overlay-put ov 'window win)
+                                    (overlay-put ov 'priority 200)
+                                    (overlay-put ov 'before-string
+                                                 (propertize " " 'display
+                                                             `((margin right-margin)
+                                                               ,(propertize "▐" 'face (my-edit-ruler--face type))))))))
+                              (unless (zerop (forward-line 1))
+                                (cl-return))))))))))))
+
+(defun my-edit-ruler-refresh (&rest _)
+  "Refresh the edit ruler in all windows."
+  (dolist (win (window-list nil 'no-mini))
+    (my-edit-ruler-refresh-window win)))
+
+;; Redraw on scroll/resize. Hunk-data refreshes come straight from git-gutter:
+;; it computes hunks in an ASYNC process, so save/open/revert hooks would run
+;; before `git-gutter:diffinfos' is updated — advise its update function
+;; instead, which the async sentinel calls with the target buffer current.
+(add-hook 'window-scroll-functions #'my-edit-ruler-refresh-window)
+(add-hook 'window-configuration-change-hook #'my-edit-ruler-refresh)
+(defun my-edit-ruler--after-gutter-update (&rest _)
+  "Refresh the ruler in every window showing the buffer whose hunks updated."
+  (dolist (win (get-buffer-window-list (current-buffer) nil t))
+    (my-edit-ruler-refresh-window win)))
+(with-eval-after-load 'git-gutter
+  (advice-add 'git-gutter:update-diffinfo :after #'my-edit-ruler--after-gutter-update))
+
+;; Jump between edits (works anywhere in the file)
+(with-eval-after-load 'git-gutter
+  (global-set-key (kbd "C-c n") 'git-gutter:next-hunk)
+  (global-set-key (kbd "C-c p") 'git-gutter:previous-hunk))
 
 ;; Keybindings: file dialogs, save, zoom
 (global-set-key (kbd "C-o") 'menu-find-file-existing)
@@ -671,6 +858,9 @@
       cua-prefix-override-inhibit-delay 0.05
       ;; Avoid extra Windows clipboard readback before replacing it.
       save-interprogram-paste-before-kill nil)
+(defun my-begin-shift-selection ()
+  (when (and cua-mode (not (use-region-p)))
+    (cua-set-mark)))
 (defun my-deactivate-selection ()
   (cond
    ((my-select-all-active-p)
@@ -679,9 +869,16 @@
    ((use-region-p)
     (deactivate-mark))))
 (defun my-collapse-selection-and-move (_direction fallback)
-  (if (or (my-select-all-active-p) (use-region-p))
-      (my-deactivate-selection)
-    (funcall fallback)))
+  (cond
+   (this-command-keys-shift-translated
+    (when (my-select-all-active-p)
+      (my-clear-select-all-state))
+    (my-begin-shift-selection)
+    (call-interactively fallback))
+   ((or (my-select-all-active-p) (use-region-p))
+    (my-deactivate-selection))
+   (t
+    (call-interactively fallback))))
 (defun my-left-or-clear-selection ()
   (interactive)
   (my-collapse-selection-and-move 'left #'left-char))
@@ -694,12 +891,30 @@
 (defun my-down-or-clear-selection ()
   (interactive)
   (my-collapse-selection-and-move 'down #'next-line))
+(defun my-page-up-command ()
+  (interactive)
+  (condition-case nil
+      (progn
+        (scroll-down-command)
+        (when (= (window-start) (point-min))
+          (goto-char (point-min))))
+    (beginning-of-buffer
+     (goto-char (point-min)))))
+(defun my-page-down-command ()
+  (interactive)
+  (condition-case nil
+      (progn
+        (scroll-up-command)
+        (when (>= (window-end nil t) (point-max))
+          (goto-char (point-max))))
+    (end-of-buffer
+     (goto-char (point-max)))))
 (defun my-page-up-or-clear-selection ()
   (interactive)
-  (my-collapse-selection-and-move 'page-up #'scroll-down-command))
+  (my-collapse-selection-and-move 'page-up #'my-page-up-command))
 (defun my-page-down-or-clear-selection ()
   (interactive)
-  (my-collapse-selection-and-move 'page-down #'scroll-up-command))
+  (my-collapse-selection-and-move 'page-down #'my-page-down-command))
 (global-set-key [left] #'my-left-or-clear-selection)
 (global-set-key [right] #'my-right-or-clear-selection)
 (global-set-key [up] #'my-up-or-clear-selection)
@@ -755,6 +970,8 @@
 (defun my-forward-word (&optional arg)
   (interactive "^p")
   (or arg (setq arg 1))
+  (when this-command-keys-shift-translated
+    (my-begin-shift-selection))
   (let* ((backward (< arg 0)) (count (abs arg))
          (char-next (if backward 'char-before 'char-after))
          (skip-syntax (if backward 'skip-syntax-backward 'skip-syntax-forward))
@@ -941,8 +1158,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Resolve repository root for current buffer/default-directory
+(defun my-git--actual-repo-root ()
+  "Return the real Git root for the current buffer/default-directory, or nil."
+  (when (executable-find "git")
+    (let ((default-directory
+            (or (and buffer-file-name
+                     (file-name-directory (file-truename buffer-file-name)))
+                default-directory)))
+      (with-temp-buffer
+        (when (zerop (process-file "git" nil t nil "rev-parse" "--show-toplevel"))
+          (file-name-as-directory (string-trim (buffer-string))))))))
+
 (defun my-git--repo-root ()
-  (or (and (fboundp 'magit-toplevel) (ignore-errors (magit-toplevel)))
+  (or (my-git--actual-repo-root)
+      (and (fboundp 'magit-toplevel) (ignore-errors (magit-toplevel)))
       (and (fboundp 'vc-root-dir) (vc-root-dir))
       (locate-dominating-file default-directory ".git")
       default-directory))

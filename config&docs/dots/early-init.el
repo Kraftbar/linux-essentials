@@ -10,9 +10,9 @@
             (setq gc-cons-threshold my-startup-gc-cons-threshold
                   gc-cons-percentage my-startup-gc-cons-percentage)))
 
-;; Use HTTPS MELPA by default
+;; Use HTTPS package archives by default
 (setq package-archives
-      '(("gnu"   . "http://elpa.gnu.org/packages/")
+      '(("gnu"   . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 
 ;; Faster startup by preloading package autoloads
