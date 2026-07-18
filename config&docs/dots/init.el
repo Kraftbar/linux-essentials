@@ -3,7 +3,7 @@
 ;; Emacs Config (single-file)
 ;; - Minimal UI, Windows-like word nav/delete
 ;; - Notepad++-style keys where sensible
-;; - Chrome-like tabs (C-Tab/CS-Tab, C-t new tab, C-w close, C-S-t reopen)
+;; - Chrome-like tabs (C-Tab/CS-Tab, C-n/C-t new tab, C-w close, C-S-t reopen)
 ;; - Helm + helm-swoop (C-f), undo-tree (C-z/C-S-z), popwin
 
 
@@ -1266,10 +1266,9 @@ systems falls back to the default shell."
     (funcall initial-major-mode)
     (setq buffer-offer-save t)
     $buf))
-;; Chrome-style: C-t opens a new tab. C-n goes back to plain next-line
-;; (explicit rebind so live-session reloads actually drop the old binding).
+;; New tab on C-n (and C-t as Chrome-style alias)
+(global-set-key (kbd "C-n") 'my-new-empty-buffer)
 (global-set-key (kbd "C-t") 'my-new-empty-buffer)
-(global-set-key (kbd "C-n") 'next-line)
 (defvar killed-file-list nil "List of recently killed files.")
 (defun add-file-to-killed-file-list () (when buffer-file-name (push buffer-file-name killed-file-list)))
 (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
