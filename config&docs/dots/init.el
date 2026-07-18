@@ -811,11 +811,37 @@ systems falls back to the default shell."
 ;; We bypass stock `comint-interrupt-subjob' because it stamps literal
 ;; "  C-c C-c" key-description text into the buffer (comint-skip-input),
 ;; which then gets sent to the shell as garbage input.
+;; `interrupt-process' on Windows attaches to the child's hidden console to
+;; inject a real Ctrl+C — that flashes a console window and is slow. Only
+;; pay that cost when a command is actually running; detect idle by whether
+;; the text before the process mark looks like a prompt.
+(defun my-comint--idle-p ()
+  "Non-nil when the shell shows a prompt, i.e. no command is running."
+  (let* ((proc (get-buffer-process (current-buffer)))
+         (pmark (and proc (process-mark proc)))
+         ;; comint's own default prompt regexp "^" matches anything;
+         ;; fall back to a real shell prompt pattern in that case.
+         (re (if (member comint-prompt-regexp '("^" "^ *"))
+                 (or (bound-and-true-p shell-prompt-pattern)
+                     "^[^#$%>\n]*[#$%>] *")
+               comint-prompt-regexp)))
+    (and pmark
+         (string-match-p
+          re
+          (buffer-substring-no-properties
+           (save-excursion
+             (goto-char pmark)
+             ;; the prompt is a comint text field; without this,
+             ;; line-beginning-position won't cross into it
+             (let ((inhibit-field-text-motion t))
+               (line-beginning-position)))
+           pmark)))))
 (defun my-comint-cancel ()
   "Cancel current input and/or running command; land on a fresh prompt."
   (interactive)
   (comint-kill-input)
-  (ignore-errors (interrupt-process nil comint-ptyp))
+  (unless (my-comint--idle-p)
+    (ignore-errors (interrupt-process nil comint-ptyp)))
   (comint-send-string nil "\n"))
 ;; Terminal-style single Ctrl+C in shell buffers: CUA only claims C-c while
 ;; a region is selected (copy), so binding bare C-c locally is safe — with a
