@@ -289,7 +289,7 @@
 (use-package command-log-mode
   :ensure t
   :commands (command-log-mode global-command-log-mode clm/open-command-log-buffer))
-(defun xah-start-command-log ()
+(defun my-start-command-log ()
   (interactive)
   (command-log-mode)
   (global-command-log-mode)
@@ -1259,7 +1259,7 @@ systems falls back to the default shell."
 (global-set-key (kbd "C-w") 'my-close-buffer-smart)
 
 ;; New empty buffer as a new tab in the current pane
-(defun xah-new-empty-buffer ()
+(defun my-new-empty-buffer ()
   (interactive)
   (let (($buf (generate-new-buffer "untitled")))
     (switch-to-buffer $buf)
@@ -1268,7 +1268,7 @@ systems falls back to the default shell."
     $buf))
 ;; Chrome-style: C-t opens a new tab. C-n goes back to plain next-line
 ;; (explicit rebind so live-session reloads actually drop the old binding).
-(global-set-key (kbd "C-t") 'xah-new-empty-buffer)
+(global-set-key (kbd "C-t") 'my-new-empty-buffer)
 (global-set-key (kbd "C-n") 'next-line)
 (defvar killed-file-list nil "List of recently killed files.")
 (defun add-file-to-killed-file-list () (when buffer-file-name (push buffer-file-name killed-file-list)))
