@@ -655,8 +655,10 @@
   (add-hook 'after-save-hook #'my-minimap-refresh-edit-marks)
   (add-hook 'after-revert-hook #'my-minimap-refresh-edit-marks))
 ;; Minimap is OFF by default (it scrolls with long files, so far-away edits
-;; vanish from it — the edit ruler below solves that). Toggle with C-c m.
-(global-set-key (kbd "C-c m") 'minimap-mode)
+;; vanish from it — the edit ruler below solves that). Toggle with F8.
+;; NOTE: don't bind custom keys on the C-c prefix — CUA owns C-c (copy) and
+;; the 0.05s prefix-override window makes C-c <key> unusable with a selection.
+(global-set-key (kbd "<f8>") 'minimap-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Edit overview ruler (VSCode scrollbar-marks style)
@@ -753,10 +755,83 @@ START overrides `window-start' — required when called from
 (with-eval-after-load 'git-gutter
   (advice-add 'git-gutter:update-diffinfo :after #'my-edit-ruler--after-gutter-update))
 
-;; Jump between edits (works anywhere in the file)
+;; Jump between edits (works anywhere; comint/helm local maps still win M-p/M-n)
 (with-eval-after-load 'git-gutter
-  (global-set-key (kbd "C-c n") 'git-gutter:next-hunk)
-  (global-set-key (kbd "C-c p") 'git-gutter:previous-hunk))
+  (global-set-key (kbd "M-n") 'git-gutter:next-hunk)
+  (global-set-key (kbd "M-p") 'git-gutter:previous-hunk))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PowerShell in Emacs (F6) / Windows Terminal (F7)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Native Windows Emacs has no ptys, so real terminal emulators (vterm, eat,
+;; ansi-term) cannot work here. A comint-driven PowerShell is the practical
+;; option: real PS prompt, colors, command history — but no TUI apps (htop,
+;; curses installers etc.); use Windows Terminal for those.
+;; PowerShell echoes input when driven over pipes, hence comint-process-echoes.
+(defun my-powershell ()
+  "Open or switch to a PowerShell buffer, starting in the current file's directory.
+Prefers PowerShell 7 (pwsh) over Windows PowerShell 5.1. On non-Windows
+systems falls back to the default shell."
+  (interactive)
+  (let* ((default-directory (or (and buffer-file-name
+                                     (file-name-directory buffer-file-name))
+                                default-directory))
+         (ps (or (executable-find "pwsh")
+                 (let ((p "C:/Program Files/PowerShell/7/pwsh.exe"))
+                   (and (file-exists-p p) p))
+                 (executable-find "powershell"))))
+    (if (not ps)
+        (shell)
+      (let ((explicit-shell-file-name ps))
+        ;; `shell' picks up extra args from explicit-<basename>-args
+        (set (intern (concat "explicit-" (file-name-nondirectory ps) "-args"))
+             '("-NoLogo"))
+        (with-current-buffer (shell "*PowerShell*")
+          (setq-local comint-process-echoes t))))))
+(global-set-key (kbd "<f6>") 'my-powershell)
+
+;; F7: full terminal escape hatch — Windows Terminal (real ConPTY, TUI apps
+;; work) opened at the current file's directory. Emacs cannot host a true
+;; terminal on native Windows (no ConPTY support), so this covers that gap.
+(defun my-windows-terminal ()
+  "Launch Windows Terminal in the current file's directory."
+  (interactive)
+  (let ((dir (or (and buffer-file-name
+                      (file-name-directory buffer-file-name))
+                 default-directory)))
+    (if (fboundp 'w32-shell-execute)
+        (w32-shell-execute "open" "wt.exe"
+                           (concat "-d \"" (expand-file-name dir) "\""))
+      (user-error "Windows only; use F6 for the in-Emacs shell"))))
+(global-set-key (kbd "<f7>") 'my-windows-terminal)
+
+;; Console-style cancel in shell buffers, on Escape and C-c C-c:
+;; wipe whatever is typed, interrupt any running command, and coax a fresh
+;; prompt line (the "lineskip" a real console gives you on Ctrl+C).
+;; We bypass stock `comint-interrupt-subjob' because it stamps literal
+;; "  C-c C-c" key-description text into the buffer (comint-skip-input),
+;; which then gets sent to the shell as garbage input.
+(defun my-comint-cancel ()
+  "Cancel current input and/or running command; land on a fresh prompt."
+  (interactive)
+  (comint-kill-input)
+  (ignore-errors (interrupt-process nil comint-ptyp))
+  (comint-send-string nil "\n"))
+(with-eval-after-load 'comint
+  (define-key comint-mode-map [escape] 'my-comint-cancel)
+  (define-key comint-mode-map (kbd "C-c C-c") 'my-comint-cancel))
+
+;; `clear' / `cls' need a console cursor, which pipe-driven shells don't have
+;; (PS errors with "The handle is invalid"). Intercept them and clear the
+;; Emacs buffer instead, then nudge an empty line for a fresh prompt.
+(defun my-comint-send-or-clear (proc string)
+  (if (string-match-p "\\`[ \t]*\\(clear\\|cls\\)[ \t]*\\'" string)
+      (progn
+        (comint-clear-buffer)
+        (comint-simple-send proc ""))
+    (comint-simple-send proc string)))
+(add-hook 'comint-mode-hook
+          (lambda () (setq-local comint-input-sender #'my-comint-send-or-clear)))
 
 ;; Keybindings: file dialogs, save, zoom
 (global-set-key (kbd "C-o") 'menu-find-file-existing)
@@ -953,7 +1028,7 @@ START overrides `window-start' — required when called from
   (interactive "p")
   (if (active-minibuffer-window)
       (minibuffer-complete)
-    (if (string= (buffer-name) "*shell*")
+    (if (derived-mode-p 'comint-mode)   ;; any shell-ish buffer (*shell*, *PowerShell*, ...)
         (completion-at-point)
       (if (use-region-p)
           (indent-region-custom 4)
