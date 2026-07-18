@@ -3,7 +3,7 @@
 ;; Emacs Config (single-file)
 ;; - Minimal UI, Windows-like word nav/delete
 ;; - Notepad++-style keys where sensible
-;; - Chrome-like tabs (C-Tab/CS-Tab, C-n new tab, C-w close)
+;; - Chrome-like tabs (C-Tab/CS-Tab, C-t new tab, C-w close, C-S-t reopen)
 ;; - Helm + helm-swoop (C-f), undo-tree (C-z/C-S-z), popwin
 
 
@@ -1147,7 +1147,12 @@ systems falls back to the default shell."
   (let ((bufs (tab-line-tabs-window-buffers)))
     (cl-remove-if (lambda (b)
                     (let ((n (buffer-name b)))
-                      (or (null n) (string-prefix-p "*" n))))
+                      (or (null n)
+                          (and (string-prefix-p "*" n)
+                               ;; keep shells (*PowerShell* etc.) as real
+                               ;; tabs so switching away doesn't lose them
+                               (not (with-current-buffer b
+                                      (derived-mode-p 'comint-mode)))))))
                   bufs)))
 
 (defun my-tab--get-ordered-list ()
@@ -1261,7 +1266,10 @@ systems falls back to the default shell."
     (funcall initial-major-mode)
     (setq buffer-offer-save t)
     $buf))
-(global-set-key (kbd "C-n") 'xah-new-empty-buffer)
+;; Chrome-style: C-t opens a new tab. C-n goes back to plain next-line
+;; (explicit rebind so live-session reloads actually drop the old binding).
+(global-set-key (kbd "C-t") 'xah-new-empty-buffer)
+(global-set-key (kbd "C-n") 'next-line)
 (defvar killed-file-list nil "List of recently killed files.")
 (defun add-file-to-killed-file-list () (when buffer-file-name (push buffer-file-name killed-file-list)))
 (add-hook 'kill-buffer-hook #'add-file-to-killed-file-list)
