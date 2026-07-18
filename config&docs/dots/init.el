@@ -817,9 +817,35 @@ systems falls back to the default shell."
   (comint-kill-input)
   (ignore-errors (interrupt-process nil comint-ptyp))
   (comint-send-string nil "\n"))
+;; Terminal-style single Ctrl+C in shell buffers: CUA only claims C-c while
+;; a region is selected (copy), so binding bare C-c locally is safe — with a
+;; selection CUA copies, without one we interrupt, just like a real console.
+;; This shadows comint's stock C-c prefix commands in shells, which is fine.
+(defun my-comint-ctrl-c ()
+  "Copy if a region is selected, otherwise interrupt like a terminal Ctrl+C."
+  (interactive)
+  (if (use-region-p)
+      (call-interactively 'cua-copy-region)
+    (my-comint-cancel)))
 (with-eval-after-load 'comint
-  (define-key comint-mode-map [escape] 'my-comint-cancel)
-  (define-key comint-mode-map (kbd "C-c C-c") 'my-comint-cancel))
+  (define-key comint-mode-map [escape] 'my-comint-cancel))
+;; CUA claims C-c as a prefix in its emulation keymap, which outranks every
+;; major/minor-mode map — so a plain define-key can never win. Register our
+;; own emulation keymap, active only in comint buffers, ahead of CUA's.
+;; `my-comint-ctrl-c' still copies when a region is selected, so no CUA
+;; behavior is lost in shells.
+(defvar my-comint-ctrl-c-map
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "C-c") 'my-comint-ctrl-c)
+    m))
+(defvar-local my-comint-ctrl-c-enabled nil)
+(add-hook 'comint-mode-hook
+          (lambda ()
+            (setq my-comint-ctrl-c-enabled t)
+            ;; Prepend at shell startup: CUA is long since initialized by
+            ;; then, so front position (= higher precedence) is guaranteed.
+            (add-to-list 'emulation-mode-map-alists
+                         `((my-comint-ctrl-c-enabled . ,my-comint-ctrl-c-map)))))
 
 ;; `clear' / `cls' need a console cursor, which pipe-driven shells don't have
 ;; (PS errors with "The handle is invalid"). Intercept them and clear the
