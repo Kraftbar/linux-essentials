@@ -1,1 +1,5 @@
 custom0	Smart close (tab-first)	config&docs/smart-close.sh	<Shift><Control>w
+custom1	Smart tile (left)	config&docs/smart-tile.sh left	<Super>Left
+custom2	Smart tile (right)	config&docs/smart-tile.sh right	<Super>Right
+custom3	Smart tile (up)	config&docs/smart-tile.sh up	<Super>Up
+custom4	Smart tile (down)	config&docs/smart-tile.sh down	<Super>Down
