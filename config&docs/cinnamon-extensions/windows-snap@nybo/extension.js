@@ -69,15 +69,17 @@ const TILE_MODE_ZONES = {
  *
  * Quarters follow Windows instead and never float: a horizontal arrow just
  * flips to the other quarter in the same row, and the way out is the vertical
- * arrow pointing back at the half the quarter came from.
+ * arrow pointing back at the half the quarter came from. Pressing up again
+ * from a top quarter - already against the top edge - maximizes, the same as
+ * pressing up from a floating window.
  */
 const TRANSITIONS = {
     FLOAT: { left: 'LEFT',  right: 'RIGHT', up: 'MAX',   down: 'MIN'   },
     MAX:   { left: 'LEFT',  right: 'RIGHT', up: null,    down: 'FLOAT' },
     LEFT:  { left: 'RIGHT', right: 'FLOAT', up: 'TL',    down: 'BL'    },
     RIGHT: { left: 'FLOAT', right: 'LEFT',  up: 'TR',    down: 'BR'    },
-    TL:    { left: 'TR',    right: 'TR',    up: null,    down: 'LEFT'  },
-    TR:    { left: 'TL',    right: 'TL',    up: null,    down: 'RIGHT' },
+    TL:    { left: 'TR',    right: 'TR',    up: 'MAX',   down: 'LEFT'  },
+    TR:    { left: 'TL',    right: 'TL',    up: 'MAX',   down: 'RIGHT' },
     BL:    { left: 'BR',    right: 'BR',    up: 'LEFT',  down: null    },
     BR:    { left: 'BL',    right: 'BL',    up: 'RIGHT', down: null    },
 };

@@ -372,7 +372,8 @@ half gives the quarter on that side.
 
 Quarters follow Windows and never float - a horizontal arrow flips to the
 other quarter in the same row, and the way out is the vertical arrow pointing
-back at the half the quarter came from. Snapping from floating therefore
+back at the half the quarter came from. Super+Up from a top quarter, already
+against the top edge, maximizes. Snapping from floating therefore
 always lands on a half, never a quarter. The arrow pointing back at the half a quarter came from
 returns to it, so Super+Up then Super+Down is reversible. Super+Up maximizes
 from floating and Super+Down restores from maximized.
