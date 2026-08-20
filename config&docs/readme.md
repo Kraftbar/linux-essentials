@@ -366,12 +366,14 @@ features needed all three and were unreliable; the git history around
 
 ### windows-snap@nybo - Super+arrow window snapping
 
-Repeated presses of one arrow run a 3-step cycle. Super+Left gives
-floating -> left half -> right half -> floating; Super+Up from a half gives
-quarter -> floating. The cycle stays in whichever row the window is in, so
-from a top-left quarter Super+Left runs
-top-left -> top-right -> floating -> top-left rather than dropping back to
-full-height halves. A vertical arrow moves between rows. The arrow pointing back at the half a quarter came from
+Halves run a 3-step cycle: Super+Left gives
+floating -> left half -> right half -> floating. Super+Up or Super+Down from a
+half gives the quarter on that side.
+
+Quarters follow Windows and never float - a horizontal arrow flips to the
+other quarter in the same row, and the way out is the vertical arrow pointing
+back at the half the quarter came from. Snapping from floating therefore
+always lands on a half, never a quarter. The arrow pointing back at the half a quarter came from
 returns to it, so Super+Up then Super+Down is reversible. Super+Up maximizes
 from floating and Super+Down restores from maximized.
 

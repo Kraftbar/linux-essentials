@@ -61,47 +61,25 @@ const TILE_MODE_ZONES = {
 };
 
 /*
- * Which row of the screen each zone lives in, and the zone reached by going
- * left or right within a row.
- *
- * Without this the cycle escapes the corners: floating out of the top-left
- * quarter and pressing the same arrow again would give a full-height half,
- * because nothing remembered that the window had been in the top row. The
- * band is carried across the floating step so a corner cycle stays a corner
- * cycle, and only changes when a vertical arrow moves the window to another
- * row.
- */
-const BAND_OF_ZONE = {
-    LEFT: 'FULL', RIGHT: 'FULL',
-    TL: 'TOP',    TR: 'TOP',
-    BL: 'BOTTOM', BR: 'BOTTOM',
-};
-
-const BAND_ZONES = {
-    FULL:   { LEFT: 'LEFT', RIGHT: 'RIGHT' },
-    TOP:    { LEFT: 'TL',   RIGHT: 'TR'    },
-    BOTTOM: { LEFT: 'BL',   RIGHT: 'BR'    },
-};
-
-/*
  * State machine. Keys are the current state, values map an arrow direction to
  * the next state. null means "do nothing".
  *
- * Every direction runs the same 3-step cycle: move that way, then across to
- * the opposite side, then back to floating. Horizontally that is
- * left half -> right half -> floating; vertically, from a half, it is
- * quarter -> floating. The arrow pointing back at the half a quarter came
- * from returns to it, so Super+Up and Super+Down stay reversible.
+ * Halves run a 3-step cycle - move that way, then across to the other side,
+ * then back to floating.
+ *
+ * Quarters follow Windows instead and never float: a horizontal arrow just
+ * flips to the other quarter in the same row, and the way out is the vertical
+ * arrow pointing back at the half the quarter came from.
  */
 const TRANSITIONS = {
     FLOAT: { left: 'LEFT',  right: 'RIGHT', up: 'MAX',   down: 'MIN'   },
     MAX:   { left: 'LEFT',  right: 'RIGHT', up: null,    down: 'FLOAT' },
     LEFT:  { left: 'RIGHT', right: 'FLOAT', up: 'TL',    down: 'BL'    },
     RIGHT: { left: 'FLOAT', right: 'LEFT',  up: 'TR',    down: 'BR'    },
-    TL:    { left: 'TR',    right: 'FLOAT', up: 'FLOAT', down: 'LEFT'  },
-    TR:    { left: 'FLOAT', right: 'TL',    up: 'FLOAT', down: 'RIGHT' },
-    BL:    { left: 'BR',    right: 'FLOAT', up: 'LEFT',  down: 'FLOAT' },
-    BR:    { left: 'FLOAT', right: 'BL',    up: 'RIGHT', down: 'FLOAT' },
+    TL:    { left: 'TR',    right: 'TR',    up: null,    down: 'LEFT'  },
+    TR:    { left: 'TL',    right: 'TL',    up: null,    down: 'RIGHT' },
+    BL:    { left: 'BR',    right: 'BR',    up: 'LEFT',  down: null    },
+    BR:    { left: 'BL',    right: 'BL',    up: 'RIGHT', down: null    },
 };
 
 const BINDINGS = [
@@ -270,7 +248,6 @@ function applyZone(win, zoneName) {
     moveResize(win, r.x, r.y, r.width, r.height);
 
     win._wsState = zoneName;
-    win._wsBand = BAND_OF_ZONE[zoneName];
     /* Remember where we put it so currentState() can tell later whether the
      * window is still there or the user has since moved it. */
     win._wsZoneRect = r;
@@ -311,18 +288,7 @@ function handle(direction) {
         return;
 
     const state = currentState(win);
-
-    /* Keep the band in step with where the window actually is, including
-     * zones it reached by mouse or that were recognised from geometry. */
-    if (BAND_OF_ZONE[state])
-        win._wsBand = BAND_OF_ZONE[state];
-
-    let next = TRANSITIONS[state][direction];
-
-    /* Coming back from floating, return to the row the window came from
-     * rather than always to a full-height half. */
-    if (state === 'FLOAT' && (next === 'LEFT' || next === 'RIGHT'))
-        next = BAND_ZONES[win._wsBand || 'FULL'][next];
+    const next = TRANSITIONS[state][direction];
 
     if (!next)
         return;
