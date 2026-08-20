@@ -31,6 +31,9 @@ state="$(xprop -id "$win" _NET_WM_STATE 2>/dev/null)"
 if [[ "$state" == *MAXIMIZED_VERT* || "$state" == *MAXIMIZED_HORZ* ]]; then
     wmctrl -ir "$win" -b remove,maximized_vert,maximized_horz
 else
-    sleep 0.15
+    # Let the physically-held Super (from triggering this hotkey) release
+    # before injecting the synthetic Ctrl+Super+<dir>, otherwise the real
+    # and synthetic modifier/key state can clash.
+    sleep 0.05
     xdotool key --clearmodifiers "ctrl+super+$keysym"
 fi
