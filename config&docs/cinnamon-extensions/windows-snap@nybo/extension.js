@@ -43,6 +43,24 @@ const ZONES = {
 };
 
 /*
+ * muffin's own tile_mode, mapped onto the zones above. Dragging a window to a
+ * screen edge tiles it through muffin rather than through this extension, so
+ * without consulting tile_mode the window would look "floating" here and
+ * Super+Left would re-snap it left instead of continuing the cycle.
+ *
+ * TOP and BOTTOM have no equivalent zone (nothing here produces a full-width
+ * half), so they are deliberately absent and fall through to floating.
+ */
+const TILE_MODE_ZONES = {
+    [Meta.TileMode.LEFT]:  'LEFT',
+    [Meta.TileMode.RIGHT]: 'RIGHT',
+    [Meta.TileMode.ULC]:   'TL',
+    [Meta.TileMode.URC]:   'TR',
+    [Meta.TileMode.LLC]:   'BL',
+    [Meta.TileMode.LRC]:   'BR',
+};
+
+/*
  * State machine. Keys are the current state, values map an arrow direction to
  * the next state. null means "do nothing".
  *
@@ -102,19 +120,60 @@ function sameRect(a, b) {
 }
 
 /*
+ * True when muffin is managing the window's geometry - it was maximized, or
+ * tiled by dragging it to a screen edge. muffin saves the pre-tile geometry in
+ * that case, and unmaximize() puts it back, which is how a mouse-snapped
+ * window can be restored even though this extension never saw it float.
+ */
+function isMuffinManaged(win) {
+    return win.get_maximized() !== 0 || win.tile_mode !== Meta.TileMode.NONE;
+}
+
+/*
  * Work out the state the window is *actually* in, rather than trusting what we
- * recorded last time. If the user has dragged or resized the window since, it
- * is no longer in its zone and we treat it as floating again - otherwise the
- * cycle would continue from a stale state and jump somewhere unexpected.
+ * recorded last time - it may have been dragged, resized or edge-snapped since.
+ *
+ * muffin's own view wins where it has one: tile_mode and get_maximized() are
+ * authoritative and cover snapping done by mouse. Only when muffin considers
+ * the window untiled do we fall back to our own record, and even then the
+ * geometry has to still match, otherwise the window has been moved and is
+ * floating again.
  */
 function currentState(win) {
-    if (win._wsState === 'MAX')
-        return win.get_maximized() === Meta.MaximizeFlags.BOTH ? 'MAX' : 'FLOAT';
+    if (win.get_maximized() === Meta.MaximizeFlags.BOTH ||
+        win.tile_mode === Meta.TileMode.MAXIMIZED)
+        return 'MAX';
 
-    if (!win._wsState || win._wsState === 'FLOAT')
+    const tiled = TILE_MODE_ZONES[win.tile_mode];
+    if (tiled)
+        return tiled;
+
+    if (!win._wsState || win._wsState === 'FLOAT' || win._wsState === 'MAX')
         return 'FLOAT';
 
     return sameRect(rectOf(win), win._wsZoneRect) ? win._wsState : 'FLOAT';
+}
+
+/*
+ * Record where the window should return to when it next floats.
+ *
+ * The easy case is a window that is floating right now. The other case is one
+ * muffin is holding tiled or maximized - this extension never saw it float, so
+ * it asks muffin: unmaximize() drops the window back to the geometry muffin
+ * saved, and get_frame_rect() reflects that immediately (verified - the value
+ * is updated synchronously, not on the next repaint), so it can be read back
+ * in the same handler.
+ */
+function ensureFloatRect(win, state) {
+    if (state === 'FLOAT') {
+        win._wsFloatRect = rectOf(win);
+        return;
+    }
+
+    if (!win._wsFloatRect && isMuffinManaged(win)) {
+        win.unmaximize(Meta.MaximizeFlags.BOTH);
+        win._wsFloatRect = rectOf(win);
+    }
 }
 
 function applyZone(win, zoneName) {
@@ -138,15 +197,19 @@ function applyZone(win, zoneName) {
 }
 
 function restore(win) {
-    if (win.get_maximized())
+    win._wsState = 'FLOAT';
+    win._wsZoneRect = null;
+
+    /* If muffin tiled or maximized this window it already knows the geometry
+     * to go back to, and unmaximize() restores it exactly. */
+    if (isMuffinManaged(win)) {
         win.unmaximize(Meta.MaximizeFlags.BOTH);
+        return;
+    }
 
     const orig = win._wsFloatRect;
     if (orig)
         moveResize(win, orig.x, orig.y, orig.width, orig.height);
-
-    win._wsState = 'FLOAT';
-    win._wsZoneRect = null;
 }
 
 function handle(direction) {
@@ -168,9 +231,9 @@ function handle(direction) {
     if (!next)
         return;
 
-    /* Leaving the floating state: remember the geometry to come back to. */
-    if (state === 'FLOAT')
-        win._wsFloatRect = rectOf(win);
+    /* Remember where to come back to before we move the window anywhere. */
+    if (next !== 'FLOAT' && next !== 'MIN')
+        ensureFloatRect(win, state);
 
     switch (next) {
         case 'MIN':

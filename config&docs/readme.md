@@ -377,6 +377,14 @@ to the "Super alone opens the menu" overlay key, so Super+Left just opened the
 menu. `Main.keybindingManager.addHotKey()` registers through muffin like a
 native WM binding and works.
 
+Windows snapped with the **mouse** (dragged to a screen edge) are tiled by
+muffin, not by this extension, so it reads muffin's `tile_mode` rather than
+only its own record. Super+Left on a mouse-snapped window therefore continues
+the cycle instead of re-snapping it to the side it is already on. muffin also
+keeps the pre-snap geometry for those windows, and `unmaximize()` restores it
+exactly - so such a window still floats back to its original size even though
+this extension never saw it float.
+
 Two muffin quirks the extension works around, verified on Cinnamon 6.4.14 and
 commented in `extension.js`:
 
