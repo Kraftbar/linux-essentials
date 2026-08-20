@@ -358,3 +358,17 @@ echo "Setup complete!"
   A proper fix probably needs a real Cinnamon JS patch (like the
   `appSwitcher.js` patch above) rather than external key injection - e.g.
   hooking wherever muffin implements push-tile-* directly.
+
+- **Ctrl+Shift+W as a global "close any window" fallback, without breaking
+  tab-close**: currently Ctrl+Shift+W is left unbound at the WM level, so
+  gnome-terminal's own tab-close accelerator fires natively - reliable, but
+  only works in apps that implement Ctrl+Shift+W themselves. Windows with no
+  shortcut of their own (e.g. a sound-settings applet) need Super+Q or Alt+F4
+  instead. Tried making Ctrl+Shift+W do both (tab-first in terminal, close-
+  window everywhere else) via `smart-close.sh` - technically worked, but was
+  dropped along with `smart-tile.sh` when simplifying back to native-only
+  behavior. If revisited: a global WM-level grab on Ctrl+Shift+W always wins
+  over gnome-terminal's own accelerator, so tab-first-close requires either
+  the `smart-close.sh` re-injection trick again, or (cleaner if it exists) a
+  Cinnamon JS-level hook that can tell whether the focused app already
+  handles the key before deciding to close the window.
