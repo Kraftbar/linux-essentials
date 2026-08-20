@@ -119,25 +119,66 @@ function sameRect(a, b) {
         Math.abs(a.height - b.height) <= TOLERANCE;
 }
 
+/* Pixel geometry of a zone on the monitor the window is currently on. */
+function zoneRect(win, zoneName) {
+    const area = win.get_work_area_for_monitor(win.get_monitor());
+    const z = ZONES[zoneName];
+    return {
+        x: area.x + Math.round(z.x * area.width),
+        y: area.y + Math.round(z.y * area.height),
+        width:  Math.round(z.w * area.width),
+        height: Math.round(z.h * area.height),
+    };
+}
+
 /*
- * True when muffin is managing the window's geometry - it was maximized, or
- * tiled by dragging it to a screen edge. muffin saves the pre-tile geometry in
- * that case, and unmaximize() puts it back, which is how a mouse-snapped
- * window can be restored even though this extension never saw it float.
+ * Which zone, if any, a rectangle is sitting on.
+ *
+ * This matters because the extension cannot rely on its own bookkeeping: the
+ * per-window state lives on the Meta.Window JS wrapper and is lost whenever
+ * Cinnamon reloads, and a window can be put on a zone by other means entirely.
+ * Without this, such a window looks like it is floating even though it visibly
+ * is not, and the first arrow press would both re-snap it to where it already
+ * is and record the zone geometry as the place to "restore" to later.
+ */
+function zoneOfRect(win, rect) {
+    return Object.keys(ZONES).find(name => sameRect(rect, zoneRect(win, name))) || null;
+}
+
+/*
+ * True when muffin is managing the window's geometry - maximized in either
+ * axis, or tiled by dragging it to a screen edge. muffin saves the pre-snap
+ * geometry in that case and unmaximize() puts it back, which is how a window
+ * snapped by mouse can still be restored even though this extension never saw
+ * it float.
  */
 function isMuffinManaged(win) {
     return win.get_maximized() !== 0 || win.tile_mode !== Meta.TileMode.NONE;
 }
 
+/* Fallback for a window that needs to float but has no trustworthy geometry
+ * to go back to - centred, and small enough to clearly read as un-snapped. */
+function defaultFloatRect(win) {
+    const area = win.get_work_area_for_monitor(win.get_monitor());
+    const width  = Math.round(area.width  * 0.6);
+    const height = Math.round(area.height * 0.6);
+    return {
+        x: area.x + Math.round((area.width  - width)  / 2),
+        y: area.y + Math.round((area.height - height) / 2),
+        width,
+        height,
+    };
+}
+
 /*
  * Work out the state the window is *actually* in, rather than trusting what we
- * recorded last time - it may have been dragged, resized or edge-snapped since.
+ * recorded last time - it may have been dragged, resized or edge-snapped since,
+ * and our record may simply be gone after a Cinnamon reload.
  *
- * muffin's own view wins where it has one: tile_mode and get_maximized() are
- * authoritative and cover snapping done by mouse. Only when muffin considers
- * the window untiled do we fall back to our own record, and even then the
- * geometry has to still match, otherwise the window has been moved and is
- * floating again.
+ * Order matters: muffin's own view (tile_mode, get_maximized) is authoritative
+ * and covers snapping done with the mouse; then our own record, but only if the
+ * window is still where we put it; and finally the geometry itself, so a window
+ * sitting on a zone is treated as being in that zone no matter how it got there.
  */
 function currentState(win) {
     if (win.get_maximized() === Meta.MaximizeFlags.BOTH ||
@@ -148,31 +189,51 @@ function currentState(win) {
     if (tiled)
         return tiled;
 
-    if (!win._wsState || win._wsState === 'FLOAT' || win._wsState === 'MAX')
-        return 'FLOAT';
+    const rect = rectOf(win);
 
-    return sameRect(rectOf(win), win._wsZoneRect) ? win._wsState : 'FLOAT';
+    if (win._wsState && win._wsState !== 'FLOAT' && win._wsState !== 'MAX' &&
+        sameRect(rect, win._wsZoneRect))
+        return win._wsState;
+
+    return zoneOfRect(win, rect) || 'FLOAT';
 }
 
 /*
- * Record where the window should return to when it next floats.
+ * Where the window should go when it next floats.
  *
- * The easy case is a window that is floating right now. The other case is one
- * muffin is holding tiled or maximized - this extension never saw it float, so
- * it asks muffin: unmaximize() drops the window back to the geometry muffin
- * saved, and get_frame_rect() reflects that immediately (verified - the value
- * is updated synchronously, not on the next repaint), so it can be read back
- * in the same handler.
+ * A stored rect that is itself a zone is discarded rather than used. That
+ * happens when a window was already sitting on a zone the first time an arrow
+ * was pressed - the geometry got recorded as "floating", and restoring to it
+ * would just put the window back on the zone it is trying to leave.
+ */
+function floatTarget(win) {
+    const stored = win._wsFloatRect;
+    if (stored && !zoneOfRect(win, stored))
+        return stored;
+    return defaultFloatRect(win);
+}
+
+/*
+ * Remember where the window should return to, before it gets moved anywhere.
+ *
+ * When muffin is managing the window it holds the real pre-snap geometry, so
+ * ask it: unmaximize() drops the window back to the rect muffin saved, and
+ * get_frame_rect() reflects that immediately (verified - updated synchronously,
+ * not on the next repaint), so it can be read back in the same handler.
  */
 function ensureFloatRect(win, state) {
-    if (state === 'FLOAT') {
+    if (isMuffinManaged(win)) {
+        win.unmaximize(Meta.MaximizeFlags.BOTH);
         win._wsFloatRect = rectOf(win);
         return;
     }
 
-    if (!win._wsFloatRect && isMuffinManaged(win)) {
-        win.unmaximize(Meta.MaximizeFlags.BOTH);
-        win._wsFloatRect = rectOf(win);
+    /* Only a genuinely floating window can describe its own float geometry,
+     * and only if it is not parked on a zone - see floatTarget(). */
+    if (state === 'FLOAT') {
+        const rect = rectOf(win);
+        if (!zoneOfRect(win, rect))
+            win._wsFloatRect = rect;
     }
 }
 
@@ -180,20 +241,13 @@ function applyZone(win, zoneName) {
     if (win.get_maximized())
         win.unmaximize(Meta.MaximizeFlags.BOTH);
 
-    const area = win.get_work_area_for_monitor(win.get_monitor());
-    const z = ZONES[zoneName];
-
-    const x = area.x + Math.round(z.x * area.width);
-    const y = area.y + Math.round(z.y * area.height);
-    const w = Math.round(z.w * area.width);
-    const h = Math.round(z.h * area.height);
-
-    moveResize(win, x, y, w, h);
+    const r = zoneRect(win, zoneName);
+    moveResize(win, r.x, r.y, r.width, r.height);
 
     win._wsState = zoneName;
     /* Remember where we put it so currentState() can tell later whether the
      * window is still there or the user has since moved it. */
-    win._wsZoneRect = { x, y, width: w, height: h };
+    win._wsZoneRect = r;
 }
 
 function restore(win) {
@@ -204,12 +258,16 @@ function restore(win) {
      * to go back to, and unmaximize() restores it exactly. */
     if (isMuffinManaged(win)) {
         win.unmaximize(Meta.MaximizeFlags.BOTH);
-        return;
+        if (!zoneOfRect(win, rectOf(win)))
+            return;
+        /* Some windows are left on a zone by unmaximize (a vertical-only
+         * maximize of an already half-width window, say); fall through and
+         * place it properly. */
     }
 
-    const orig = win._wsFloatRect;
-    if (orig)
-        moveResize(win, orig.x, orig.y, orig.width, orig.height);
+    const target = floatTarget(win);
+    moveResize(win, target.x, target.y, target.width, target.height);
+    win._wsFloatRect = target;
 }
 
 function handle(direction) {

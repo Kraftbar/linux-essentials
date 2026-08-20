@@ -377,6 +377,19 @@ to the "Super alone opens the menu" overlay key, so Super+Left just opened the
 menu. `Main.keybindingManager.addHotKey()` registers through muffin like a
 native WM binding and works.
 
+The extension never assumes its own bookkeeping is intact - that state lives
+on the window object and is lost every time Cinnamon reloads. It works out
+where a window really is from three sources in order: muffin's `tile_mode` and
+`get_maximized()`, then its own record (only if the window is still where it
+was put), then the raw geometry, so a window sitting on a zone counts as being
+in that zone however it got there.
+
+That last step also stops a float rect being poisoned. A window already parked
+on a zone the first time an arrow is pressed would otherwise have the zone
+geometry recorded as "floating", and restoring would put it straight back on
+the zone it was trying to leave. A stored float rect that is itself a zone is
+discarded, and the window is centred at 60% of the work area instead.
+
 Windows snapped with the **mouse** (dragged to a screen edge) are tiled by
 muffin, not by this extension, so it reads muffin's `tile_mode` rather than
 only its own record. Super+Left on a mouse-snapped window therefore continues
