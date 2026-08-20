@@ -1,0 +1,8 @@
+{
+    "uuid": "smart-close@nybo",
+    "name": "Smart Close",
+    "description": "Ctrl+Shift+W closes any window, except in apps that use the shortcut themselves (terminals close a tab).",
+    "version": "1.0",
+    "url": "https://github.com/Kraftbar/linux-essentials",
+    "cinnamon-version": ["6.0", "6.2", "6.4"]
+}
