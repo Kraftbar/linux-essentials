@@ -1,1 +1,3 @@
 org.cinnamon.desktop.keybindings.wm	close	<Shift><Control>w
+org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	next-tab	<Control>Tab
+org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	prev-tab	<Control><Shift>Tab
