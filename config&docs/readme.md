@@ -342,22 +342,50 @@ echo "Setup complete!"
 
 ```
 
-## TODO
+## Windows-style window snapping (Cinnamon)
 
-- **Windows-style Super+arrow tile "restore from any direction"**: Cinnamon's
-  native push-tile-left/right/up/down (Super+arrows) only restores a tiled
-  window to floating via the *opposite* arrow, not any direction. Tried
-  building this via a Cinnamon custom keybinding + xdotool XTEST re-injection
-  (see git history around `smart-tile.sh` / `smart-close.sh` in `config&docs/`)
-  but it turned out unreliable specifically for tiling (menu-opening due to
-  custom keybindings not grabbing bare Super combos reliably, then garbled/
-  partial tiles even on Ctrl+Super). `smart-close.sh`'s equivalent trick for
-  Ctrl+Shift+W (close tab before window) worked fine, so the tiling case is
-  specifically fragile, likely due to muffin's tile animation/geometry
-  handling being more timing-sensitive than a plain close action.
-  A proper fix probably needs a real Cinnamon JS patch (like the
-  `appSwitcher.js` patch above) rather than external key injection - e.g.
-  hooking wherever muffin implements push-tile-* directly.
+`cinnamon-extensions/windows-snap@nybo/` is a Cinnamon extension giving
+Windows-style Super+arrow snapping. Install:
+
+```bash
+ln -sfn "$PWD/config&docs/cinnamon-extensions/windows-snap@nybo" \
+        ~/.local/share/cinnamon/extensions/windows-snap@nybo
+gsettings set org.cinnamon enabled-extensions "['windows-snap@nybo']"
+# the extension owns Super+arrows, so clear muffin's own grabs on them
+for k in push-tile-left push-tile-right push-tile-up push-tile-down; do
+    gsettings set org.cinnamon.desktop.keybindings.wm "$k" "[]"
+done
+cinnamon --replace &
+```
+
+Repeated presses of one arrow run a 3-step cycle, e.g. Super+Left:
+floating -> left half -> right half -> floating. Vertical arrows collapse a
+half into a quarter and back. Super+Up maximizes from floating, Super+Down
+restores from maximized.
+
+Two earlier attempts at this failed and are worth not repeating:
+
+- A **custom keybinding** (`org.cinnamon.desktop.keybindings custom-list`)
+  running a script can't hold Super+arrow at all - it loses the bare-Super
+  grab to the "Super alone opens the menu" overlay key, so Super+Left just
+  opened the menu. Native WM keybindings and
+  `Main.keybindingManager.addHotKey()` both register through muffin instead
+  and work fine.
+- **xdotool XTEST re-injection** (the old `smart-tile.sh`) was unreliable and
+  needed a `sleep` to dodge a modifier race. Calling the Meta.Window API from
+  an extension is synchronous and exact, so none of that is needed.
+
+Two muffin quirks the extension has to work around, both verified on
+Cinnamon 6.4.14 and commented in `extension.js`:
+
+- `move_resize_frame(x, y, w, h)` applies the size but **ignores x/y**; the
+  position needs a separate `move_frame(x, y)` call afterwards.
+- `allows_resize()` returns **false while a window is maximized**, so using it
+  as a guard silently disables Super+Down (unmaximize) - the one case it is
+  most needed. The `resizeable` property is state-independent and is used
+  instead.
+
+## TODO
 
 - **Ctrl+Shift+W as a global "close any window" fallback, without breaking
   tab-close**: currently Ctrl+Shift+W is left unbound at the WM level, so
@@ -366,9 +394,10 @@ echo "Setup complete!"
   shortcut of their own (e.g. a sound-settings applet) need Super+Q or Alt+F4
   instead. Tried making Ctrl+Shift+W do both (tab-first in terminal, close-
   window everywhere else) via `smart-close.sh` - technically worked, but was
-  dropped along with `smart-tile.sh` when simplifying back to native-only
-  behavior. If revisited: a global WM-level grab on Ctrl+Shift+W always wins
-  over gnome-terminal's own accelerator, so tab-first-close requires either
-  the `smart-close.sh` re-injection trick again, or (cleaner if it exists) a
-  Cinnamon JS-level hook that can tell whether the focused app already
-  handles the key before deciding to close the window.
+  dropped when simplifying back to native-only behavior. If revisited: a
+  global WM-level grab on Ctrl+Shift+W always wins over gnome-terminal's own
+  accelerator, so tab-first-close needs either the `smart-close.sh`
+  re-injection trick again, or - better, now that the snapping extension has
+  proven the approach - a Cinnamon extension that grabs the key via
+  `Main.keybindingManager` and checks the focused window's WM_CLASS before
+  deciding whether to close the window or forward the key to the app.
