@@ -1,0 +1,6 @@
+org.cinnamon	desktop-effects	false
+org.cinnamon	desktop-effects-on-dialogs	false
+org.cinnamon	desktop-effects-on-menus	false
+org.cinnamon	desktop-effects-workspace	false
+org.cinnamon	startup-animation	false
+org.cinnamon.desktop.interface	enable-animations	false
