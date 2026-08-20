@@ -34,6 +34,6 @@ else
     # Let the physically-held Super (from triggering this hotkey) release
     # before injecting the synthetic Ctrl+Super+<dir>, otherwise the real
     # and synthetic modifier/key state can clash.
-    sleep 0.05
+    sleep 0.08
     xdotool key --clearmodifiers "ctrl+super+$keysym"
 fi
