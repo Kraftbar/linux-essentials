@@ -1,3 +1,4 @@
 org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	next-tab	<Control>Tab
 org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	prev-tab	<Control><Shift>Tab
-org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	new-tab	<Control>t
+org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	new-tab	<Control>n
+org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	close-tab	<Primary><Alt>w
