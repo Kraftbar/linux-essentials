@@ -4,7 +4,4 @@ org.cinnamon	desktop-effects-on-menus	false
 org.cinnamon	desktop-effects-workspace	false
 org.cinnamon	startup-animation	false
 org.cinnamon.desktop.interface	enable-animations	false
-org.cinnamon.desktop.keybindings.wm	push-tile-left	['<Control><Super>Left']
-org.cinnamon.desktop.keybindings.wm	push-tile-right	['<Control><Super>Right']
-org.cinnamon.desktop.keybindings.wm	push-tile-up	['<Control><Super>Up']
-org.cinnamon.desktop.keybindings.wm	push-tile-down	['<Control><Super>Down']
+org.cinnamon.desktop.keybindings.wm	close	['<Alt>F4', '<Super>q']

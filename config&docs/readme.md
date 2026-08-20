@@ -341,3 +341,20 @@ cinnamon --replace &
 echo "Setup complete!"
 
 ```
+
+## TODO
+
+- **Windows-style Super+arrow tile "restore from any direction"**: Cinnamon's
+  native push-tile-left/right/up/down (Super+arrows) only restores a tiled
+  window to floating via the *opposite* arrow, not any direction. Tried
+  building this via a Cinnamon custom keybinding + xdotool XTEST re-injection
+  (see git history around `smart-tile.sh` / `smart-close.sh` in `config&docs/`)
+  but it turned out unreliable specifically for tiling (menu-opening due to
+  custom keybindings not grabbing bare Super combos reliably, then garbled/
+  partial tiles even on Ctrl+Super). `smart-close.sh`'s equivalent trick for
+  Ctrl+Shift+W (close tab before window) worked fine, so the tiling case is
+  specifically fragile, likely due to muffin's tile animation/geometry
+  handling being more timing-sensitive than a plain close action.
+  A proper fix probably needs a real Cinnamon JS patch (like the
+  `appSwitcher.js` patch above) rather than external key injection - e.g.
+  hooking wherever muffin implements push-tile-* directly.

@@ -25,10 +25,6 @@ win="$(xdotool getactivewindow)"
 class="$(xprop -id "$win" WM_CLASS 2>/dev/null | sed -n 's/.*"\(.*\)"$/\1/p')"
 
 if [[ "$class" == "Gnome-terminal" ]]; then
-    # Let the physically-held Ctrl+Shift (from triggering this hotkey)
-    # release before injecting the synthetic Ctrl+Alt+W, otherwise the
-    # real and synthetic modifier state can clash.
-    sleep 0.08
     xdotool key --clearmodifiers ctrl+alt+w
 else
     wmctrl -ic "$win"
