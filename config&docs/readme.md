@@ -366,10 +366,11 @@ features needed all three and were unreliable; the git history around
 
 ### windows-snap@nybo - Super+arrow window snapping
 
-Repeated presses of one arrow run a 3-step cycle, e.g. Super+Left:
-floating -> left half -> right half -> floating. Vertical arrows collapse a
-half into a quarter and back. Super+Up maximizes from floating, Super+Down
-restores from maximized.
+Repeated presses of one arrow run a 3-step cycle. Super+Left gives
+floating -> left half -> right half -> floating; Super+Up from a half gives
+quarter -> floating. The arrow pointing back at the half a quarter came from
+returns to it, so Super+Up then Super+Down is reversible. Super+Up maximizes
+from floating and Super+Down restores from maximized.
 
 A **custom keybinding** (`org.cinnamon.desktop.keybindings custom-list`)
 running a script cannot hold Super+arrow at all - it loses the bare-Super grab

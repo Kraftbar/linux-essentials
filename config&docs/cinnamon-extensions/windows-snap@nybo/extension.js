@@ -64,19 +64,21 @@ const TILE_MODE_ZONES = {
  * State machine. Keys are the current state, values map an arrow direction to
  * the next state. null means "do nothing".
  *
- * Horizontal arrows always run the same 3-step cycle - move to that side, then
- * across to the other side, then back to floating - which is what produces
- * the Super+Left / Super+Left / Super+Left cycle described above.
+ * Every direction runs the same 3-step cycle: move that way, then across to
+ * the opposite side, then back to floating. Horizontally that is
+ * left half -> right half -> floating; vertically, from a half, it is
+ * quarter -> floating. The arrow pointing back at the half a quarter came
+ * from returns to it, so Super+Up and Super+Down stay reversible.
  */
 const TRANSITIONS = {
     FLOAT: { left: 'LEFT',  right: 'RIGHT', up: 'MAX',   down: 'MIN'   },
     MAX:   { left: 'LEFT',  right: 'RIGHT', up: null,    down: 'FLOAT' },
     LEFT:  { left: 'RIGHT', right: 'FLOAT', up: 'TL',    down: 'BL'    },
     RIGHT: { left: 'FLOAT', right: 'LEFT',  up: 'TR',    down: 'BR'    },
-    TL:    { left: 'TR',    right: 'FLOAT', up: null,    down: 'LEFT'  },
-    TR:    { left: 'FLOAT', right: 'TL',    up: null,    down: 'RIGHT' },
-    BL:    { left: 'BR',    right: 'FLOAT', up: 'LEFT',  down: null    },
-    BR:    { left: 'FLOAT', right: 'BL',    up: 'RIGHT', down: null    },
+    TL:    { left: 'TR',    right: 'FLOAT', up: 'FLOAT', down: 'LEFT'  },
+    TR:    { left: 'FLOAT', right: 'TL',    up: 'FLOAT', down: 'RIGHT' },
+    BL:    { left: 'BR',    right: 'FLOAT', up: 'LEFT',  down: 'FLOAT' },
+    BR:    { left: 'FLOAT', right: 'BL',    up: 'RIGHT', down: 'FLOAT' },
 };
 
 const BINDINGS = [
