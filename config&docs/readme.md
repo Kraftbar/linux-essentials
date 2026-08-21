@@ -457,69 +457,73 @@ Verified both ways: with the grab held a press ran the extension callback and
 the terminal was untouched; with it released the callback did not run and the
 terminal closed its tab.
 
-## Bluetooth headphones - let the phone take over (A2DP handoff)
+## Bluetooth headphones - do not try to make idle A2DP suspend
 
-`wireplumber/51-bluez-suspend.lua` -> `~/.config/wireplumber/bluetooth.lua.d/`:
+Multipoint headphones (Bose QC) grant A2DP to one host at a time and leave the
+other on HFP. Windows releases the A2DP stream when nothing is playing so the
+phone can take over; Linux holds it open, so the headset stays pinned to the PC.
 
-```bash
-mkdir -p ~/.config/wireplumber/bluetooth.lua.d
-ln -sf "$(readlink -f "config&docs/wireplumber/51-bluez-suspend.lua")" \
-       ~/.config/wireplumber/bluetooth.lua.d/
-systemctl --user restart wireplumber
-```
+The obvious fix is to make the node suspend when idle. **It does not work on
+bluez 5.72 - do not do it.** Recorded here so it is not attempted twice.
 
-The rule applies when the node is created, so an already-connected headset
-needs a reconnect - a wireplumber restart on its own is not enough.
-
-Multipoint headphones (Bose QC) grant A2DP to **one** host at a time and leave
-the other on HFP. On Windows the PC releases the A2DP stream when nothing is
-playing, so the phone can take over. Linux held it open indefinitely: the
-headset stayed pinned to the PC, could not hand off, and kept draining battery.
-
-The cause is not blueman - its autoconnect list is empty
-(`gsettings get org.blueman.plugins.autoconnect services` -> `[]`).
 `/usr/share/wireplumber/scripts/monitors/bluez.lua` hardcodes
-`node.pause-on-idle = false` on every bluetooth node it creates (lines 99, 110,
-116, 126 and 265 on wireplumber 0.4.17). Suspension is then left to
-`suspend-node.lua`, which only arms its timer when a node reports state `idle`.
-A bluetooth node that never pauses never reaches `idle`, so the timer never
-arms and the transport stays open forever.
+`node.pause-on-idle = false` on every bluetooth node (lines 99, 110, 116, 126
+and 265 on wireplumber 0.4.17). That looks like an oversight and is not - it is
+a deliberate workaround. `rulesApplyProperties()` at bluez.lua:299 runs after
+the default, so a `bluez_monitor.rules` entry with
+`node.pause-on-idle = true` and `session.suspend-timeout-seconds = 5` does
+override it, and the node does then suspend when idle. The handoff problem is
+still not solved, because on resume:
 
-`rulesApplyProperties(properties)` runs at bluez.lua:299, **after** that
-default is set, so a `bluez_monitor.rules` entry overrides it. Setting
-`node.pause-on-idle = true` lets the node go idle and
-`session.suspend-timeout-seconds = 5` then suspends it.
-
-Verify - with the headset connected and nothing playing:
-
-```bash
-pw-dump | python3 -c "
-import json,sys
-for o in json.load(sys.stdin):
-    p=(o.get('info') or {}).get('props') or {}
-    if p.get('node.name','').startswith('bluez_'):
-        print(p['node.name'], p.get('node.pause-on-idle'),
-              p.get('session.suspend-timeout-seconds'), (o.get('info') or {}).get('state'))
-"
+```
+wireplumber: Acquire .../sep1/fd5 returned error: org.bluez.Error.NotAuthorized
+wireplumber: (bluez_output...) running -> error (Received error event)
+bluetoothd:  avdtp.c:cancel_request() Start: Operation canceled (125)
+bluetoothd:  a2dp.c:a2dp_suspend() SEP in bad state for suspend
+bluetoothd:  a2dp.c:a2dp_resume() SEP in bad state for resume
+bluetoothd:  avdtp.c:session_cb() Transaction label doesn't match
 ```
 
-Wanted: `True 5 suspended`. `pactl list short sinks | grep bluez` should say
-`SUSPENDED`, not `RUNNING`.
+bluez 5.72 fails to re-acquire the transport it just released, leaving the SEP
+wedged and the transaction labels desynced. A2DP then disappears from the card
+entirely - `pactl list cards` shows only `headset-head-unit*` profiles, so
+`pactl set-card-profile ... a2dp-sink` fails with `No such entity`, and the
+headset is stuck in mono 16 kHz until it is reconnected.
 
-An app holding an **uncorked** stream keeps the node `running` even with the
-rule applied, and Firefox does this with nothing playing. If handoff fails,
-`pactl list sink-inputs | grep -E "Sink Input|application.name|Corked"` names
-what is pinning it.
+Each suspend/resume cycle is a chance to hit this, which is why upstream never
+lets these nodes pause. The real fix is pipewire 1.2.x, which reworked
+transport acquire/release; `ppa:aglasgall/pipewire-extra-bt-codecs` has 1.2.7
+for noble (and AAC/aptX, missing from the distro build because `fdk-aac` is in
+multiverse). Not attempted yet.
 
-Unrelated but worth knowing when this stack misbehaves:
+### Living with it
 
-- Only SBC and SBC-XQ are offered. AAC is missing because `fdk-aac` is in
-  multiverse and `libspa-0.2-bluetooth` is in main, so Ubuntu builds without
-  it. The `ppa:aglasgall/pipewire-extra-bt-codecs` PPA has AAC and aptX for
-  noble, but its newest build jumps pipewire 1.0.5 -> 1.2.7.
-- Do not upgrade bluez to chase A2DP problems. 5.83/5.84 have a regression
-  where A2DP fails to connect at startup (bluez issue #1570); 5.72 is fine.
-- A wedged AVDTP session shows as `a2dp-sink profile connect failed ...
-  Transport endpoint is not connected (107)` in `journalctl -u bluetooth`, with
-  only HFP profiles left on the card. Power-cycling the *headset* clears it;
-  restarting bluetooth is the fallback.
+To hand the headset to the phone, disconnect it explicitly:
+
+```bash
+bluetoothctl disconnect E4:58:BC:C4:73:85
+```
+
+**Do not open Cinnamon Sound settings while the headset is connected.** The
+Input tab runs a `Peak detect` stream on the selected source; if that source is
+the headset mic it forces the card to `headset-head-unit-msbc` - mono 16 kHz,
+sounds like a phone call. Closing the window frees the mic but the switch back
+to A2DP is exactly the transition that wedges, so it usually needs a reconnect
+anyway. Use `pactl` instead of the GUI.
+
+Anything else that opens the bluetooth mic does the same thing. Check with:
+
+```bash
+pactl list source-outputs | grep -E "Source Output|application.name|media.name"
+```
+
+Recovering a wedged session, cheapest first - power-cycle the headset, then:
+
+```bash
+bluetoothctl disconnect E4:58:BC:C4:73:85 && bluetoothctl connect E4:58:BC:C4:73:85
+sudo systemctl restart bluetooth   # fallback
+```
+
+Do not upgrade bluez to chase this. 5.83/5.84 have a separate regression where
+A2DP fails to connect at startup (bluez issue #1570); 5.72 is the better of the
+two problems.
