@@ -347,16 +347,19 @@ function handle(direction) {
  * the cursor was not over the window at all.
  *
  * Ending the grab and immediately restarting it makes muffin re-anchor to the
- * new geometry. That also decides the position: begin_grab_op() centres the
- * window on the pointer in both axes (verified - the pointer ends up at
- * exactly half the new width and height regardless of where the window was
- * grabbed), which is what Windows does too.
+ * new geometry. The restart is done through Meta.Display.begin_grab_op rather
+ * than the window's own one-liner because only that form takes the anchor
+ * point. Meta.Window.begin_grab_op() always anchors at the centre of the
+ * window - verified: the pointer ended up at exactly half the new width and
+ * height no matter where the window was actually grabbed - which leaves the
+ * cursor holding the middle of the window rather than its title bar.
  *
- * The window is therefore placed centred on the pointer here as well, even
- * though the regrab would move it there anyway. Leaving it at its old corner
- * makes it visibly shrink in place and then jump to the cursor a moment later,
- * because the regrab has to be deferred to an idle callback; positioning it up
- * front means the regrab lands it where it already is and nothing jumps.
+ * Passing the real pointer position as the anchor keeps whatever offset the
+ * window is given here, so the window is placed with the title bar still under
+ * the cursor and centred horizontally, and the drag continues from there.
+ * Positioning it up front also matters on its own: the regrab has to be
+ * deferred to an idle callback, so a window left at its old corner visibly
+ * shrinks in place and then jumps to the cursor a moment later.
  */
 let regrabbing = false;
 
@@ -384,11 +387,15 @@ function onGrabBegin(display, unused, win, op) {
 
     const [px, py] = global.get_pointer();
 
-    moveResize(win,
-        Math.round(px - target.width / 2),
-        Math.round(py - target.height / 2),
-        target.width,
-        target.height);
+    /* Keep hold of the title bar: preserve how far down the window the pointer
+     * was, not the proportion, so the grab stays on the bar rather than sliding
+     * into the window body. Clamped so the bar cannot end up off-screen. */
+    const grabY = Math.min(Math.max(py - frame.y, 0), Math.max(target.height - 1, 0));
+
+    const x = Math.round(px - target.width / 2);
+    const y = Math.round(py - grabY);
+
+    moveResize(win, x, y, target.width, target.height);
 
     win._wsState = 'FLOAT';
     win._wsZoneRect = null;
@@ -400,7 +407,15 @@ function onGrabBegin(display, unused, win, op) {
         try {
             const time = global.get_current_time();
             global.display.end_grab_op(time);
-            win.begin_grab_op(Meta.GrabOp.MOVING, true, time);
+            global.display.begin_grab_op(
+                win,
+                Meta.GrabOp.MOVING,
+                false,   /* pointer_already_grabbed */
+                true,    /* frame_action */
+                1,       /* button */
+                0,       /* modmask */
+                time,
+                px, py); /* anchor - the offset the window was just given */
         } catch (e) {
             global.logError(`[${UUID}] regrab: ${e}\n${e.stack}`);
         }

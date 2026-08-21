@@ -415,7 +415,7 @@ keeps the pre-snap geometry for those windows, and `unmaximize()` restores it
 exactly - so such a window still floats back to its original size even though
 this extension never saw it float.
 
-Three muffin quirks the extension works around, verified on Cinnamon 6.4.14 and
+Four muffin quirks the extension works around, verified on Cinnamon 6.4.14 and
 commented in `extension.js`:
 
 - `move_resize_frame(x, y, w, h)` applies the size but **ignores x/y**; the
@@ -428,8 +428,12 @@ commented in `extension.js`:
   runs, so resizing a window there leaves the pointer tracking the old frame -
   grabbing a left-snapped window near its right edge dragged it several hundred
   px away from the cursor, entirely out from under it. Ending and immediately
-  restarting the grab re-anchors it; `begin_grab_op()` then centres the window
-  on the pointer, which is Windows' behaviour anyway.
+  restarting the grab re-anchors it.
+- `Meta.Window.begin_grab_op()` **always anchors at the window centre**,
+  whatever the window's actual position, so the cursor ends up holding the
+  middle of the window instead of its title bar. `Meta.Display.begin_grab_op()`
+  is the same operation but takes an explicit anchor point, which is what the
+  extension uses to keep the title bar under the pointer.
 
 ### smart-close@nybo - Ctrl+Shift+W closes any window
 
