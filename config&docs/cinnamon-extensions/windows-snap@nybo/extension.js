@@ -25,6 +25,10 @@
  * Super+Right mirrors it. Vertical arrows collapse a half into a quarter and
  * back out again, so Super+Left then Super+Down gives the bottom-left quarter
  * (matching Windows), and Super+Up from there returns to the left half.
+ *
+ * From a floating window the vertical arrows instead climb and drop:
+ * Super+Up goes floating -> maximized -> top half and stops, while Super+Down
+ * returns any expanded window straight to floating, then minimizes it.
  */
 
 const Main = imports.ui.main;
@@ -36,6 +40,7 @@ const UUID = 'windows-snap@nybo';
 const ZONES = {
     LEFT:  { x: 0,   y: 0,   w: 0.5, h: 1   },
     RIGHT: { x: 0.5, y: 0,   w: 0.5, h: 1   },
+    TOP:   { x: 0,   y: 0,   w: 1,   h: 0.5 },
     TL:    { x: 0,   y: 0,   w: 0.5, h: 0.5 },
     TR:    { x: 0.5, y: 0,   w: 0.5, h: 0.5 },
     BL:    { x: 0,   y: 0.5, w: 0.5, h: 0.5 },
@@ -48,12 +53,13 @@ const ZONES = {
  * without consulting tile_mode the window would look "floating" here and
  * Super+Left would re-snap it left instead of continuing the cycle.
  *
- * TOP and BOTTOM have no equivalent zone (nothing here produces a full-width
- * half), so they are deliberately absent and fall through to floating.
+ * BOTTOM has no equivalent zone - Super+Down minimizes rather than snapping to
+ * a bottom half - so it is deliberately absent and falls through to floating.
  */
 const TILE_MODE_ZONES = {
     [Meta.TileMode.LEFT]:  'LEFT',
     [Meta.TileMode.RIGHT]: 'RIGHT',
+    [Meta.TileMode.TOP]:   'TOP',
     [Meta.TileMode.ULC]:   'TL',
     [Meta.TileMode.URC]:   'TR',
     [Meta.TileMode.LLC]:   'BL',
@@ -72,10 +78,16 @@ const TILE_MODE_ZONES = {
  * arrow pointing back at the half the quarter came from. Pressing up again
  * from a top quarter - already against the top edge - maximizes, the same as
  * pressing up from a floating window.
+ *
+ * The vertical arrows are deliberately not mirror images of each other, again
+ * matching Windows. Up climbs a ladder, floating -> maximized -> top half, and
+ * stops there. Down does not walk back down that ladder: from any expanded
+ * state it drops straight to floating, and from floating it minimizes.
  */
 const TRANSITIONS = {
     FLOAT: { left: 'LEFT',  right: 'RIGHT', up: 'MAX',   down: 'MIN'   },
-    MAX:   { left: 'LEFT',  right: 'RIGHT', up: null,    down: 'FLOAT' },
+    MAX:   { left: 'LEFT',  right: 'RIGHT', up: 'TOP',   down: 'FLOAT' },
+    TOP:   { left: 'LEFT',  right: 'RIGHT', up: null,    down: 'FLOAT' },
     LEFT:  { left: 'RIGHT', right: 'FLOAT', up: 'TL',    down: 'BL'    },
     RIGHT: { left: 'FLOAT', right: 'LEFT',  up: 'TR',    down: 'BR'    },
     TL:    { left: 'TR',    right: 'TR',    up: 'MAX',   down: 'LEFT'  },
