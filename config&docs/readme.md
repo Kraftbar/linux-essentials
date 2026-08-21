@@ -491,10 +491,20 @@ entirely - `pactl list cards` shows only `headset-head-unit*` profiles, so
 headset is stuck in mono 16 kHz until it is reconnected.
 
 Each suspend/resume cycle is a chance to hit this, which is why upstream never
-lets these nodes pause. The real fix is pipewire 1.2.x, which reworked
-transport acquire/release; `ppa:aglasgall/pipewire-extra-bt-codecs` has 1.2.7
-for noble (and AAC/aptX, missing from the distro build because `fdk-aac` is in
-multiverse). Not attempted yet.
+lets these nodes pause.
+
+**There is no known fix.** blueman issue #2976 reports this exact failure on
+this exact stack - pipewire 1.0.5, wireplumber 0.4.17, bluez 5, noble - and was
+closed as stale with no patch. The only workaround found there was to keep
+audio playing so the transport never idles, which is what
+`node.pause-on-idle = false` already achieves. bluez issue #1545 (a related
+pipewire/bluez transport race) is still open and unfixed.
+
+So the default is not a placeholder waiting on an upstream fix; it is the best
+anyone has. Upgrading pipewire is a guess, not a known cure - do not assume
+`ppa:aglasgall/pipewire-extra-bt-codecs` (1.2.7 for noble, also carries
+AAC/aptX that the distro build lacks because `fdk-aac` is in multiverse) will
+help. It might; nobody has shown that it does.
 
 ### Living with it
 
@@ -527,3 +537,76 @@ sudo systemctl restart bluetooth   # fallback
 Do not upgrade bluez to chase this. 5.83/5.84 have a separate regression where
 A2DP fails to connect at startup (bluez issue #1570); 5.72 is the better of the
 two problems.
+
+## Keyboard volume wheel changes the wrong output
+
+Symptom: the keyboard volume wheel moves some other sink - the HDMI/monitor
+output - while sound plays over the device you are actually using. The on
+screen volume overlay animates normally, so it looks like volume is simply
+broken.
+
+The panel applet is **not** involved. `sound@cinnamon.org` handles the mouse
+wheel over the panel; the keyboard wheel goes to `csd-media-keys`, a separate
+daemon started by `cinnamon-session` from
+`/etc/xdg/autostart/cinnamon-settings-daemon-media-keys.desktop`. It holds its
+own mixer connection, so reloading the applet, `cinnamon --replace`, and even
+restarting wireplumber all leave it untouched.
+
+Check the applet is innocent before chasing it - this drives its real volume
+path and reports which sink it hit:
+
+```bash
+dbus-send --session --print-reply --dest=org.Cinnamon /org/Cinnamon \
+  org.Cinnamon.Eval string:'
+(function(){
+  let a = imports.ui.appletManager.getRunningInstancesForUuid("sound@cinnamon.org")[0];
+  let o = a._output;
+  o.volume = Math.min(a._volumeMax, o.volume + a._volumeNorm * 0.20);
+  o.push_volume();
+  return "pushed to " + o.get_name() + " idx=" + o.get_index();
+})()'
+```
+
+Fix - restart the daemon. `cinnamon-session` respawns it, so do not launch it
+by hand unless it fails to come back; two instances make every keypress step
+twice:
+
+```bash
+kill $(pgrep -x csd-media-keys)
+pgrep -c -x csd-media-keys    # must be 1
+```
+
+**Cause not yet established.** It may bind its output once at startup and never
+follow later default-sink changes, or it may have desynced because the sink was
+destroyed and renumbered a dozen times in one session while chasing an
+unrelated bluetooth problem. Those call for different fixes, so nothing is
+patched yet.
+
+To find out, change the default sink and press the keyboard wheel:
+
+```bash
+pactl set-default-sink alsa_output.usb-TOPPING_DX1_II-00.analog-stereo
+# press the wheel, then check which sink moved:
+pactl list short sinks
+```
+
+Follows the new default -> one-off desync, leave it alone. Keeps driving the
+old sink -> deterministic, and a small script to restart the daemon is the
+proportionate fix. Patching `cinnamon-settings-daemon` from source is not -
+package updates would revert it.
+
+Useful when diagnosing anything in this area, because the numbers move:
+
+```bash
+# which sink is each app on, and is anything holding the mic
+pactl list short sink-inputs
+pactl list source-outputs | grep -E "Source Output|application.name|media.name"
+# fallback order when a device disappears - first entry that still exists wins
+cat ~/.local/state/wireplumber/default-nodes
+```
+
+That last file is worth knowing about. It is a ranked list, not a priority
+calculation, and a disappearing device falls through to the next entry that
+exists. Ranking a silent HDMI monitor second means every dropout lands on
+silence; selecting a device in the applet promotes it, so put something audible
+there.
