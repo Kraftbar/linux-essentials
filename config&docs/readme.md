@@ -456,3 +456,70 @@ releases it:
 Verified both ways: with the grab held a press ran the extension callback and
 the terminal was untouched; with it released the callback did not run and the
 terminal closed its tab.
+
+## Bluetooth headphones - let the phone take over (A2DP handoff)
+
+`wireplumber/51-bluez-suspend.lua` -> `~/.config/wireplumber/bluetooth.lua.d/`:
+
+```bash
+mkdir -p ~/.config/wireplumber/bluetooth.lua.d
+ln -sf "$(readlink -f "config&docs/wireplumber/51-bluez-suspend.lua")" \
+       ~/.config/wireplumber/bluetooth.lua.d/
+systemctl --user restart wireplumber
+```
+
+The rule applies when the node is created, so an already-connected headset
+needs a reconnect - a wireplumber restart on its own is not enough.
+
+Multipoint headphones (Bose QC) grant A2DP to **one** host at a time and leave
+the other on HFP. On Windows the PC releases the A2DP stream when nothing is
+playing, so the phone can take over. Linux held it open indefinitely: the
+headset stayed pinned to the PC, could not hand off, and kept draining battery.
+
+The cause is not blueman - its autoconnect list is empty
+(`gsettings get org.blueman.plugins.autoconnect services` -> `[]`).
+`/usr/share/wireplumber/scripts/monitors/bluez.lua` hardcodes
+`node.pause-on-idle = false` on every bluetooth node it creates (lines 99, 110,
+116, 126 and 265 on wireplumber 0.4.17). Suspension is then left to
+`suspend-node.lua`, which only arms its timer when a node reports state `idle`.
+A bluetooth node that never pauses never reaches `idle`, so the timer never
+arms and the transport stays open forever.
+
+`rulesApplyProperties(properties)` runs at bluez.lua:299, **after** that
+default is set, so a `bluez_monitor.rules` entry overrides it. Setting
+`node.pause-on-idle = true` lets the node go idle and
+`session.suspend-timeout-seconds = 5` then suspends it.
+
+Verify - with the headset connected and nothing playing:
+
+```bash
+pw-dump | python3 -c "
+import json,sys
+for o in json.load(sys.stdin):
+    p=(o.get('info') or {}).get('props') or {}
+    if p.get('node.name','').startswith('bluez_'):
+        print(p['node.name'], p.get('node.pause-on-idle'),
+              p.get('session.suspend-timeout-seconds'), (o.get('info') or {}).get('state'))
+"
+```
+
+Wanted: `True 5 suspended`. `pactl list short sinks | grep bluez` should say
+`SUSPENDED`, not `RUNNING`.
+
+An app holding an **uncorked** stream keeps the node `running` even with the
+rule applied, and Firefox does this with nothing playing. If handoff fails,
+`pactl list sink-inputs | grep -E "Sink Input|application.name|Corked"` names
+what is pinning it.
+
+Unrelated but worth knowing when this stack misbehaves:
+
+- Only SBC and SBC-XQ are offered. AAC is missing because `fdk-aac` is in
+  multiverse and `libspa-0.2-bluetooth` is in main, so Ubuntu builds without
+  it. The `ppa:aglasgall/pipewire-extra-bt-codecs` PPA has AAC and aptX for
+  noble, but its newest build jumps pipewire 1.0.5 -> 1.2.7.
+- Do not upgrade bluez to chase A2DP problems. 5.83/5.84 have a regression
+  where A2DP fails to connect at startup (bluez issue #1570); 5.72 is fine.
+- A wedged AVDTP session shows as `a2dp-sink profile connect failed ...
+  Transport endpoint is not connected (107)` in `journalctl -u bluetooth`, with
+  only HFP profiles left on the card. Power-cycling the *headset* clears it;
+  restarting bluetooth is the fallback.
