@@ -350,8 +350,13 @@ function handle(direction) {
  * new geometry. That also decides the position: begin_grab_op() centres the
  * window on the pointer in both axes (verified - the pointer ends up at
  * exactly half the new width and height regardless of where the window was
- * grabbed), which is what Windows does too. So only the size is set below;
- * any position given here would be discarded.
+ * grabbed), which is what Windows does too.
+ *
+ * The window is therefore placed centred on the pointer here as well, even
+ * though the regrab would move it there anyway. Leaving it at its old corner
+ * makes it visibly shrink in place and then jump to the cursor a moment later,
+ * because the regrab has to be deferred to an idle callback; positioning it up
+ * front means the regrab lands it where it already is and nothing jumps.
  */
 let regrabbing = false;
 
@@ -377,7 +382,13 @@ function onGrabBegin(display, unused, win, op) {
     if (win.get_maximized())
         win.unmaximize(Meta.MaximizeFlags.BOTH);
 
-    moveResize(win, frame.x, frame.y, target.width, target.height);
+    const [px, py] = global.get_pointer();
+
+    moveResize(win,
+        Math.round(px - target.width / 2),
+        Math.round(py - target.height / 2),
+        target.width,
+        target.height);
 
     win._wsState = 'FLOAT';
     win._wsZoneRect = null;
