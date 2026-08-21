@@ -375,8 +375,18 @@ other quarter in the same row, and the way out is the vertical arrow pointing
 back at the half the quarter came from. Super+Up from a top quarter, already
 against the top edge, maximizes. Snapping from floating therefore
 always lands on a half, never a quarter. The arrow pointing back at the half a quarter came from
-returns to it, so Super+Up then Super+Down is reversible. Super+Up maximizes
-from floating and Super+Down restores from maximized.
+returns to it, so Super+Up then Super+Down is reversible.
+
+The vertical arrows are deliberately not mirror images, matching Windows.
+Super+Up climbs floating -> maximized -> top half and stops there. Super+Down
+does not walk back down that ladder: from any expanded state it drops straight
+to floating, and from floating it minimizes.
+
+Dragging a snapped window with the mouse hands back its floating size, again
+like Windows. muffin does this for windows it tiled itself, but these zones are
+applied with `move_resize_frame()`, so muffin sees ordinary half-screen-sized
+windows with no pre-snap geometry and would otherwise drag them at full
+snapped size.
 
 A **custom keybinding** (`org.cinnamon.desktop.keybindings custom-list`)
 running a script cannot hold Super+arrow at all - it loses the bare-Super grab
@@ -405,7 +415,7 @@ keeps the pre-snap geometry for those windows, and `unmaximize()` restores it
 exactly - so such a window still floats back to its original size even though
 this extension never saw it float.
 
-Two muffin quirks the extension works around, verified on Cinnamon 6.4.14 and
+Three muffin quirks the extension works around, verified on Cinnamon 6.4.14 and
 commented in `extension.js`:
 
 - `move_resize_frame(x, y, w, h)` applies the size but **ignores x/y**; the
@@ -414,6 +424,12 @@ commented in `extension.js`:
   as a guard silently disables Super+Down (unmaximize) - the one case it is
   most needed. The `resizeable` property is state-independent and is used
   instead.
+- The drag anchor is captured when a grab begins, **before** `grab-op-begin`
+  runs, so resizing a window there leaves the pointer tracking the old frame -
+  grabbing a left-snapped window near its right edge dragged it several hundred
+  px away from the cursor, entirely out from under it. Ending and immediately
+  restarting the grab re-anchors it; `begin_grab_op()` then centres the window
+  on the pointer, which is Windows' behaviour anyway.
 
 ### smart-close@nybo - Ctrl+Shift+W closes any window
 

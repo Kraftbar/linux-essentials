@@ -33,6 +33,7 @@
 
 const Main = imports.ui.main;
 const Meta = imports.gi.Meta;
+const Mainloop = imports.mainloop;
 
 const UUID = 'windows-snap@nybo';
 
@@ -329,6 +330,76 @@ function handle(direction) {
     }
 }
 
+/*
+ * Dragging a snapped window with the mouse should hand back its floating size,
+ * the way Windows does.
+ *
+ * muffin does this by itself for windows *it* tiled, but the zones here are
+ * applied with move_resize_frame(), so as far as muffin is concerned those
+ * windows are just ordinary windows that happen to be half-screen sized - it
+ * has no pre-snap geometry for them and drags them at full snapped size.
+ *
+ * Resizing alone is not enough. muffin captures the drag anchor when the grab
+ * starts, before this runs, and then tracks pointer motion against that, so
+ * simply moving the window here is ignored for the rest of the drag. Measured
+ * on this build, grabbing a left-snapped window near its right edge and
+ * dragging left the window a few hundred px from the pointer - far enough that
+ * the cursor was not over the window at all.
+ *
+ * Ending the grab and immediately restarting it makes muffin re-anchor to the
+ * new geometry. That also decides the position: begin_grab_op() centres the
+ * window on the pointer in both axes (verified - the pointer ends up at
+ * exactly half the new width and height regardless of where the window was
+ * grabbed), which is what Windows does too. So only the size is set below;
+ * any position given here would be discarded.
+ */
+let regrabbing = false;
+
+function onGrabBegin(display, unused, win, op) {
+    /* begin_grab_op() below re-emits this signal; without this the handler
+     * would recurse into itself. */
+    if (regrabbing)
+        return;
+
+    if (op !== Meta.GrabOp.MOVING || !win)
+        return;
+    if (win.get_window_type() !== Meta.WindowType.NORMAL || !win.resizeable)
+        return;
+
+    if (currentState(win) === 'FLOAT')
+        return;
+
+    const frame = rectOf(win);
+    const target = floatTarget(win);
+    if (sameRect(frame, target))
+        return;
+
+    if (win.get_maximized())
+        win.unmaximize(Meta.MaximizeFlags.BOTH);
+
+    moveResize(win, frame.x, frame.y, target.width, target.height);
+
+    win._wsState = 'FLOAT';
+    win._wsZoneRect = null;
+
+    /* Deferred: the grab cannot be torn down and rebuilt from inside the
+     * signal muffin is still dispatching. */
+    regrabbing = true;
+    Mainloop.idle_add(() => {
+        try {
+            const time = global.get_current_time();
+            global.display.end_grab_op(time);
+            win.begin_grab_op(Meta.GrabOp.MOVING, true, time);
+        } catch (e) {
+            global.logError(`[${UUID}] regrab: ${e}\n${e.stack}`);
+        }
+        regrabbing = false;
+        return false;
+    });
+}
+
+let grabBeginId = 0;
+
 function init(metadata) {
 }
 
@@ -345,9 +416,22 @@ function enable() {
             }
         });
     }
+
+    grabBeginId = global.display.connect('grab-op-begin', (...args) => {
+        try {
+            onGrabBegin(...args);
+        } catch (e) {
+            global.logError(`[${UUID}] grab-op-begin: ${e}\n${e.stack}`);
+        }
+    });
 }
 
 function disable() {
     for (const [name] of BINDINGS)
         Main.keybindingManager.removeHotKey(name);
+
+    if (grabBeginId) {
+        global.display.disconnect(grabBeginId);
+        grabBeginId = 0;
+    }
 }
