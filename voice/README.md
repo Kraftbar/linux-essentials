@@ -67,6 +67,23 @@ Note `--ask-for-approval never` is Codex CLI syntax and does nothing here; the
 Claude Code equivalents are `--dangerously-skip-permissions` and
 `--permission-mode bypassPermissions`.
 
+## Finding past voice conversations
+
+`claude --resume` does not reliably list sessions the daemon created, even from
+the right directory. Resuming them by id works, and the transcripts are
+complete, so nothing is lost - they are just hard to find in the picker. The
+session files are structurally identical to interactive ones (same record
+types, same flags, same cwd, same version), so the reason is not visible from
+the outside and is not guessed at here.
+
+    ./voicehist                    sessions for $HOME, where the daemon runs
+    ./voicehist ~/linux-essentials
+    cd ~ && claude --resume <id>
+
+History is bucketed per working directory, so voice sessions land wherever
+`VOICED_WORKDIR` points - `$HOME` by default, which is a different bucket from
+a repo you normally work in.
+
 ## Session continuation
 
 The first turn passes `--session-id <uuid>`; every later turn passes

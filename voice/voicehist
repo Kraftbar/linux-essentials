@@ -1,0 +1,41 @@
+#!/bin/bash
+# List recent Claude sessions for a directory, with ids you can resume directly.
+#
+#   voicehist              sessions for $HOME, where the voice daemon runs
+#   voicehist ~/linux-essentials
+#   voicehist -n 20
+#
+# `claude --resume` does not reliably list sessions created headlessly by the
+# voice daemon, though resuming them by id works. This reads the session files
+# itself, so nothing is hidden.
+set -u
+
+count=10
+dir="$HOME"
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -n) count="$2"; shift 2 ;;
+        *)  dir="$(cd "$1" 2>/dev/null && pwd)" || { echo "no such directory: $1"; exit 1; }; shift ;;
+    esac
+done
+
+# Claude encodes the project path by replacing / with -
+project=$(printf '%s' "$dir" | sed 's|/|-|g')
+store="$HOME/.claude/projects/$project"
+
+if [ ! -d "$store" ]; then
+    echo "no sessions recorded for $dir"
+    exit 0
+fi
+
+printf "sessions for %s\n\n" "$dir"
+ls -t "$store"/*.jsonl 2>/dev/null | head -"$count" | while read -r f; do
+    id=$(basename "$f" .jsonl)
+    when=$(stat -c '%y' "$f" | cut -c1-16)
+    title=$(grep -m1 '"type":"ai-title"' "$f" 2>/dev/null \
+            | python3 -c "import json,sys;print(json.load(sys.stdin).get('aiTitle','')[:46])" 2>/dev/null)
+    turns=$(grep -c '"type":"user"' "$f" 2>/dev/null || echo 0)
+    printf "  %s  %s  %2s turns  %s\n" "$when" "$id" "$turns" "${title:-(untitled)}"
+done
+
+printf "\nresume one with:\n  cd %s && claude --resume <id>\n" "$dir"
