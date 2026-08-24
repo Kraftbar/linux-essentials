@@ -1,0 +1,8 @@
+def recognize(image_path: str) -> dict:
+    path = Path(image_path)
+    if not path.is_file():
+        return {"ok": False, "error": f"no such file: {image_path}"}
+
+    lines = [l.text for l in preds[0].text_lines
+             if l.confidence >= 0.5]
+    return {'ok': True, 'lines': len(lines)}

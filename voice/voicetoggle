@@ -1,0 +1,45 @@
+#!/bin/bash
+# Toggle the hands-free voice session. This is what the hotkey runs, so it must
+# stay cheap: no model loading, just a socket write.
+set -u
+
+# A desktop keybinding does not inherit the login shell's PATH.
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) PATH="$HOME/.local/bin:$PATH" ;; esac
+export PATH
+
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+LOG="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/voicetoggle.log"
+echo "$(date +%FT%T) pid=$$" >> "$LOG" 2>/dev/null || true
+
+say() {
+    command -v notify-send >/dev/null && notify-send -a "Voice" -t 4000 "$1" "${2:-}"
+    echo "${1}${2:+: $2}" >&2
+}
+
+SOCKET="${VOICED_SOCKET:-${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/voiced.sock}"
+if [ ! -S "$SOCKET" ]; then
+    say "Voice daemon not running" "systemctl --user start voiced"
+    exit 1
+fi
+
+python3 - "$SOCKET" <<'PY'
+import json, socket, sys
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+sock.settimeout(10)
+try:
+    sock.connect(sys.argv[1])
+    sock.sendall(json.dumps({"toggle": True}).encode() + b"\n")
+    data = b""
+    while b"\n" not in data:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        data += chunk
+    reply = json.loads(data.split(b"\n", 1)[0])
+    print(reply.get("action", "?"))
+except Exception as exc:
+    print(f"error: {exc}", file=sys.stderr)
+    sys.exit(1)
+finally:
+    sock.close()
+PY

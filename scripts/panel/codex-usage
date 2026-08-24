@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+"""Read the signed-in Codex account's current rate-limit window.
+
+Codex exposes account/rateLimits/read through its local app-server protocol.
+This script uses a short-lived, isolated app-server runtime to avoid touching
+the user's live Codex state database. It only copies auth/config into that
+runtime; the original ~/.codex files are never modified.
+
+Token safety: the isolated runtime must never be the thing that refreshes the
+OAuth token. If it did, the rotated refresh token would land in the throwaway
+copy and be lost, which can invalidate the real login. So when the access token
+is at or near expiry we skip the app-server entirely and serve cached values,
+leaving the refresh to Codex itself.
+"""
+
+import base64
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+
+CODEX_HOME = os.path.expanduser("~/.codex")
+RUNTIME = os.path.expanduser("~/.cache/codex-usage-runtime")
+CACHE_DIR = os.path.expanduser("~/.cache/codex-usage")
+CACHE = os.path.join(CACHE_DIR, "state.json")
+MIN_INTERVAL = 1800          # the tracked window is 30 days; polling hard is waste
+REFRESH_MARGIN = 3600        # treat a token expiring within the hour as unusable
+
+
+def read_cache():
+    try:
+        with open(CACHE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def write_cache(state):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    temp = CACHE + ".tmp"
+    with open(temp, "w") as f:
+        json.dump(state, f)
+    os.replace(temp, CACHE)
+
+
+def token_expiry():
+    """Expiry of the stored access token, or None if it can't be read."""
+    try:
+        with open(os.path.join(CODEX_HOME, "auth.json")) as f:
+            tok = json.load(f)["tokens"]["access_token"]
+        payload = tok.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        return json.loads(base64.urlsafe_b64decode(payload)).get("exp")
+    except Exception:
+        return None
+
+
+def request_rate_limits():
+    """Start a temporary app server and return its Codex rate-limit snapshot."""
+    os.makedirs(RUNTIME, mode=0o700, exist_ok=True)
+    os.chmod(RUNTIME, 0o700)
+    # Sync the token copy each run: Codex itself owns and refreshes the source.
+    # Write via a 0600 handle so the copy never inherits a lax umask.
+    for name in ("auth.json", "config.toml"):
+        src = os.path.join(CODEX_HOME, name)
+        dst = os.path.join(RUNTIME, name)
+        fd = os.open(dst, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "wb") as out, open(src, "rb") as inp:
+            shutil.copyfileobj(inp, out)
+        os.chmod(dst, 0o600)
+
+    env = dict(os.environ, CODEX_HOME=RUNTIME)
+    proc = subprocess.Popen(
+        ["codex", "app-server", "--stdio"],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        text=True, env=env,
+    )
+    try:
+        requests = [
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
+                "clientInfo": {"name": "codex-usage-applet", "version": "1.1"},
+                "capabilities": {},
+            }},
+            {"jsonrpc": "2.0", "id": 2, "method": "account/rateLimits/read", "params": None},
+        ]
+        for request in requests:
+            proc.stdin.write(json.dumps(request) + "\n")
+            proc.stdin.flush()
+
+        deadline = time.monotonic() + 25
+        while time.monotonic() < deadline:
+            line = proc.stdout.readline()
+            if not line:
+                break
+            try:
+                message = json.loads(line)
+            except ValueError:
+                continue
+            if message.get("id") == 2:
+                if message.get("error"):
+                    raise RuntimeError(str(message["error"])[:120])
+                return message["result"]["rateLimits"]
+        raise RuntimeError("Codex app-server did not return rate limits")
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def format_reset(epoch):
+    if not epoch:
+        return None, None, None
+    reset = datetime.fromtimestamp(epoch).astimezone()
+    secs = epoch - time.time()
+    if secs <= 0:
+        left = "now"
+    elif secs < 86400:
+        left = "%dh" % (secs // 3600)
+    else:
+        left = "%dd" % (secs // 86400)
+    return reset.strftime("%d %b"), reset.strftime("%a %d %b %H:%M"), left
+
+
+def window(block):
+    if not isinstance(block, dict):
+        return None
+    label, full, left = format_reset(block.get("resetsAt"))
+    return {
+        "percent": block.get("usedPercent"),
+        "window_minutes": block.get("windowDurationMins"),
+        "reset_label": label, "reset_full": full, "reset_in": left,
+    }
+
+
+def state(force=False):
+    cached = read_cache()
+    if not force and time.time() - cached.get("fetched_at", 0) < MIN_INTERVAL:
+        return cached
+
+    exp = token_expiry()
+    if exp is not None and exp - time.time() < REFRESH_MARGIN:
+        # Let Codex do the refreshing; never risk rotating the token in the sandbox.
+        cached = dict(cached or {})
+        cached["error"] = "token-expiring"
+        return cached
+
+    try:
+        limits = request_rate_limits()
+        primary = window(limits.get("primary")) or {}
+        secondary = window(limits.get("secondary"))
+        cached = {
+            "fetched_at": time.time(),
+            "percent": primary.get("percent"),
+            "window_minutes": primary.get("window_minutes"),
+            "reset_label": primary.get("reset_label"),
+            "reset_full": primary.get("reset_full"),
+            "reset_in": primary.get("reset_in"),
+            "secondary": secondary,
+            "plan": limits.get("planType"),
+            "has_credits": bool((limits.get("credits") or {}).get("hasCredits")),
+            "credit_balance": (limits.get("credits") or {}).get("balance"),
+            "reached": limits.get("rateLimitReachedType"),
+            "error": None,
+        }
+        write_cache(cached)
+    except Exception as e:
+        cached = dict(cached or {})
+        cached["error"] = "unavailable"
+        cached["detail"] = str(e)[:120]
+        if "fetched_at" not in cached:
+            cached["fetched_at"] = 0
+    return cached
+
+
+def main():
+    current = state(force="--force" in sys.argv)
+    if "--json" in sys.argv:
+        current = dict(current)
+        current["age"] = int(time.time() - current.get("fetched_at", time.time()))
+        print(json.dumps(current))
+        return
+    percent = current.get("percent")
+    print("cx %s%s" % ("--" if percent is None else "%d%%" % percent,
+                       " " + current["reset_label"] if current.get("reset_label") else ""))
+
+
+if __name__ == "__main__":
+    main()

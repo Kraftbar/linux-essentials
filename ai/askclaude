@@ -1,0 +1,95 @@
+#!/bin/bash
+# Send the current selection to Claude and show the answer.
+#
+#   askclaude                          "Summarize this briefly."
+#   askclaude "Explain this code"      any prompt
+#   askclaude -                        prompt read from stdin
+#
+# Bound to a hotkey: highlight something anywhere, press the key, read the
+# answer. Takes the X PRIMARY selection, which any highlight sets, so there is
+# no need to press Ctrl+C first; falls back to the clipboard if PRIMARY is
+# empty (some apps, notably terminals in some configs, only populate one).
+set -u
+
+PROMPT="${1:-Summarize this briefly.}"
+[ "$PROMPT" = "-" ] && PROMPT=$(cat)
+
+# A desktop keybinding does not inherit the login shell's PATH, so ~/.local/bin
+# is absent and `claude` - which lives there - is simply not found. Everything
+# else this script uses is in /usr/bin, which is why ocrclip never hit this.
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
+export PATH
+
+NOTIFY=$(command -v notify-send || true)
+MAX_CHARS=${ASKCLAUDE_MAX_CHARS:-60000}
+
+# One line per invocation, so "nothing happened" can be told apart from "the
+# key never fired" - the two need looking in completely different places.
+LOG="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/askclaude.log"
+echo "$(date +%FT%T) pid=$$ prompt=${1:-<default>} claude=$(command -v claude || echo MISSING)" >> "$LOG" 2>/dev/null || true
+
+notify_id=""
+say() {
+    if [ -n "$NOTIFY" ]; then
+        if [ -n "$notify_id" ]; then
+            notify-send -a "Ask Claude" -t 5000 -r "$notify_id" "$1" "${2:-}"
+        else
+            notify-send -a "Ask Claude" -t 5000 "$1" "${2:-}"
+        fi
+    fi
+    echo "${1}${2:+: $2}" >&2
+}
+
+command -v claude >/dev/null || { say "claude CLI not found" "install Claude Code"; exit 1; }
+command -v xclip  >/dev/null || { say "xclip not installed" "sudo apt install xclip"; exit 1; }
+
+# PRIMARY is set by highlighting; CLIPBOARD needs an explicit copy. Prefer the
+# former so the hotkey works on a plain highlight.
+text=$(timeout 3 xclip -selection primary -o 2>/dev/null || true)
+[ -z "${text// }" ] && text=$(timeout 3 xclip -selection clipboard -o 2>/dev/null || true)
+
+if [ -z "${text// }" ]; then
+    say "Nothing selected" "highlight some text first"
+    exit 0
+fi
+
+chars=${#text}
+if [ "$chars" -gt "$MAX_CHARS" ]; then
+    # Truncating beats silently sending a book and waiting minutes for it.
+    text="${text:0:$MAX_CHARS}"
+    truncated=" (truncated from $chars)"
+else
+    truncated=""
+fi
+
+if [ -n "$NOTIFY" ]; then
+    notify_id=$(notify-send -a "Ask Claude" -p -t 0 "Asking Claude..." \
+                "${chars} characters${truncated}" 2>/dev/null || true)
+fi
+
+answer=$(printf '%s' "$text" | timeout 180 claude -p "$PROMPT" 2>/tmp/askclaude.$$)
+status=$?
+err=$(cat /tmp/askclaude.$$ 2>/dev/null); rm -f /tmp/askclaude.$$
+
+if [ $status -ne 0 ] || [ -z "${answer// }" ]; then
+    say "Claude failed" "${err:-no output (exit $status)}"
+    exit 1
+fi
+
+# Dismiss the progress bubble; the window carries the answer.
+[ -n "$notify_id" ] && notify-send -a "Ask Claude" -t 1 -r "$notify_id" " " 2>/dev/null
+
+if command -v zenity >/dev/null; then
+    # --ok-label=Copy: the common next step is pasting it somewhere.
+    if printf '%s' "$answer" | zenity --text-info \
+            --title="Claude" --width=760 --height=520 \
+            --ok-label="Copy" --cancel-label="Close" 2>/dev/null; then
+        printf '%s' "$answer" | xclip -selection clipboard >/dev/null 2>&1
+        say "Copied to clipboard"
+    fi
+else
+    say "Claude" "${answer:0:400}"
+fi

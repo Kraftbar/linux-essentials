@@ -1,0 +1,39 @@
+[Unit]
+Description=Hands-free voice interface for Claude Code
+Documentation=https://github.com/Kraftbar/linux-essentials
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/voice-daemon/venv/bin/python %h/.local/share/voice-daemon/voiced.py
+Restart=on-failure
+RestartSec=5
+
+# CPU only, deliberately. The 8 GB card is fully committed to ocrd, which holds
+# ~7.2 GB resident; Whisper cannot share it. base/int8 on a Ryzen 3700X
+# transcribes far faster than realtime, so there is nothing to gain by fighting
+# over the GPU.
+Environment=VOICED_MODEL=base
+Environment=VOICED_VOICE=en_US-lessac-medium
+
+# Yolo: pass --dangerously-skip-permissions, so hands-free requests are not
+# blocked by prompts nobody is looking at. Deliberate, and it removes the last
+# real guard - the spoken yes/no convention is a prompt instruction, not an
+# enforced check, so a misheard sentence can run a command unattended.
+# Set to 0 to restore permission prompts.
+Environment=VOICED_SKIP_PERMISSIONS=1
+
+# Where Claude runs. Worth keeping deliberate now that permissions are skipped:
+# narrowing this to a project directory bounds what a misheard request reaches.
+Environment=VOICED_WORKDIR=%h
+
+# Leave VOICED_INPUT unset to use the system default source. Set it to a
+# sounddevice name or index to pin a microphone - e.g. a headset.
+# Environment=VOICED_INPUT=
+
+# VAD aggressiveness 0-3 and the silence gap that ends an utterance. 900ms is
+# long enough to survive a mid-sentence pause without feeling sluggish.
+Environment=VOICED_VAD=2
+Environment=VOICED_SILENCE_MS=900
+
+[Install]
+WantedBy=default.target

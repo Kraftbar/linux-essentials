@@ -1,0 +1,8 @@
+{
+    "uuid": "codex-usage@nybo",
+    "name": "Codex Usage",
+    "description": "Shows the signed-in Codex account's rate-limit window.",
+    "icon": "utilities-terminal",
+    "version": "1.0.0",
+    "max-instances": 1
+}

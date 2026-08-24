@@ -1,0 +1,91 @@
+#!/bin/bash
+# Grab a screen region, OCR it through the resident daemon, put it on the
+# clipboard. This is what the hotkey runs, so it stays cheap: no model loading,
+# just a screenshot, a socket round-trip, and xclip.
+#
+#   ocrclip            select a region interactively
+#   ocrclip FILE.png   OCR an existing image
+set -u
+
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+NOTIFY=$(command -v notify-send || true)
+
+# One line per invocation. A desktop keybinding that does nothing is otherwise
+# indistinguishable from one that was never fired, and the difference decides
+# where to look: no line means the grab never reached us.
+LOG="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ocrclip.log"
+echo "$(date +%FT%T) pid=$$ args=$* display=${DISPLAY:-unset} xdg=${XDG_RUNTIME_DIR:-unset}" >> "$LOG" 2>/dev/null || true
+
+say() {
+    # Errors have to reach the user, who is looking at the screen, not a shell.
+    # Reuse the "working" notification's id where we have one, so the result
+    # replaces it rather than stacking a second bubble underneath.
+    if [ -n "$NOTIFY" ]; then
+        if [ -n "${notify_id:-}" ]; then
+            notify-send -a "OCR" -t 4000 -r "$notify_id" "$1" "${2:-}"
+        else
+            notify-send -a "OCR" -t 4000 "$1" "${2:-}"
+        fi
+    fi
+    echo "${1}${2:+: $2}" >&2
+}
+
+command -v xclip >/dev/null || { say "xclip not installed" "sudo apt install xclip"; exit 1; }
+
+if [ $# -ge 1 ]; then
+    image="$1"
+    cleanup=false
+else
+    # mktemp, not a fixed path: the old myocrclip wrote ~/test.png and would
+    # happily clobber a real file of that name.
+    image=$(mktemp --tmpdir ocrclip-XXXXXX.png)
+    cleanup=true
+    if command -v gnome-screenshot >/dev/null; then
+        gnome-screenshot -a -f "$image"
+    elif command -v maim >/dev/null; then
+        maim -s "$image"
+    else
+        say "no screenshot tool" "install gnome-screenshot or maim"
+        exit 1
+    fi
+    # A cancelled selection leaves an empty file, or none at all.
+    if [ ! -s "$image" ]; then
+        rm -f "$image"
+        exit 0
+    fi
+fi
+
+# Recognition costs ~8ms per output character, so a dense selection runs for
+# tens of seconds with nothing on screen. Say so up front, and replace the
+# notification with the result when it lands.
+notify_id=""
+if [ -n "$NOTIFY" ]; then
+    notify_id=$(notify-send -a "OCR" -p -t 0 "Reading selection..." 2>/dev/null || true)
+fi
+
+text=$(python3 "$HERE/ocrsend.py" "$image" 2>/tmp/ocrclip.$$)
+status=$?
+info=$(cat /tmp/ocrclip.$$); rm -f /tmp/ocrclip.$$
+[ "$cleanup" = true ] && rm -f "$image"
+
+if [ $status -ne 0 ]; then
+    say "OCR failed" "$info"
+    exit 1
+fi
+
+if [ -z "$text" ]; then
+    say "No text found" "$info"
+    exit 0
+fi
+
+# xclip has to stay alive to own the X selection - that is how the clipboard
+# works, the owning process serves it on request. Redirect its descriptors so
+# it does not hold the caller's stdout open for its whole lifetime, which makes
+# ocrclip look like it never finishes.
+# xclip forks itself into the background and stays alive to own the X
+# selection - that is how the clipboard works, the owning process serves it on
+# request. Only its stdout/stderr are redirected; redirecting stdin would cut
+# it off from the pipe and it would own an empty selection.
+printf '%s' "$text" | xclip -selection clipboard >/dev/null 2>&1
+
+say "Copied ${#text} characters" "$info"

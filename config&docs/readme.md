@@ -71,7 +71,7 @@ echo "Setting up Linux for desktop"
 
 # Install required packages
 sudo apt install -y python3-pip python3-gi python3-{nautilus,nemo,caja} xclip \
-software-properties-common translate-shell gnuplot tesseract-ocr texlive-full jq
+software-properties-common translate-shell gnuplot texlive-full jq
 
 # Install git-nautilus-icons
 pip3 install --user git-nautilus-icons
@@ -242,11 +242,11 @@ gsettings set org.cinnamon.desktop.keybindings.media-keys.area-screenshot-clip "
 # Define custom keybindings
 gsettings set org.cinnamon.desktop.keybindings custom-list "['custom0', 'custom1']"
 
-# Custom keybinding 0: myocrclip
+# Custom keybinding 0: ocrclip (see ../ocr/ - replaced myocrclip 2026-08-24)
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
-keybindings/custom-keybindings/custom0/ name 'myocrclip'
+keybindings/custom-keybindings/custom0/ name 'ocrclip'
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
-keybindings/custom-keybindings/custom0/ command 'myocrclip'
+keybindings/custom-keybindings/custom0/ command 'ocrclip'
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/\
 keybindings/custom-keybindings/custom0/ binding "['<Super><Shift>c']"
 
@@ -456,6 +456,127 @@ releases it:
 Verified both ways: with the grab held a press ran the extension callback and
 the terminal was untouched; with it released the callback did not run and the
 terminal closed its tab.
+
+## Cinnamon applets - panel usage readouts
+
+Two applets in `cinnamon-applets/`, backed by three scripts in
+`scripts/panel/`. Install the same way as the extensions:
+
+```bash
+for a in claude-usage@nybo oslo-weather@nybo; do
+    ln -sfn "$PWD/config&docs/cinnamon-applets/$a" \
+            ~/.local/share/cinnamon/applets/$a
+done
+for s in claude-usage codex-usage oslo-weather; do
+    ln -sfn "$PWD/scripts/panel/$s" ~/.local/bin/$s
+done
+```
+
+Then add them to `org.cinnamon enabled-applets` - the key is a flat list of
+`panel:side:order:uuid:instance` strings, and Cinnamon hot-loads a change to
+it, so no `cinnamon --replace` is needed. Each script also runs standalone
+(`--json` for structured output, `--force` to bypass its cache), which is the
+fastest way to test one without touching the panel.
+
+`claude-usage@nybo` renders all three numbers - `5h 46% 05:30  wk 15% Sat  cx
+37% 22 Sep`. A standalone `codex-usage@nybo` is in the repo but deliberately
+**not** enabled; it exists only if the combined label is ever worth splitting.
+
+### Reloading and inspecting an applet
+
+Editing `applet.js` does nothing until the applet is reloaded, which is not
+obvious and cost a session's confusion - the Codex readout was written, looked
+correct on disk, and simply never appeared:
+
+```bash
+dbus-send --session --dest=org.Cinnamon /org/Cinnamon \
+  org.Cinnamon.ReloadXlet string:'claude-usage@nybo' string:'APPLET'
+```
+
+Live applet state is reachable through `Eval`, which is far better than
+guessing from a screenshot. `appletManager.appletObj` is empty - the instance
+hangs off the definition instead:
+
+```bash
+dbus-send --session --print-reply --dest=org.Cinnamon /org/Cinnamon \
+  org.Cinnamon.Eval string:'
+(function(){
+  let d = imports.ui.appletManager.definitions
+            .filter(x => x.uuid == "claude-usage@nybo")[0];
+  return d.applet._applet_label.get_text();
+})()'
+```
+
+That same trick reads the real filesystem from outside a sandboxed shell, which
+is how a "the files are gone" scare was settled - `GLib.file_test()` from the
+Cinnamon process showed all of them present.
+
+Panel labels are plain text by default. Colour needs
+`_applet_label.get_clutter_text().set_markup()` *after* `set_applet_label()`,
+and the plain call is kept as the fallback because invalid markup throws.
+
+### claude-usage - 5-hour and weekly limits
+
+Reads `GET https://api.anthropic.com/api/oauth/usage` with the OAuth token
+Claude Code stores in `~/.claude/.credentials.json`. Same endpoint the
+`/usage` slash command uses; `anthropic-beta: oauth-2025-04-20` is required.
+
+Do not hardcode colour thresholds. The response carries a `limits[]` array with
+a server-side `severity` per window plus an `is_active` flag marking whichever
+window is currently binding, and severity escalates past `warning` to
+`critical` on its own. The applet renders the active window bold and takes its
+colour from `severity`, treating any unrecognised value as critical.
+
+Each poll appends a sample to `~/.cache/claude-usage/state.json` (3h rolling).
+When the recent slope projects hitting 100% *before* the window resets, the
+segment goes red and the dropdown names the projected time - a percentage alone
+does not tell you whether you will hit the wall. `notify-send` fires at 80% and
+95%, keyed to the window's `resets_at` so each new window re-arms exactly once.
+
+**The credentials file is read, never written.** Claude Code owns the refresh,
+and a background poller racing it over token rotation could break the login.
+The cost is that the token lasts ~8h, so the applet can go stale overnight; it
+shows the last values with a `⚠` and says to run any Claude Code command.
+
+`extra_usage` is a trap worth spelling out. `monthly_limit` is a **spend cap,
+not a balance**, so rendering `used / limit` implies money on hand that is not
+there. `spend_limit_reached: false` alongside `disabled_reason:
+"out_of_credits"` means the cap was never hit and the wallet behind it is
+simply empty. While `is_enabled` is false nothing can be billed, and that is
+what the dropdown says rather than a fraction.
+
+### codex-usage - Codex rate-limit window
+
+There is **no standalone usage endpoint** for Codex. Limits otherwise only ride
+on `x-codex-*` headers attached to real inference responses, so polling for
+them would burn quota. The way in is Codex's own local app-server protocol:
+
+```bash
+codex app-server --stdio   # JSON-RPC: initialize, then account/rateLimits/read
+```
+
+It runs against an isolated `CODEX_HOME` at `~/.cache/codex-usage-runtime`
+(0700, with `auth.json` copied through a 0600 handle - `shutil.copyfile` does
+not set a mode, and a 0002 umask would otherwise leave tokens group-readable)
+so it never disturbs live Codex state.
+
+**The sandbox must never be what refreshes the token.** A rotated refresh token
+would land in the throwaway copy and be lost, which can invalidate the real
+login. The script therefore checks the access token's `exp` and skips the
+app-server entirely within an hour of expiry, serving cache and leaving the
+refresh to Codex. Codex access tokens last ~10 days, so this is rare but real.
+
+Polling is deliberately slow (30 min). The window is 30 days, and each poll
+spawns a ~258 MB app-server. Codex has no server-side severity either, so one
+is synthesised - amber at 75%, red at 90% or on `rateLimitReached` - because
+the 95% threshold that suits a 5-hour window is far too late for a monthly one.
+
+### oslo-weather - met.no
+
+`locationforecast/2.0/compact` for Oslo (59.9139, 10.7522). No API key. met.no
+requires an identifying `User-Agent` and asks clients not to poll harder than
+the data changes, so results are cached 15 min and revalidated with
+`If-None-Match`; a 304 refreshes the cache timestamp without refetching.
 
 ## Bluetooth headphones - do not try to make idle A2DP suspend
 

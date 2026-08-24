@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+"""Fetch Claude subscription usage for a panel applet.
+
+Reads the OAuth access token Claude Code stores in ~/.claude/.credentials.json
+and queries the same endpoint the /usage slash command uses. Never writes to the
+credentials file. Keeps a short sample history so it can project when a window
+will run out, and fires desktop notifications as limits get close.
+"""
+
+import json
+import os
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+
+CREDS = os.path.expanduser("~/.claude/.credentials.json")
+CACHE_DIR = os.path.expanduser("~/.cache/claude-usage")
+CACHE = os.path.join(CACHE_DIR, "state.json")
+URL = "https://api.anthropic.com/api/oauth/usage"
+MIN_INTERVAL = 45        # seconds between real network calls
+HISTORY_SECONDS = 3 * 3600
+NOTIFY_AT = (80, 95)     # percentages that trigger a desktop notification
+
+
+def read_cache():
+    try:
+        with open(CACHE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def write_cache(obj):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    tmp = CACHE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(obj, f)
+    os.replace(tmp, CACHE)
+
+
+def fetch():
+    with open(CREDS) as f:
+        oauth = json.load(f)["claudeAiOauth"]
+    if oauth.get("expiresAt", 0) / 1000.0 < time.time():
+        raise RuntimeError("expired")
+    req = urllib.request.Request(URL, headers={
+        "Authorization": "Bearer " + oauth["accessToken"],
+        "Accept": "application/json",
+        "anthropic-beta": "oauth-2025-04-20",
+        "User-Agent": "claude-usage-applet/2.0",
+    })
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.load(resp)
+
+
+def parse_ts(value):
+    try:
+        return datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def pct(block):
+    if not isinstance(block, dict):
+        return None
+    v = block.get("utilization")
+    return None if v is None else int(round(v))
+
+
+def human_delta(secs):
+    if secs <= 0:
+        return "now"
+    if secs < 3600:
+        return "%dm" % (secs // 60)
+    if secs < 86400:
+        return "%dh %dm" % (secs // 3600, (secs % 3600) // 60)
+    return "%dd %dh" % (secs // 86400, (secs % 86400) // 3600)
+
+
+def window(block, limits, kind):
+    """Normalise one usage window into the shape the applet renders."""
+    out = {
+        "percent": pct(block),
+        "resets_in": None, "resets_clock": None, "resets_day": None,
+        "severity": "normal", "is_active": False,
+    }
+    for entry in limits or []:
+        if entry.get("kind") == kind:
+            out["severity"] = entry.get("severity") or "normal"
+            out["is_active"] = bool(entry.get("is_active"))
+            if out["percent"] is None and entry.get("percent") is not None:
+                out["percent"] = int(round(entry["percent"]))
+            break
+
+    reset = parse_ts((block or {}).get("resets_at"))
+    if reset:
+        local = reset.astimezone()
+        out["resets_in"] = human_delta((reset - datetime.now(timezone.utc)).total_seconds())
+        out["resets_clock"] = local.strftime("%H:%M")
+        out["resets_day"] = local.strftime("%a")
+        out["resets_epoch"] = reset.timestamp()
+    return out
+
+
+def project(history, key, current, reset_epoch):
+    """Estimate when this window hits 100% at the recent burn rate.
+
+    Returns (clock_string, seconds_from_now) if exhaustion is expected before
+    the window resets, else None. Needs samples spanning at least 5 minutes.
+    """
+    if current is None or reset_epoch is None or current >= 100:
+        return None
+    pts = [(s["t"], s[key]) for s in history if s.get(key) is not None]
+    if len(pts) < 2:
+        return None
+    now = time.time()
+    recent = [p for p in pts if now - p[0] <= 1800] or pts[-6:]
+    if len(recent) < 2:
+        return None
+    (t0, v0), (t1, v1) = recent[0], recent[-1]
+    span = t1 - t0
+    if span < 300 or v1 <= v0:
+        return None
+    rate = (v1 - v0) / span                      # percent per second
+    secs = (100 - current) / rate
+    if now + secs >= reset_epoch:
+        return None
+    return datetime.fromtimestamp(now + secs).strftime("%H:%M"), int(secs)
+
+
+def notify(state, label, win, key):
+    """Fire a one-shot desktop notification per threshold, per window."""
+    percent, epoch = win.get("percent"), win.get("resets_epoch")
+    if percent is None or epoch is None:
+        return
+    seen = state.setdefault("notified", {})
+    stamp = "%s:%s" % (key, int(epoch))         # resets each new window
+    already = seen.get(stamp, 0)
+    level = max([t for t in NOTIFY_AT if percent >= t] or [0])
+    if level <= already:
+        return
+    seen[stamp] = level
+    for old in [k for k in seen if k.split(":")[0] == key and k != stamp]:
+        del seen[old]
+    body = "%d%% used — resets in %s" % (percent, win.get("resets_in") or "?")
+    urgency = "critical" if level >= 95 else "normal"
+    try:
+        subprocess.Popen(
+            ["notify-send", "-u", urgency, "-i", "utilities-system-monitor",
+             "Claude %s limit" % label, body],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+
+def refresh(force=False):
+    state = read_cache()
+    fresh = False
+    if force or time.time() - state.get("fetched_at", 0) >= MIN_INTERVAL:
+        try:
+            state["data"] = fetch()
+            state["fetched_at"] = time.time()
+            state.pop("error", None)
+            fresh = True
+        except Exception as e:
+            if isinstance(e, urllib.error.HTTPError):
+                state["error"] = "auth" if e.code in (401, 403) else "http %d" % e.code
+            elif isinstance(e, RuntimeError) and str(e) == "expired":
+                state["error"] = "auth"
+            else:
+                state["error"] = "offline"
+
+    data = state.get("data") or {}
+    limits = data.get("limits")
+    five = window(data.get("five_hour"), limits, "session")
+    seven = window(data.get("seven_day"), limits, "weekly_all")
+
+    if fresh:
+        history = [s for s in state.get("history", [])
+                   if time.time() - s.get("t", 0) <= HISTORY_SECONDS]
+        history.append({"t": state["fetched_at"],
+                        "five": five["percent"], "seven": seven["percent"]})
+        state["history"] = history
+        notify(state, "5-hour", five, "five")
+        notify(state, "weekly", seven, "seven")
+        write_cache(state)
+
+    five["projected"] = project(state.get("history", []), "five",
+                                five["percent"], five.get("resets_epoch"))
+    seven["projected"] = project(state.get("history", []), "seven",
+                                 seven["percent"], seven.get("resets_epoch"))
+    return state, five, seven
+
+
+# monthly_limit is a SPEND CAP, not a balance, so "used / limit" must never be
+# rendered as though the remainder were money on hand. While extra usage is
+# disabled nothing can be billed, and that is what the applet should say.
+DISABLED_REASON = {
+    "out_of_credits": "no credits left",
+    "user_disabled": "turned off",
+    "spend_limit_reached": "monthly cap reached",
+}
+
+
+def credits(data):
+    extra = (data or {}).get("extra_usage") or {}
+    if not extra.get("monthly_limit"):
+        return None
+    dp = extra.get("decimal_places", 2)
+    scale = 10 ** dp
+    enabled = bool(extra.get("is_enabled"))
+    reason = extra.get("disabled_reason")
+    return {
+        "used": extra.get("used_credits", 0) / scale,
+        "cap": extra["monthly_limit"] / scale,
+        "percent": int(round(extra.get("utilization") or 0)),
+        "currency": extra.get("currency", "USD"),
+        "billable": enabled,
+        "reason": None if enabled else DISABLED_REASON.get(reason, reason or "off"),
+    }
+
+
+def by_model(data):
+    """Per-model weekly windows — null on Pro, populated on Max."""
+    out = {}
+    for field, label in (("seven_day_opus", "Opus"), ("seven_day_sonnet", "Sonnet")):
+        p = pct((data or {}).get(field))
+        if p is not None:
+            out[label] = p
+    return out
+
+
+def main():
+    args = sys.argv[1:]
+    state, five, seven = refresh(force="--force" in args)
+    data = state.get("data") or {}
+
+    if "--json" in args:
+        print(json.dumps({
+            "five_hour": five, "seven_day": seven,
+            "credits": credits(data), "by_model": by_model(data),
+            "error": state.get("error"),
+            "age": int(time.time() - state.get("fetched_at", time.time())),
+        }))
+        return
+
+    def seg(label, win, tail):
+        p = "--" if win["percent"] is None else "%d%%" % win["percent"]
+        return "%s %s%s" % (label, p, (" " + tail) if tail else "")
+
+    print("%s  %s%s" % (
+        seg("5h", five, five["resets_clock"] or ""),
+        seg("wk", seven, seven["resets_day"] or ""),
+        "*" if state.get("error") else ""))
+
+
+if __name__ == "__main__":
+    main()

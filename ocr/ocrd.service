@@ -1,0 +1,38 @@
+[Unit]
+Description=Resident OCR daemon for screenshot text extraction
+Documentation=https://github.com/Kraftbar/linux-essentials
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/ocr-daemon/venv-paddle/bin/python %h/.local/share/ocr-daemon/ocrd.py
+Restart=on-failure
+RestartSec=5
+
+# PaddleOCR-VL 1.6. Byte-exact on four of five screenshot fixtures and the only
+# engine tested that preserves indentation. Switching to surya also means
+# pointing ExecStart at venv/ instead: the two cannot share a venv, because
+# surya-ocr needs transformers 4.x and paddleocr needs 5.x.
+Environment=OCRD_ENGINE=paddlevl
+Environment=OCRD_DEVICE=gpu:0
+
+# Paddle's allocator reserves ~7.6 GB while only 5.7 GB is live, which OOMs on
+# an 8 GB card that is also driving the display. LOQ's bare GPU had 8.14 GB free
+# and fit; this desktop has 7.46 GB free and did not.
+#
+# chunk_size is the setting that actually fixed it - it caps how much the
+# allocator grabs per growth step, cutting the cached overhead. 64 MB peaks at
+# ~7.25 GB and works. Counter-intuitively 16 MB is worse (~7.5 GB): more,
+# smaller chunks fragment harder. Do not "optimise" this downward.
+Environment=FLAGS_allocator_strategy=auto_growth
+Environment=FLAGS_fraction_of_gpu_memory_to_use=0
+Environment=FLAGS_auto_growth_chunk_size_in_mb=64
+Environment=FLAGS_eager_delete_tensor_gb=0
+
+# Only consulted by the surya backend. Its confidence floor is load-bearing:
+# Surya emits fluent nonsense for noise regions and scores it 0.07-0.37 against
+# 0.99+ for real text, so this is what stops a blank selection returning
+# invented words.
+Environment=OCRD_CONFIDENCE=0.5
+
+[Install]
+WantedBy=default.target

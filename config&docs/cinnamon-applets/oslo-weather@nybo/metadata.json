@@ -1,0 +1,8 @@
+{
+    "uuid": "oslo-weather@nybo",
+    "name": "Oslo Weather",
+    "description": "Current Oslo conditions from the Norwegian Meteorological Institute.",
+    "icon": "weather-few-clouds",
+    "version": "1.0.0",
+    "max-instances": 1
+}

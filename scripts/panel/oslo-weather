@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""Current Oslo weather from the Norwegian Meteorological Institute (met.no).
+
+No API key needed. met.no's terms require an identifying User-Agent and ask
+clients not to poll harder than the data changes, so results are cached and
+conditional requests are used.
+"""
+
+import json
+import os
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+
+LAT, LON = 59.9139, 10.7522                      # Oslo
+URL = ("https://api.met.no/weatherapi/locationforecast/2.0/compact"
+       "?lat=%s&lon=%s" % (LAT, LON))
+UA = "cinnamon-oslo-weather/1.0 (personal desktop applet)"
+CACHE_DIR = os.path.expanduser("~/.cache/oslo-weather")
+CACHE = os.path.join(CACHE_DIR, "state.json")
+MIN_INTERVAL = 900                               # 15 minutes
+
+# met.no symbol_code prefixes -> glyph. Checked longest-first.
+SYMBOLS = [
+    ("clearsky_night", "☾"), ("clearsky", "☀"),
+    ("fair_night", "☾"), ("fair", "🌤"),
+    ("partlycloudy", "⛅"), ("cloudy", "☁"), ("fog", "🌫"),
+    ("lightrainshowersandthunder", "⛈"), ("rainshowersandthunder", "⛈"),
+    ("heavyrainandthunder", "⛈"), ("rainandthunder", "⛈"),
+    ("sleetandthunder", "⛈"), ("snowandthunder", "⛈"), ("thunder", "⛈"),
+    ("heavyrain", "🌧"), ("lightrain", "🌦"), ("rainshowers", "🌦"), ("rain", "🌧"),
+    ("heavysleet", "🌨"), ("lightsleet", "🌨"), ("sleet", "🌨"),
+    ("heavysnow", "❄"), ("lightsnow", "🌨"), ("snow", "❄"),
+]
+
+
+def glyph(code):
+    if not code:
+        return "•"
+    for prefix, char in SYMBOLS:
+        if code.startswith(prefix):
+            return char
+    return "•"
+
+
+def describe(code):
+    if not code:
+        return "unknown"
+    base = code.split("_")[0]
+    words = {
+        "clearsky": "clear", "fair": "fair", "partlycloudy": "partly cloudy",
+        "cloudy": "cloudy", "fog": "fog", "lightrain": "light rain",
+        "rain": "rain", "heavyrain": "heavy rain", "rainshowers": "rain showers",
+        "lightsnow": "light snow", "snow": "snow", "heavysnow": "heavy snow",
+        "sleet": "sleet", "thunder": "thunderstorm",
+    }
+    return words.get(base, base.replace("and", " and "))
+
+
+def read_cache():
+    try:
+        with open(CACHE) as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def write_cache(obj):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    tmp = CACHE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(obj, f)
+    os.replace(tmp, CACHE)
+
+
+def fetch(etag=None):
+    headers = {"User-Agent": UA, "Accept": "application/json"}
+    if etag:
+        headers["If-None-Match"] = etag
+    req = urllib.request.Request(URL, headers=headers)
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.load(resp), resp.headers.get("ETag")
+
+
+def summarise(payload):
+    series = (payload or {}).get("properties", {}).get("timeseries") or []
+    if not series:
+        return None
+    now = datetime.now(timezone.utc)
+
+    # The entry covering the current hour, i.e. the last one already started.
+    current = series[0]
+    for entry in series:
+        t = datetime.fromisoformat(entry["time"].replace("Z", "+00:00"))
+        if t <= now:
+            current = entry
+        else:
+            break
+
+    details = current["data"].get("instant", {}).get("details", {})
+    hour = current["data"].get("next_1_hours") or current["data"].get("next_6_hours") or {}
+    code = (hour.get("summary") or {}).get("symbol_code")
+    rain = (hour.get("details") or {}).get("precipitation_amount")
+
+    # Today's high/low from the next 24 hours of instant temperatures.
+    temps = []
+    for entry in series:
+        t = datetime.fromisoformat(entry["time"].replace("Z", "+00:00"))
+        if (t - now).total_seconds() > 86400:
+            break
+        v = entry["data"].get("instant", {}).get("details", {}).get("air_temperature")
+        if v is not None:
+            temps.append(v)
+
+    return {
+        "temp": details.get("air_temperature"),
+        "symbol": code,
+        "glyph": glyph(code),
+        "text": describe(code),
+        "wind": details.get("wind_speed"),
+        "humidity": details.get("relative_humidity"),
+        "rain_next_hour": rain,
+        "high": max(temps) if temps else None,
+        "low": min(temps) if temps else None,
+    }
+
+
+def refresh(force=False):
+    state = read_cache()
+    if force or time.time() - state.get("fetched_at", 0) >= MIN_INTERVAL:
+        try:
+            payload, etag = fetch(state.get("etag"))
+            state["payload"] = payload
+            state["etag"] = etag
+            state["fetched_at"] = time.time()
+            state.pop("error", None)
+        except urllib.error.HTTPError as e:
+            if e.code == 304:                     # unchanged, cache still good
+                state["fetched_at"] = time.time()
+                state.pop("error", None)
+            else:
+                state["error"] = "http %d" % e.code
+        except Exception:
+            state["error"] = "offline"
+        write_cache(state)
+    return state
+
+
+def main():
+    args = sys.argv[1:]
+    state = refresh(force="--force" in args)
+    now = summarise(state.get("payload"))
+
+    if "--json" in args:
+        out = dict(now or {})
+        out["error"] = state.get("error")
+        out["age"] = int(time.time() - state.get("fetched_at", time.time()))
+        print(json.dumps(out))
+        return
+
+    if not now or now.get("temp") is None:
+        print("Oslo --")
+        return
+    print("%s %d°" % (now["glyph"], round(now["temp"])))
+
+
+if __name__ == "__main__":
+    main()

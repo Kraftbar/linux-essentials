@@ -34,3 +34,28 @@ while IFS=$'\t' read -r id name command binding; do
     gsettings set "$path" binding "['$binding']"
     echo "set:  $id name=$name command=$repo_root/$command binding=$binding"
 done < "$tsv"
+
+# csd-media-keys installs its passive grabs when it starts and does not reliably
+# pick up ids added to custom-list afterwards. Without this nudge a new binding
+# silently does nothing until the next login, which reads as "the hotkey is
+# broken" rather than "the daemon has not seen it yet".
+#
+# The short wait is precautionary, not proven necessary: gsettings returns
+# before dconf commits, so give the write a moment to land before csd re-reads.
+sleep 1
+
+if pid=$(pgrep -x csd-media-keys); then
+    kill "$pid"
+    sleep 2
+    if pgrep -x csd-media-keys >/dev/null; then
+        echo "grab: restarted csd-media-keys, bindings are live now"
+    else
+        setsid /usr/bin/csd-media-keys >/dev/null 2>&1 &
+        sleep 2
+        pgrep -x csd-media-keys >/dev/null \
+            && echo "grab: restarted csd-media-keys, bindings are live now" \
+            || echo "grab: csd-media-keys did not come back - log out and in"
+    fi
+else
+    echo "grab: csd-media-keys not running - bindings apply at next login"
+fi

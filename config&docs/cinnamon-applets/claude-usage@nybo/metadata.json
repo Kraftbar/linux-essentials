@@ -1,0 +1,8 @@
+{
+    "uuid": "claude-usage@nybo",
+    "name": "Claude Usage",
+    "description": "Shows Claude subscription usage for the 5-hour and weekly limit windows.",
+    "icon": "utilities-system-monitor",
+    "version": "1.0.0",
+    "max-instances": 1
+}

@@ -1,0 +1,5 @@
+def load_config(config_path: str) -> dict:
+    user_name = get_config_value('db_host')
+    MAX_RETRY_COUNT = 5
+    self._private_method(arg_one, arg_two)
+    return {"ok": True, "error": None}
