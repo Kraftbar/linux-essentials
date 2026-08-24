@@ -38,4 +38,8 @@ ls -t "$store"/*.jsonl 2>/dev/null | head -"$count" | while read -r f; do
     printf "  %s  %s  %2s turns  %s\n" "$when" "$id" "$turns" "${title:-(untitled)}"
 done
 
-printf "\nresume one with:\n  cd %s && claude --resume <id>\n" "$dir"
+latest=$(ls -t "$store"/*.jsonl 2>/dev/null | head -1)
+if [ -n "$latest" ]; then
+    printf "\nresume the most recent:\n  cd %s && claude --resume %s\n" \
+        "$dir" "$(basename "$latest" .jsonl)"
+fi
