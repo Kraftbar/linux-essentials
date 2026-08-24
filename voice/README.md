@@ -69,12 +69,32 @@ Claude Code equivalents are `--dangerously-skip-permissions` and
 
 ## Finding past voice conversations
 
-`claude --resume` does not reliably list sessions the daemon created, even from
-the right directory. Resuming them by id works, and the transcripts are
-complete, so nothing is lost - they are just hard to find in the picker. The
-session files are structurally identical to interactive ones (same record
-types, same flags, same cwd, same version), so the reason is not visible from
-the outside and is not guessed at here.
+### Known bug: voice sessions never appear in `claude --resume`
+
+Sessions the daemon creates are recorded correctly and resume correctly **by
+id**, but they are never listed by the interactive picker - including from
+`~`, which is the directory they record as their `cwd`. Reproduced on Claude
+Code 2.1.241, 2026-08-24.
+
+Ruled out, by comparing a voice session against an interactive one in the same
+project directory:
+
+- **Not the working directory.** Voice sessions record `cwd: /home/nybo` and
+  land in the `-home-nybo` project store alongside sessions the picker does
+  list. Running `claude --resume` from `~` still does not show them.
+- **Not missing metadata.** They carry an `ai-title` like any other; the
+  hello-world test session is titled "Session start".
+- **Not the `mode` record.** Voice sessions have one, but so do some
+  interactive sessions, and some non-voice sessions do not.
+
+Every field inspectable from the filesystem matches: same record types, same
+`isSidechain`, `userType`, `cwd` and `version`. So whatever excludes them lives
+in the picker rather than in the data, and the most likely explanation - that
+headless `-p` sessions are filtered out by design - is a guess, not something
+confirmed here.
+
+Nothing is lost either way: the transcripts are complete, and `voicehist`
+below finds them.
 
     ./voicehist                    sessions for $HOME, where the daemon runs
     ./voicehist ~/linux-essentials
