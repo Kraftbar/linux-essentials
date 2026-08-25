@@ -32,8 +32,10 @@ printf "sessions for %s\n\n" "$dir"
 ls -t "$store"/*.jsonl 2>/dev/null | head -"$count" | while read -r f; do
     id=$(basename "$f" .jsonl)
     when=$(stat -c '%y' "$f" | cut -c1-16)
-    title=$(grep -m1 '"type":"ai-title"' "$f" 2>/dev/null \
-            | python3 -c "import json,sys;print(json.load(sys.stdin).get('aiTitle','')[:46])" 2>/dev/null)
+    # Interactive sessions get an ai-title. Voice sessions are named up front
+    # with --name, which lands as custom-title, so check both.
+    title=$(grep -m1 -E '"type":"(ai-title|custom-title)"' "$f" 2>/dev/null \
+            | python3 -c "import json,sys;d=json.load(sys.stdin);print((d.get('aiTitle') or d.get('customTitle') or '')[:46])" 2>/dev/null)
     turns=$(grep -c '"type":"user"' "$f" 2>/dev/null || echo 0)
     printf "  %s  %s  %2s turns  %s\n" "$when" "$id" "$turns" "${title:-(untitled)}"
 done

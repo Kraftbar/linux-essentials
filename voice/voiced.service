@@ -8,6 +8,12 @@ ExecStart=%h/.local/share/voice-daemon/venv/bin/python %h/.local/share/voice-dae
 Restart=on-failure
 RestartSec=5
 
+# The claude launcher lives in ~/.local/bin, which is not on the PATH systemd
+# gives a user service. Pin it here rather than relying on the manager
+# environment: that is only imported at login, so a running daemon keeps a stale
+# PATH and the subprocess call fails with "No such file or directory: 'claude'".
+Environment=PATH=%h/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 # CPU only, deliberately. The 8 GB card is fully committed to ocrd, which holds
 # ~7.2 GB resident; Whisper cannot share it. base/int8 on a Ryzen 3700X
 # transcribes far faster than realtime, so there is nothing to gain by fighting

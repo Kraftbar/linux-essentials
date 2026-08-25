@@ -210,6 +210,14 @@ class Session:
         return None
 
 
+def session_label(text: str) -> str:
+    """A short display name for the /resume picker, built from what was said."""
+    words = " ".join(text.split())
+    if len(words) > 40:
+        words = words[:39].rstrip() + "\u2026"
+    return f"voice: {words}" if words else "voice"
+
+
 class Models:
     """Whisper, Piper and the Claude call. Loaded once, reused."""
 
@@ -257,7 +265,13 @@ class Models:
         resumes it, which is what carries context between utterances.
         """
         command = ["claude", "-p", text, "--append-system-prompt", SPOKEN_STYLE]
-        command += ["--session-id", session_id] if first_turn else ["--resume", session_id]
+        if first_turn:
+            # Without a name these sit in the /resume picker as untitled rows
+            # among every other session in this directory. The opening utterance
+            # is the only thing that tells them apart, so use it as the label.
+            command += ["--session-id", session_id, "--name", session_label(text)]
+        else:
+            command += ["--resume", session_id]
         if SKIP_PERMISSIONS:
             # Requested deliberately: hands-free is unusable if every tool call
             # stops for a prompt nobody can see. Note what this gives up - the
