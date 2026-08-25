@@ -5,3 +5,4 @@ org.cinnamon	desktop-effects-workspace	false
 org.cinnamon	startup-animation	false
 org.cinnamon.desktop.interface	enable-animations	false
 org.cinnamon.desktop.keybindings.wm	close	['<Alt>F4', '<Super>q']
+org.cinnamon.muffin	tile-maximize	true
