@@ -8,6 +8,12 @@ ExecStart=%h/.local/share/ocr-daemon/venv-paddle/bin/python %h/.local/share/ocr-
 Restart=on-failure
 RestartSec=5
 
+# Not enabled at login any more: ocrd.socket is, and starts this on the first
+# hotkey press. The model is then dropped after 15 idle minutes so the 6.5 GB
+# of VRAM is only committed while OCR is actually in use. Cost is a 6-18 s
+# cold start on the first request after a quiet spell.
+Environment=OCRD_IDLE_SECONDS=900
+
 # PaddleOCR-VL 1.6. Byte-exact on four of five screenshot fixtures and the only
 # engine tested that preserves indentation. Switching to surya also means
 # pointing ExecStart at venv/ instead: the two cannot share a venv, because
@@ -33,6 +39,3 @@ Environment=FLAGS_eager_delete_tensor_gb=0
 # 0.99+ for real text, so this is what stops a blank selection returning
 # invented words.
 Environment=OCRD_CONFIDENCE=0.5
-
-[Install]
-WantedBy=default.target

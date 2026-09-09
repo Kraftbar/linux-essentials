@@ -1,0 +1,12 @@
+[Unit]
+Description=Socket for the OCR daemon (starts ocrd.service on first use)
+
+[Socket]
+# %t = XDG_RUNTIME_DIR, the same path ocrd.py and ocrsend.py resolve to.
+ListenStream=%t/ocrd.sock
+SocketMode=0600
+# Connections queue here while the model loads (6-18 s); the client waits 300 s.
+Backlog=16
+
+[Install]
+WantedBy=default.target

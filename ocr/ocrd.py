@@ -24,6 +24,13 @@ Protocol, newline-delimited JSON over SOCK_STREAM:
 
 Errors come back as {"ok": false, "error": "..."} rather than a dropped
 connection, so the client can say something useful.
+
+Lifecycle: the model costs ~6.5 GB of an 8 GB card and is used a handful of
+times a day, so it does not stay resident. systemd owns the socket
+(ocrd.socket); the first connect starts this process, which loads the model,
+serves requests, and exits once OCRD_IDLE_SECONDS pass without one. The client
+already waits up to 300 s, so the 6-18 s cold start fits inside its timeout.
+Run without systemd (no LISTEN_FDS) and it binds the socket itself and stays up.
 """
 import json
 import os
@@ -50,9 +57,13 @@ def _runtime_dir() -> Path:
 SOCKET_PATH = Path(os.environ.get("OCRD_SOCKET", _runtime_dir() / "ocrd.sock"))
 ENGINE = os.environ.get("OCRD_ENGINE", "paddlevl").lower()
 CONFIDENCE = float(os.environ.get("OCRD_CONFIDENCE", "0.5"))
+# 0 = never exit. Only meaningful under socket activation; a self-bound daemon
+# that exits takes its socket with it.
+IDLE_SECONDS = float(os.environ.get("OCRD_IDLE_SECONDS", "0"))
 
 _backend = None
 _lock = threading.Lock()
+_last_activity = time.monotonic()
 
 
 def log(message: str) -> None:
@@ -187,6 +198,8 @@ def handle(conn: socket.socket) -> None:
             return
 
         reply = recognize(request.get("image", ""))
+        global _last_activity
+        _last_activity = time.monotonic()
         if reply["ok"]:
             log(f"{reply['lines']} lines in {reply['seconds']}s")
         else:
@@ -199,8 +212,25 @@ def handle(conn: socket.socket) -> None:
             log("client disconnected before the reply was sent")
 
 
+def _inherited_socket() -> socket.socket | None:
+    """The listening socket systemd hands us under socket activation, or None.
+
+    Always fd 3; LISTEN_PID guards against inheriting a parent's fds by
+    accident. Detecting family and type from the fd is what socket(fileno=)
+    does for us.
+    """
+    if os.environ.get("LISTEN_PID") != str(os.getpid()):
+        return None
+    if int(os.environ.get("LISTEN_FDS", "0")) < 1:
+        return None
+    return socket.socket(fileno=3)
+
+
 def main() -> None:
-    if SOCKET_PATH.exists():
+    server = _inherited_socket()
+    activated = server is not None
+
+    if not activated and SOCKET_PATH.exists():
         # A leftover socket from a killed daemon would block bind(); a live one
         # means we are a duplicate and should not steal it.
         probe = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -215,24 +245,41 @@ def main() -> None:
 
     load_models()
 
-    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    server.bind(str(SOCKET_PATH))
-    SOCKET_PATH.chmod(0o600)          # the socket is a text-extraction oracle
-    server.listen(4)
-    log(f"listening on {SOCKET_PATH}")
+    if activated:
+        # The connection that woke us has been waiting in the backlog since
+        # before load_models(); accept() below picks it up.
+        log(f"socket-activated, idle exit after {IDLE_SECONDS:g}s")
+    else:
+        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        server.bind(str(SOCKET_PATH))
+        SOCKET_PATH.chmod(0o600)      # the socket is a text-extraction oracle
+        server.listen(4)
+        log(f"listening on {SOCKET_PATH}")
 
     def shutdown(*_):
         log("shutting down")
         server.close()
-        SOCKET_PATH.unlink(missing_ok=True)
+        if not activated:             # systemd's socket is not ours to remove
+            SOCKET_PATH.unlink(missing_ok=True)
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
 
+    if IDLE_SECONDS > 0:
+        server.settimeout(IDLE_SECONDS)
+
     while True:
         try:
             conn, _ = server.accept()
+        except socket.timeout:
+            # A request still running holds _lock; never exit under it. Its
+            # temp file belongs to a client that is still waiting.
+            idle = time.monotonic() - _last_activity
+            if idle >= IDLE_SECONDS and not _lock.locked():
+                log(f"idle for {idle:.0f}s, exiting to free the GPU")
+                shutdown()
+            continue
         except OSError:
             break
         threading.Thread(target=handle, args=(conn,), daemon=True).start()

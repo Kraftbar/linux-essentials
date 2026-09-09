@@ -23,6 +23,12 @@ work; kept resident it is imperceptible.
 The daemon is what makes an accurate engine usable on a hotkey at all. Without
 it you are choosing between a fast bad answer and an unusable good one.
 
+It is not resident around the clock, though. The model holds ~6.5 GB of an
+8 GB card and gets used a handful of times a day, so `ocrd.socket` owns the
+socket, the first hotkey press starts the daemon (6-20 s), and it exits after
+15 idle minutes (`OCRD_IDLE_SECONDS` in `ocrd.service`). Within that window
+every request is the resident-speed row above.
+
 ## Why PaddleOCR-VL
 
 Measured on `../ocr-bench`, against hand-typed ground truth for screen captures.
@@ -68,7 +74,8 @@ says nothing about prose, UI chrome, tables, low contrast or non-English text.
     ./install.sh --with-surya    # also build the Surya venv, for A/B
 
 Creates a venv under `~/.local/share/ocr-daemon`, installs `ocrclip` into
-`~/.local/bin`, and enables the `ocrd` user service. Re-run to deploy edits.
+`~/.local/bin`, and enables the `ocrd` user socket. Re-run to deploy edits
+(it stops any running daemon so the next request loads the new code).
 
 The two engines get **separate venvs**: `surya-ocr` pins transformers 4.x and
 `paddleocr` requires 5.x, so they cannot coexist. The service picks one via
@@ -97,16 +104,19 @@ The sound menu is still reachable by clicking the panel icon.
 
 ## Operating it
 
-    systemctl --user status ocrd
-    systemctl --user restart ocrd          # after editing ocrd.py
-    journalctl --user -u ocrd -f           # per-request timings
+    systemctl --user status ocrd.socket    # should always be listening
+    systemctl --user status ocrd           # active only within the idle window
+    systemctl --user stop ocrd             # after editing ocrd.py; next request reloads
+    journalctl --user -u ocrd -f           # per-request timings, idle exits
 
 To A/B the engines, edit `OCRD_ENGINE` **and** `ExecStart` in `ocrd.service` -
 both, since the engines live in different venvs.
 
-The daemon holds GPU memory while resident. If that matters during a game,
-`systemctl --user stop ocrd`; `ocrclip` reports the daemon being down rather
-than failing silently.
+The daemon holds GPU memory only while running, and exits on its own after
+15 idle minutes. To free it right now, `systemctl --user stop ocrd`; the
+socket stays up, so the next hotkey press just cold-starts it again. To keep
+the GPU free during a game, `systemctl --user stop ocrd.socket` as well, and
+`ocrclip` will report the daemon being down rather than failing silently.
 
 ## Speed scales with text, not image size
 

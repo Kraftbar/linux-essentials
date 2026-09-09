@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install the OCR daemon, its client, and the systemd user service.
+# Install the OCR daemon, its client, and the systemd user socket + service.
 #
 # Idempotent: safe to re-run after editing the daemon, which is the normal way
 # to deploy a change. Does not touch the keybinding - see the README, since that
@@ -47,25 +47,36 @@ install -m 644 "$HERE/ocrd.py" "$SHARE/ocrd.py"
 install -m 755 "$HERE/ocrclip" "$BIN/ocrclip"
 install -m 644 "$HERE/ocrsend.py" "$BIN/ocrsend.py"
 install -m 644 "$HERE/ocrd.service" "$UNIT/ocrd.service"
+install -m 644 "$HERE/ocrd.socket"  "$UNIT/ocrd.socket"
 
+# The socket is what starts at login; the service is started by the first
+# connection and exits after OCRD_IDLE_SECONDS. Stop any running daemon so the
+# next request loads the freshly installed ocrd.py. disable is for upgrades
+# from the always-on layout, where ocrd.service itself was enabled.
 systemctl --user daemon-reload
-systemctl --user enable --now ocrd.service
-systemctl --user restart ocrd.service
+systemctl --user disable ocrd.service 2>/dev/null || true
+systemctl --user stop ocrd.service 2>/dev/null || true
+systemctl --user enable ocrd.socket
+systemctl --user restart ocrd.socket
 
 echo
-echo "waiting for the model to load..."
-for _ in $(seq 1 90); do
-    if [ -S "${XDG_RUNTIME_DIR:-/tmp}/ocrd.sock" ]; then
-        echo "daemon ready"
-        break
-    fi
-    if ! systemctl --user is-active --quiet ocrd; then
-        echo "daemon failed to start:"
-        journalctl --user -u ocrd --no-pager -n 15
-        exit 1
-    fi
-    sleep 1
-done
+echo "pinging the daemon (cold start loads the model, 6-20 s)..."
+if python3 - <<'PY'
+import json, os, socket, sys
+from pathlib import Path
+run = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM); s.settimeout(120)
+s.connect(str(Path(run) / "ocrd.sock")); s.sendall(b'{"ping": true}\n')
+reply = json.loads(s.recv(4096).split(b"\n", 1)[0])
+sys.exit(0 if reply.get("pong") else 1)
+PY
+then
+    echo "daemon ready"
+else
+    echo "daemon failed to start:"
+    journalctl --user -u ocrd --no-pager -n 15
+    exit 1
+fi
 
 command -v xclip >/dev/null || {
     echo
