@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# fleet - run a command (or copy a file) across SSH hosts in parallel.
+# Hosts come from ~/.config/fleet/hosts; connection details from ~/.ssh/config.
+set -uo pipefail
+
+HOSTS_FILE="${FLEET_HOSTS:-$HOME/.config/fleet/hosts}"
+PARALLEL="${FLEET_PARALLEL:-8}"
+GROUP="all"
+EXPLICIT=""
+MODE="run"
+QUIET=0
+
+if [[ -t 1 ]]; then
+    C_H=$'\e[1;36m'; C_OK=$'\e[32m'; C_ERR=$'\e[1;31m'; C_DIM=$'\e[2m'; C_R=$'\e[0m'
+else
+    C_H=""; C_OK=""; C_ERR=""; C_DIM=""; C_R=""
+fi
+
+usage() {
+    cat <<'__FLEET_HELP__'
+fleet - run a command across your servers in parallel
+
+USAGE
+    fleet [options] <command...>
+    fleet [options] health
+    fleet [options] --copy <local-src> <remote-dst>
+    fleet --list
+
+OPTIONS
+    -g, --group NAME     only hosts in this group (default: all)
+    -H, --hosts a,b,c    only these hosts, ignoring groups
+    -p, --parallel N     max concurrent connections (default: 8)
+    -c, --copy           copy mode: scp src to dst on every host
+    -q, --quiet          print only hosts that failed
+    -l, --list           list hosts that would be targeted, then exit
+    -h, --help           this text
+
+HOST FILE (~/.config/fleet/hosts)
+    # lines starting with # are ignored
+    [web]
+    web1
+    web2
+
+    [db]
+    db1
+
+    A host may appear in several groups. Every host is in 'all'.
+    Names should match Host aliases in ~/.ssh/config.
+
+EXAMPLES
+    fleet health
+    fleet uptime
+    fleet -g web 'systemctl is-active nginx'
+    fleet -H db1 'df -h /'
+    fleet --copy ./motd /etc/motd.new
+    fleet -q 'sudo apt-get -qq update'
+
+EXIT STATUS
+    0 if every host succeeded, 1 otherwise.
+__FLEET_HELP__
+}
+
+die() { printf '%sfleet: %s%s\n' "$C_ERR" "$*" "$C_R" >&2; exit 2; }
+
+# --- args ---------------------------------------------------------------
+ARGS=()
+while (( $# )); do
+    case "$1" in
+        -g|--group)    GROUP="${2:-}"; [[ -n $GROUP ]] || die "--group needs a name"; shift 2 ;;
+        -H|--hosts)    EXPLICIT="${2:-}"; [[ -n $EXPLICIT ]] || die "--hosts needs a list"; shift 2 ;;
+        -p|--parallel) PARALLEL="${2:-}"; shift 2 ;;
+        -c|--copy)     MODE="copy"; shift ;;
+        -q|--quiet)    QUIET=1; shift ;;
+        -l|--list)     MODE="list"; shift ;;
+        -h|--help)     usage; exit 0 ;;
+        --)            shift; ARGS+=("$@"); break ;;
+        -*)            die "unknown option: $1 (try --help)" ;;
+        *)             ARGS+=("$1"); shift ;;
+    esac
+done
+
+[[ "$PARALLEL" =~ ^[0-9]+$ && $PARALLEL -gt 0 ]] || die "--parallel must be a positive integer"
+
+# --- host selection -----------------------------------------------------
+HOSTS=()
+if [[ -n $EXPLICIT ]]; then
+    IFS=',' read -ra HOSTS <<< "$EXPLICIT"
+else
+    [[ -f $HOSTS_FILE ]] || die "no host file at $HOSTS_FILE (see --help for the format)"
+    current="ungrouped"
+    while IFS= read -r line || [[ -n $line ]]; do
+        line="${line%%#*}"
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+        [[ -z $line ]] && continue
+        if [[ $line =~ ^\[(.+)\]$ ]]; then
+            current="${BASH_REMATCH[1]}"
+            continue
+        fi
+        if [[ $GROUP == "all" || $GROUP == "$current" ]]; then
+            HOSTS+=("$line")
+        fi
+    done < "$HOSTS_FILE"
+fi
+
+# de-duplicate, preserving order
+if (( ${#HOSTS[@]} )); then
+    declare -A seen=()
+    uniq=()
+    for h in "${HOSTS[@]}"; do
+        [[ -n ${seen[$h]:-} ]] && continue
+        seen[$h]=1
+        uniq+=("$h")
+    done
+    HOSTS=("${uniq[@]}")
+fi
+
+(( ${#HOSTS[@]} )) || die "no hosts matched (group '$GROUP')"
+
+if [[ $MODE == list ]]; then
+    printf '%s\n' "${HOSTS[@]}"
+    exit 0
+fi
+
+# --- what are we doing --------------------------------------------------
+if [[ $MODE == copy ]]; then
+    (( ${#ARGS[@]} == 2 )) || die "--copy needs exactly a source and a destination"
+    SRC="${ARGS[0]}"; DST="${ARGS[1]}"
+    [[ -e $SRC ]] || die "source does not exist: $SRC"
+    LABEL="copy $SRC -> $DST"
+elif (( ${#ARGS[@]} == 1 )) && [[ ${ARGS[0]} == health ]]; then
+    # built-in: one-line summary of each host's state
+    CMD='printf "%-13s %s\n" release "$(lsb_release -ds 2>/dev/null)" kernel "$(uname -r)" uptime "$(uptime -p)" upgradable "$(apt list --upgradable 2>/dev/null | grep -c upgradable)" root-fs "$(df -h / | tail -1 | tr -s " " | cut -d" " -f5) used" reboot-req "$(test -f /var/run/reboot-required && echo YES || echo no)" failed-units "$(systemctl --failed --no-legend 2>/dev/null | grep -c .)"'
+    LABEL="health"
+else
+    (( ${#ARGS[@]} )) || { usage; exit 2; }
+    CMD="${ARGS[*]}"
+    LABEL="$CMD"
+fi
+
+TMPD="$(mktemp -d "${TMPDIR:-/tmp}/fleet.XXXXXX")" || die "cannot create temp dir"
+trap 'rm -rf "$TMPD"' EXIT
+
+run_one() {
+    local host="$1" idx="$2" rc
+    if [[ $MODE == copy ]]; then
+        scp -q -o BatchMode=yes -- "$SRC" "$host:$DST" >"$TMPD/$idx.out" 2>&1
+    else
+        ssh -o BatchMode=yes -- "$host" "$CMD" >"$TMPD/$idx.out" 2>&1
+    fi
+    rc=$?
+    printf '%s' "$rc" > "$TMPD/$idx.rc"
+}
+
+printf '%s→ %s host(s): %s%s\n' "$C_DIM" "${#HOSTS[@]}" "$LABEL" "$C_R" >&2
+
+idx=0
+for h in "${HOSTS[@]}"; do
+    while (( $(jobs -rp | wc -l) >= PARALLEL )); do wait -n 2>/dev/null || break; done
+    run_one "$h" "$idx" &
+    ((idx++))
+done
+wait
+
+# --- report -------------------------------------------------------------
+ok=0; failed=0; failed_hosts=()
+for i in "${!HOSTS[@]}"; do
+    host="${HOSTS[$i]}"
+    rc="$(cat "$TMPD/$i.rc" 2>/dev/null || echo 255)"
+    if [[ $rc == 0 ]]; then
+        ((ok++))
+        (( QUIET )) && continue
+        marker="$C_OK[$host]$C_R"
+    else
+        ((failed++)); failed_hosts+=("$host")
+        marker="$C_ERR[$host rc=$rc]$C_R"
+    fi
+    if [[ -s "$TMPD/$i.out" ]]; then
+        while IFS= read -r l || [[ -n $l ]]; do
+            printf '%s %s\n' "$marker" "$l"
+        done < "$TMPD/$i.out"
+    else
+        printf '%s %s(no output)%s\n' "$marker" "$C_DIM" "$C_R"
+    fi
+done
+
+if (( failed )); then
+    printf '%s%d ok, %d failed: %s%s\n' "$C_ERR" "$ok" "$failed" "${failed_hosts[*]}" "$C_R" >&2
+    exit 1
+fi
+printf '%s%d ok%s\n' "$C_OK" "$ok" "$C_R" >&2
