@@ -37,8 +37,26 @@ a source-content scanner or a purge of old objects, reflogs or recovery backups.
 Preparation is triggered by affected commit messages; tags are verified and
 cleaned during that preparation, but tag-only attribution is not an audit target.
 
-Run callback regression checks:
+## All repos at once
 
 ```sh
-python3 -m unittest discover -s scripts/tests -p 'test_strip_claude_attribution.py'
+ln -s "$PWD/scripts/declaudegit.py" ~/.local/bin/declaudegit   # install once
+declaudegit                 # check every repo under ~/github
+declaudegit --fix           # remove what the check found (asks first)
+declaudegit --fix ~/rdesk   # one repo, or another folder of repos
+```
+
+`declaudegit.py` also looks at origin branches, tags, pull request descriptions
+and GitHub's Contributors box. `--fix` saves all refs to
+`~/backups/declaudegit-<time>/<repo>.bundle`, recreates only the affected commits
+and what is built on them, force-pushes with a lease, and keeps the default
+branch on a temporary copy until GitHub has recounted contributors. Older
+history keeps its IDs; a signed commit that has to be recreated loses its
+signature. Repos whose origin is not your GitHub account are left alone.
+Other checkouts of a rewritten branch must be reset to the new history by hand.
+
+Run regression checks:
+
+```sh
+python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 ```
