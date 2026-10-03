@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Push trimmed claude-usage plus running Claude Code sessions to lat for the
+# Apple Watch complication. Served at https://gautenybo.no/watch_data/claude.json
+set -euo pipefail
+claude-usage --json | python3 -c '
+import glob, json, os, sys, time
+
+u = json.load(sys.stdin)
+f, s = u.get("five_hour") or {}, u.get("seven_day") or {}
+now = time.time()
+ACTIVE = 90  # a session log written within this many seconds counts as working
+
+def newest(paths):
+    return max((os.path.getmtime(p) for p in paths), default=0)
+
+sessions = []
+for pid in os.popen("pgrep -x claude").read().split():
+    try:
+        cwd = os.readlink(f"/proc/{pid}/cwd")
+    except OSError:
+        continue
+    proj = os.path.expanduser("~/.claude/projects/") + cwd.replace("/", "-").replace(".", "-")
+    working = now - newest(glob.glob(proj + "/*.jsonl")) < ACTIVE
+    sessions.append({"dir": os.path.basename(cwd) or "/", "working": working})
+
+subagents = sum(1 for p in glob.glob(os.path.expanduser("~/.claude/projects/*/*/subagents/*.jsonl"))
+                if now - os.path.getmtime(p) < ACTIVE)
+
+print(json.dumps({
+    "five_hour": {"percent": f.get("percent"), "resets_clock": f.get("resets_clock"), "resets_epoch": f.get("resets_epoch")},
+    "seven_day": {"percent": s.get("percent"), "resets_day": s.get("resets_day"), "resets_epoch": s.get("resets_epoch")},
+    "agents": {"running": len(sessions), "working": sum(x["working"] for x in sessions),
+               "subagents": subagents, "sessions": sessions},
+    "error": u.get("error"),
+    "updated": int(now),
+}))' | ssh -o BatchMode=yes lat 'cat > /var/www/twitterclone/watch_data/claude.json.tmp && mv /var/www/twitterclone/watch_data/claude.json.tmp /var/www/twitterclone/watch_data/claude.json'
