@@ -13,7 +13,7 @@ declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 
 $raw = (string)file_get_contents('php://input');
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $raw === '' || strlen($raw) > 20000) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $raw === '' || strlen($raw) > 3000000) {
     http_response_code(400);
     exit(json_encode(['ok' => false, 'reply' => 'Ugyldig forespørsel.']));
 }

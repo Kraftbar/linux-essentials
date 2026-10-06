@@ -2,7 +2,7 @@
 """Ask Claude by voice from the iPhone/Watch ("Hey Siri, spør Claude").
 
 ClaudeWatch -> gautenybo.no/ask.php -> this daemon on 127.0.0.1:7549 ->
-`claude -p` -> short reply that the Watch reads aloud.
+Whisper (if audio) -> `claude -p` -> short reply that the Watch reads aloud.
 
 Auth: each device holds a P-256 key in its Secure Enclave and signs the raw
 request body (X-Sig, DER, base64). The body carries ts and nonce, so a captured
@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 import subprocess
+import tempfile
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -37,7 +38,10 @@ KEY_DIR = os.path.expanduser("~/.config/askd/keys")
 PENDING_DIR = os.path.expanduser("~/.config/askd/pending")
 MAX_SKEW_S = 60
 MAX_PENDING = 5
-MAX_BODY = 20000
+MAX_BODY = 3000000
+# Watch sends audio (watchOS has no speech API for apps); lat transcribes it.
+# base int8 on lat's i7-7600U: ~2.7s for 6s of speech; small is ~8s.
+WHISPER_MODEL = os.environ.get("ASKD_WHISPER", "base")
 
 # Same as voiced.py, plus the answer language: dictation arrives in Norwegian.
 SPOKEN_STYLE = (
@@ -109,6 +113,30 @@ def log(message):
     print("[askd] " + message, flush=True)
 
 
+whisper = {}
+
+
+def load_whisper():
+    from faster_whisper import WhisperModel
+    whisper["model"] = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
+    log("whisper %s loaded" % WHISPER_MODEL)
+
+
+def transcribe(audio_b64):
+    if "model" not in whisper:
+        load_whisper()
+    with tempfile.NamedTemporaryFile(suffix=".m4a") as f:
+        f.write(base64.b64decode(audio_b64))
+        f.flush()
+        started = time.time()
+        segments, _ = whisper["model"].transcribe(
+            f.name, language="no", beam_size=1, vad_filter=True,
+            initial_prompt="Hei Claude.")
+        text = " ".join(s.text.strip() for s in segments).strip()
+    log("%.1fs heard %r" % (time.time() - started, text[:80]))
+    return text
+
+
 def ask(text, new):
     with lock:
         if new or time.time() - session["last"] > IDLE_RESET_S:
@@ -144,9 +172,14 @@ class Handler(BaseHTTPRequestHandler):
             with lock:
                 authenticate(req, body, sig)
             text = str(req.get("text", "")).strip()
+            if req.get("audio"):
+                text = transcribe(req["audio"])
+                if not text:
+                    self.reply(200, {"ok": True, "heard": "", "reply": ""})
+                    return
             if not text:
                 raise ValueError("empty text")
-            self.reply(200, {"ok": True, "reply": ask(text, bool(req.get("new")))})
+            self.reply(200, {"ok": True, "heard": text, "reply": ask(text, bool(req.get("new")))})
         except AuthError as error:
             log("auth: %s" % error)
             self.reply(401, {"ok": False, "reply": "Ikke godkjent: %s" % error})
@@ -168,4 +201,5 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     log("listening on 127.0.0.1:%d" % PORT)
+    threading.Thread(target=load_whisper, daemon=True).start()
     HTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
