@@ -2,43 +2,30 @@
 declare(strict_types=1);
 
 /*
- * Ask Claude on lat by voice – called by the "Spør Claude" Siri Shortcut.
+ * Ask Claude on lat by voice – called by the ClaudeWatch voice page.
  *
- *   POST {"text": "...", "new": false}  header X-Token  -> {"ok", "reply"}
+ *   POST <signed JSON body>  header X-Sig  -> {"ok", "reply"}
  *
- * LAN only, plus a token from watch_data/ask_token.php (which exits before
- * printing anything). Forwards to askd on 127.0.0.1:7549.
+ * Just a pipe: askd on 127.0.0.1:7549 checks the device signature (Secure
+ * Enclave key, see askd.py) and runs `claude -p` as nybo.
  */
 
 header('Content-Type: application/json; charset=utf-8');
 
-$ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
-$lan = strpos($ip, '192.168.1.') === 0 || $ip === '127.0.0.1';
-$token = include __DIR__ . '/watch_data/ask_token.php';
-if (!$lan || $_SERVER['REQUEST_METHOD'] !== 'POST' || !is_string($token)
-        || !hash_equals($token, (string)($_SERVER['HTTP_X_TOKEN'] ?? ''))) {
-    http_response_code(403);
-    exit(json_encode(['ok' => false, 'reply' => 'Ingen tilgang.']));
-}
-
-// Shortcuts may send JSON, a form, or the dictated text as a raw body.
 $raw = (string)file_get_contents('php://input');
-$body = json_decode($raw, true);
-if (!is_array($body)) $body = isset($_POST['text']) ? $_POST : ['text' => $raw];
-$text = trim((string)($body['text'] ?? ''));
-if ($text === '') {
-    error_log('ask.php empty: ' . ($_SERVER['CONTENT_TYPE'] ?? '-') . ' ' . substr($raw, 0, 200));
-}
-if ($text === '' || mb_strlen($text) > 4000) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $raw === '' || strlen($raw) > 20000) {
     http_response_code(400);
-    exit(json_encode(['ok' => false, 'reply' => 'Jeg hørte ingenting.']));
+    exit(json_encode(['ok' => false, 'reply' => 'Ugyldig forespørsel.']));
 }
 
 $ch = curl_init('http://127.0.0.1:7549/');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => json_encode(['text' => $text, 'new' => !empty($body['new'])]),
-    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+    CURLOPT_POSTFIELDS => $raw,
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'X-Sig: ' . preg_replace('/[^A-Za-z0-9+\/=]/', '', (string)($_SERVER['HTTP_X_SIG'] ?? '')),
+    ],
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 130,
 ]);
