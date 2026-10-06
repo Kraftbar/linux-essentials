@@ -21,8 +21,14 @@ if (!$lan || $_SERVER['REQUEST_METHOD'] !== 'POST' || !is_string($token)
     exit(json_encode(['ok' => false, 'reply' => 'Ingen tilgang.']));
 }
 
-$body = json_decode((string)file_get_contents('php://input'), true);
+// Shortcuts may send JSON, a form, or the dictated text as a raw body.
+$raw = (string)file_get_contents('php://input');
+$body = json_decode($raw, true);
+if (!is_array($body)) $body = isset($_POST['text']) ? $_POST : ['text' => $raw];
 $text = trim((string)($body['text'] ?? ''));
+if ($text === '') {
+    error_log('ask.php empty: ' . ($_SERVER['CONTENT_TYPE'] ?? '-') . ' ' . substr($raw, 0, 200));
+}
 if ($text === '' || mb_strlen($text) > 4000) {
     http_response_code(400);
     exit(json_encode(['ok' => false, 'reply' => 'Jeg hørte ingenting.']));
