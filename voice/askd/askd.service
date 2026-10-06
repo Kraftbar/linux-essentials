@@ -1,0 +1,10 @@
+[Unit]
+Description=Ask Claude by voice from Siri (localhost:7549, behind gautenybo.no/ask.php)
+
+[Service]
+ExecStart=/usr/bin/python3 %h/.local/bin/askd.py
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
