@@ -52,8 +52,26 @@ SPOKEN_STYLE = (
     "Use plain sentences: no markdown, no code blocks, no bullet lists, no emoji, "
     "no file paths unless essential, and never emit a long identifier character "
     "by character. Reply in the language the user spoke. The input is speech "
-    "recognition, so guess past obvious mis-hearings."
+    "recognition, so guess past obvious mis-hearings. "
+    "You are running on lat itself (this machine, user nybo), so never ssh to lat. "
+    "You only have read-only tools and nobody can approve anything from the Watch: "
+    "if something needs a write or an unlisted command, say what you could not do "
+    "instead of asking for approval."
 )
+
+# Read-only: Claude can look at anything on lat (files, logs, processes,
+# services, git, the web) but not change anything. Commands with write modes
+# (find -delete, sed -i, sort -o, journalctl --vacuum ...) are left out on
+# purpose. Full access was blocked by the Claude Code safety check.
+READ_ONLY = ["cd", "pwd", "ls", "cat", "head", "tail", "wc", "grep", "stat", "file", "du", "df",
+             "free", "uptime", "sensors", "ps", "pgrep", "top -bn1", "lsblk", "uname",
+             "date", "hostname", "whoami", "ip addr", "ip route", "ss", "nvidia-smi",
+             "systemctl status", "systemctl --user status", "systemctl list-units", "systemctl --failed", "systemctl --user --failed", "systemctl list-units --failed",
+             "systemctl --user list-units", "systemctl is-active", "systemctl --user is-active",
+             "git status", "git log", "git diff", "git show", "git branch"]
+ALLOWED_TOOLS = (["Read(//**)", "Grep", "Glob", "WebSearch", "WebFetch"]
+                 + ["Bash(%s)" % c for c in READ_ONLY]
+                 + ["Bash(%s:*)" % c for c in READ_ONLY])
 
 lock = threading.Lock()
 session = {"id": None, "last": 0.0}
@@ -143,7 +161,10 @@ def ask(text, new):
         if new or time.time() - session["last"] > IDLE_RESET_S:
             session["id"] = None
         command = ["claude", "-p", text, "--output-format", "json",
-                   "--append-system-prompt", SPOKEN_STYLE]
+                   "--append-system-prompt", SPOKEN_STYLE,
+                   # claude.ai connectors (Drive etc.) only add noise to spoken replies
+                   "--strict-mcp-config",
+                   "--allowedTools"] + ALLOWED_TOOLS
         if session["id"]:
             command += ["--resume", session["id"]]
         started = time.time()
