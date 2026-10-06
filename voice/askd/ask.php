@@ -4,8 +4,8 @@ declare(strict_types=1);
 /*
  * Ask Claude on lat by voice – called by the ClaudeWatch voice page.
  *
- *   POST <signed JSON body>  header X-Sig            -> {"ok", "reply"}
- *   POST <raw m4a>  headers X-Sig + X-Meta (signed JSON) -> {"ok", "heard", "reply"}
+ *   POST signed JSON body  header X-Sig            -> {"ok", "reply"}
+ *   POST raw m4a  headers X-Sig + X-Meta (signed JSON) -> {"ok", "heard", "reply"}
  *
  * Just a pipe: askd on 127.0.0.1:7549 checks the device signature (Secure
  * Enclave key, see askd.py) and runs `claude -p` as nybo.
