@@ -5,7 +5,8 @@ ClaudeWatch -> gautenybo.no/ask.php -> this daemon on 127.0.0.1:7549 ->
 Whisper (if audio) -> `claude -p` -> short reply that the Watch reads aloud.
 
 Auth: each device holds a P-256 key in its Secure Enclave and signs the raw
-request body (X-Sig, DER, base64). The body carries ts and nonce, so a captured
+request body (X-Sig, DER, base64). Audio goes as a raw body (the Watch uploads
+slowly), with the signed JSON in X-Meta carrying the audio's SHA-256. The body carries ts and nonce, so a captured
 request is dead after MAX_SKEW_S and can't be replayed inside it. Only public
 keys live here, in ~/.config/askd/keys/<kid>.der. Each body includes "pub"
 (SPKI DER b64); an unknown key lands in pending/ until
@@ -122,11 +123,11 @@ def load_whisper():
     log("whisper %s loaded" % WHISPER_MODEL)
 
 
-def transcribe(audio_b64):
+def transcribe(audio):
     if "model" not in whisper:
         load_whisper()
     with tempfile.NamedTemporaryFile(suffix=".m4a") as f:
-        f.write(base64.b64decode(audio_b64))
+        f.write(audio)
         f.flush()
         started = time.time()
         segments, _ = whisper["model"].transcribe(
@@ -168,12 +169,23 @@ class Handler(BaseHTTPRequestHandler):
                 raise AuthError("too large")
             body = self.rfile.read(length)
             sig = self.headers.get("X-Sig", "")
-            req = json.loads(body.decode())
+            audio = None
+            if self.headers.get("X-Meta"):
+                # Audio upload: the body is raw m4a, the signed JSON rides in
+                # X-Meta and pins the audio by its SHA-256.
+                signed = base64.b64decode(self.headers["X-Meta"])
+                req = json.loads(signed.decode())
+                audio = body
+            else:
+                signed = body
+                req = json.loads(body.decode())
             with lock:
-                authenticate(req, body, sig)
+                authenticate(req, signed, sig)
+            if audio is not None and hashlib.sha256(audio).hexdigest() != req.get("sha"):
+                raise AuthError("audio does not match signature")
             text = str(req.get("text", "")).strip()
-            if req.get("audio"):
-                text = transcribe(req["audio"])
+            if audio is not None:
+                text = transcribe(audio)
                 if not text:
                     self.reply(200, {"ok": True, "heard": "", "reply": ""})
                     return
