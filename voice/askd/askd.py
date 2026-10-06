@@ -7,8 +7,8 @@ ClaudeWatch -> gautenybo.no/ask.php -> this daemon on 127.0.0.1:7549 ->
 Auth: each device holds a P-256 key in its Secure Enclave and signs the raw
 request body (X-Sig, DER, base64). The body carries ts and nonce, so a captured
 request is dead after MAX_SKEW_S and can't be replayed inside it. Only public
-keys live here, in ~/.config/askd/keys/<kid>.der. An unknown device sends
-{"register": <SPKI DER b64>} signed by that key; it lands in pending/ until
+keys live here, in ~/.config/askd/keys/<kid>.der. Each body includes "pub"
+(SPKI DER b64); an unknown key lands in pending/ until
 approved with `askd-approve <kid>` after comparing the code on the Watch.
 
 Follow-ups within IDLE_RESET_S resume the same Claude session. Runs as nybo
@@ -86,31 +86,23 @@ def check_fresh(req):
     seen_nonces[nonce] = now
 
 
-def register(req, body, sig):
-    spki = base64.b64decode(str(req["register"]))
+def authenticate(req, body, sig):
+    """Every request carries the device's public key; unknown keys queue up."""
+    spki = base64.b64decode(str(req.get("pub", "")))
     verify(spki, body, sig)          # proves the sender holds the private key
     check_fresh(req)
     kid = key_id(spki)
     if os.path.exists(os.path.join(KEY_DIR, kid + ".der")):
-        return "approved", kid
+        return
     os.makedirs(PENDING_DIR, exist_ok=True)
     path = os.path.join(PENDING_DIR, kid + ".der")
-    if not os.path.exists(path) and len(os.listdir(PENDING_DIR)) >= MAX_PENDING:
-        raise AuthError("too many pending keys")
-    with open(path, "wb") as f:
-        f.write(spki)
-    log("pending key %s" % kid)
-    return "pending", kid
-
-
-def authenticate(req, body, sig):
-    kid = str(req.get("key", ""))
-    path = os.path.join(KEY_DIR, kid + ".der")
-    if not kid.isalnum() or not os.path.exists(path):
-        raise AuthError("unknown key")
-    with open(path, "rb") as f:
-        verify(f.read(), body, sig)
-    check_fresh(req)
+    if not os.path.exists(path):
+        if len(os.listdir(PENDING_DIR)) >= MAX_PENDING:
+            raise AuthError("too many pending keys")
+        with open(path, "wb") as f:
+            f.write(spki)
+        log("pending key %s" % kid)
+    raise AuthError("pending " + kid[:8].upper())
 
 
 def log(message):
@@ -150,10 +142,6 @@ class Handler(BaseHTTPRequestHandler):
             sig = self.headers.get("X-Sig", "")
             req = json.loads(body.decode())
             with lock:
-                if "register" in req:
-                    state, kid = register(req, body, sig)
-                    self.reply(200, {"ok": True, "state": state, "key": kid})
-                    return
                 authenticate(req, body, sig)
             text = str(req.get("text", "")).strip()
             if not text:
