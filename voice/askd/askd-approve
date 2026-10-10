@@ -1,0 +1,7 @@
+#!/bin/sh
+# Approve a device key for askd: askd-approve <kid>, or no argument to list pending.
+# Compare the first 8 characters with the code the Watch shows before approving.
+dir=~/.config/askd
+mkdir -p "$dir/keys"
+[ -z "$1" ] && { ls "$dir/pending" 2>/dev/null | sed 's/\.der$//'; exit; }
+mv "$dir/pending/$1.der" "$dir/keys/" && echo "approved $1"

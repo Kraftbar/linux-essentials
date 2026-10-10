@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+"""Ask Claude by voice from the iPhone/Watch ("Hey Siri, spør Claude").
+
+ClaudeWatch -> gautenybo.no/ask.php -> this daemon on 127.0.0.1:7549 ->
+Whisper (if audio) -> `claude -p` -> short reply that the Watch reads aloud.
+
+Auth: each device holds a P-256 key in its Secure Enclave and signs the raw
+request body (X-Sig, DER, base64). Audio goes as a raw body (the Watch uploads
+slowly), with the signed JSON in X-Meta carrying the audio's SHA-256. The body carries ts and nonce, so a captured
+request is dead after MAX_SKEW_S and can't be replayed inside it. Only public
+keys live here, in ~/.config/askd/keys/<kid>.der. Each body includes "pub"
+(SPKI DER b64); an unknown key lands in pending/ until
+approved with `askd-approve <kid>` after comparing the code on the Watch.
+
+Follow-ups within IDLE_RESET_S resume the same Claude session. Runs as nybo
+because Apache's www-data has no Claude login; only listens on localhost.
+"""
+import base64
+import hashlib
+import json
+import os
+import subprocess
+import tempfile
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.serialization import load_der_public_key
+
+PORT = int(os.environ.get("ASKD_PORT", "7549"))
+IDLE_RESET_S = int(os.environ.get("ASKD_IDLE_RESET_S", "600"))
+TIMEOUT_S = int(os.environ.get("ASKD_TIMEOUT_S", "120"))
+WORKDIR = os.path.expanduser(os.environ.get("ASKD_WORKDIR", "~"))
+KEY_DIR = os.path.expanduser("~/.config/askd/keys")
+PENDING_DIR = os.path.expanduser("~/.config/askd/pending")
+MAX_SKEW_S = 60
+MAX_PENDING = 5
+MAX_BODY = 3000000
+# Watch sends audio (watchOS has no speech API for apps); lat transcribes it.
+# base int8 on lat's i7-7600U: ~2.7s for 6s of speech; small is ~8s.
+WHISPER_MODEL = os.environ.get("ASKD_WHISPER", "base")
+
+# Same as voiced.py, plus the answer language: dictation arrives in Norwegian.
+SPOKEN_STYLE = (
+    "Your replies are read aloud by Siri's speech synthesiser, so write for the ear. "
+    "HARD LIMIT: 50 words. Count them. A reply over 50 words is a failure, even "
+    "if detail is lost - say the single most useful thing and stop. "
+    "Use plain sentences: no markdown, no code blocks, no bullet lists, no emoji, "
+    "no file paths unless essential, and never emit a long identifier character "
+    "by character. Reply in the language the user spoke. The input is speech "
+    "recognition, so guess past obvious mis-hearings. "
+    "You are running on lat itself (this machine, user nybo), so never ssh to lat. "
+    "You only have read-only tools and nobody can approve anything from the Watch: "
+    "if something needs a write or an unlisted command, say what you could not do "
+    "instead of asking for approval."
+)
+
+# Read-only: Claude can look at anything on lat (files, logs, processes,
+# services, git, the web) but not change anything. Commands with write modes
+# (find -delete, sed -i, sort -o, journalctl --vacuum ...) are left out on
+# purpose. Full access was blocked by the Claude Code safety check.
+READ_ONLY = ["cd", "pwd", "ls", "cat", "head", "tail", "wc", "grep", "stat", "file", "du", "df",
+             "free", "uptime", "sensors", "ps", "pgrep", "top -bn1", "lsblk", "uname",
+             "date", "hostname", "whoami", "ip addr", "ip route", "ss", "nvidia-smi",
+             "systemctl status", "systemctl --user status", "systemctl list-units", "systemctl --failed", "systemctl --user --failed", "systemctl list-units --failed",
+             "systemctl --user list-units", "systemctl is-active", "systemctl --user is-active",
+             "git status", "git log", "git diff", "git show", "git branch"]
+ALLOWED_TOOLS = (["Read(//**)", "Grep", "Glob", "WebSearch", "WebFetch"]
+                 + ["Bash(%s)" % c for c in READ_ONLY]
+                 + ["Bash(%s:*)" % c for c in READ_ONLY])
+
+lock = threading.Lock()
+session = {"id": None, "last": 0.0}
+seen_nonces = {}
+
+
+class AuthError(Exception):
+    pass
+
+
+def key_id(spki):
+    return hashlib.sha256(spki).hexdigest()[:16]
+
+
+def verify(spki, body, sig_b64):
+    try:
+        key = load_der_public_key(spki, default_backend())
+        if not isinstance(key, ec.EllipticCurvePublicKey) or key.curve.name != "secp256r1":
+            raise AuthError("not a P-256 key")
+        key.verify(base64.b64decode(sig_b64), body, ec.ECDSA(hashes.SHA256()))
+    except (InvalidSignature, ValueError, TypeError):
+        raise AuthError("bad signature")
+
+
+def check_fresh(req):
+    now = time.time()
+    for nonce, ts in list(seen_nonces.items()):
+        if now - ts > 2 * MAX_SKEW_S:
+            del seen_nonces[nonce]
+    nonce = str(req.get("nonce", ""))
+    if abs(now - float(req.get("ts", 0))) > MAX_SKEW_S:
+        raise AuthError("stale request (check the Watch clock)")
+    if len(nonce) < 16 or nonce in seen_nonces:
+        raise AuthError("replayed request")
+    seen_nonces[nonce] = now
+
+
+def authenticate(req, body, sig):
+    """Every request carries the device's public key; unknown keys queue up."""
+    spki = base64.b64decode(str(req.get("pub", "")))
+    verify(spki, body, sig)          # proves the sender holds the private key
+    check_fresh(req)
+    kid = key_id(spki)
+    if os.path.exists(os.path.join(KEY_DIR, kid + ".der")):
+        return
+    os.makedirs(PENDING_DIR, exist_ok=True)
+    path = os.path.join(PENDING_DIR, kid + ".der")
+    if not os.path.exists(path):
+        if len(os.listdir(PENDING_DIR)) >= MAX_PENDING:
+            raise AuthError("too many pending keys")
+        with open(path, "wb") as f:
+            f.write(spki)
+        log("pending key %s" % kid)
+    raise AuthError("pending " + kid[:8].upper())
+
+
+def log(message):
+    print("[askd] " + message, flush=True)
+
+
+whisper = {}
+
+
+def load_whisper():
+    from faster_whisper import WhisperModel
+    whisper["model"] = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
+    log("whisper %s loaded" % WHISPER_MODEL)
+
+
+def transcribe(audio):
+    if "model" not in whisper:
+        load_whisper()
+    with tempfile.NamedTemporaryFile(suffix=".m4a") as f:
+        f.write(audio)
+        f.flush()
+        started = time.time()
+        segments, _ = whisper["model"].transcribe(
+            f.name, language="no", beam_size=1, vad_filter=True,
+            initial_prompt="Hei Claude.")
+        text = " ".join(s.text.strip() for s in segments).strip()
+    log("%.1fs heard %r" % (time.time() - started, text[:80]))
+    return text
+
+
+def ask(text, new):
+    with lock:
+        if new or time.time() - session["last"] > IDLE_RESET_S:
+            session["id"] = None
+        command = ["claude", "-p", text, "--output-format", "json",
+                   "--append-system-prompt", SPOKEN_STYLE,
+                   # claude.ai connectors (Drive etc.) only add noise to spoken replies
+                   "--strict-mcp-config",
+                   "--allowedTools"] + ALLOWED_TOOLS
+        if session["id"]:
+            command += ["--resume", session["id"]]
+        started = time.time()
+        result = subprocess.run(command, cwd=WORKDIR, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, universal_newlines=True,
+                                timeout=TIMEOUT_S)
+        try:
+            out = json.loads(result.stdout)
+        except ValueError:
+            raise RuntimeError((result.stderr or result.stdout).strip()[-300:])
+        session["id"] = out.get("session_id") or session["id"]
+        session["last"] = time.time()
+        reply = (out.get("result") or "").strip()
+        log("%.1fs %r -> %r" % (time.time() - started, text[:80], reply[:80]))
+        return reply
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            if length > MAX_BODY:
+                raise AuthError("too large")
+            body = self.rfile.read(length)
+            sig = self.headers.get("X-Sig", "")
+            audio = None
+            if self.headers.get("X-Meta"):
+                # Audio upload: the body is raw m4a, the signed JSON rides in
+                # X-Meta and pins the audio by its SHA-256.
+                signed = base64.b64decode(self.headers["X-Meta"])
+                req = json.loads(signed.decode())
+                audio = body
+            else:
+                signed = body
+                req = json.loads(body.decode())
+            with lock:
+                authenticate(req, signed, sig)
+            if audio is not None and hashlib.sha256(audio).hexdigest() != req.get("sha"):
+                raise AuthError("audio does not match signature")
+            text = str(req.get("text", "")).strip()
+            if audio is not None:
+                text = transcribe(audio)
+                if not text:
+                    self.reply(200, {"ok": True, "heard": "", "reply": ""})
+                    return
+            if not text:
+                raise ValueError("empty text")
+            self.reply(200, {"ok": True, "heard": text, "reply": ask(text, bool(req.get("new")))})
+        except AuthError as error:
+            log("auth: %s" % error)
+            self.reply(401, {"ok": False, "reply": "Ikke godkjent: %s" % error})
+        except Exception as error:  # report anything to the caller, keep serving
+            log("error: %s" % error)
+            self.reply(500, {"ok": False, "reply": "Claude feilet: %s" % error})
+
+    def reply(self, code, payload):
+        data = json.dumps(payload, ensure_ascii=False).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def log_message(self, *args):
+        pass
+
+
+if __name__ == "__main__":
+    log("listening on 127.0.0.1:%d" % PORT)
+    threading.Thread(target=load_whisper, daemon=True).start()
+    HTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
