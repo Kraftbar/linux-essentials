@@ -84,7 +84,33 @@ def fetch(etag=None):
         return json.load(resp), resp.headers.get("ETag")
 
 
-def summarise(payload):
+def local_time(entry):
+    return datetime.fromisoformat(entry["time"].replace("Z", "+00:00")).astimezone()
+
+
+def record_days(state):
+    """Keep one temperature per local hour per day, merged across fetches.
+
+    met.no only forecasts forward, so by evening the current payload no longer
+    covers the morning. Each poll writes the hours it can see; earlier polls
+    have already written the hours that have since passed (as the last short
+    range forecast for them). Today's low/high then span the whole calendar
+    day, like a phone weather widget, not just the next 24 hours.
+    """
+    series = (state.get("payload") or {}).get("properties", {}).get("timeseries") or []
+    days = state.get("day_temps") or {}
+    for entry in series:
+        v = entry["data"].get("instant", {}).get("details", {}).get("air_temperature")
+        if v is None:
+            continue
+        t = local_time(entry)
+        days.setdefault(t.strftime("%Y-%m-%d"), {})[t.strftime("%H")] = v
+    today = datetime.now().astimezone().strftime("%Y-%m-%d")
+    state["day_temps"] = {d: h for d, h in days.items() if d >= today}
+    return state["day_temps"].get(today) or {}
+
+
+def summarise(payload, today_hours=None):
     series = (payload or {}).get("properties", {}).get("timeseries") or []
     if not series:
         return None
@@ -114,6 +140,11 @@ def summarise(payload):
         if v is not None:
             temps.append(v)
 
+    # A day record with under three hours (first run late in the day) says
+    # nothing useful; use the next-24h range until it has filled in.
+    day = list((today_hours or {}).values())
+    if len(day) < 3:
+        day = []
     return {
         "temp": details.get("air_temperature"),
         "symbol": code,
@@ -122,8 +153,11 @@ def summarise(payload):
         "wind": details.get("wind_speed"),
         "humidity": details.get("relative_humidity"),
         "rain_next_hour": rain,
-        "high": max(temps) if temps else None,
-        "low": min(temps) if temps else None,
+        "high": max(day) if day else (max(temps) if temps else None),
+        "low": min(day) if day else (min(temps) if temps else None),
+        "day_hours": len(day),
+        "next24_high": max(temps) if temps else None,
+        "next24_low": min(temps) if temps else None,
     }
 
 
@@ -151,7 +185,9 @@ def refresh(force=False):
 def main():
     args = sys.argv[1:]
     state = refresh(force="--force" in args)
-    now = summarise(state.get("payload"))
+    today_hours = record_days(state)
+    write_cache(state)
+    now = summarise(state.get("payload"), today_hours)
 
     if "--json" in args:
         out = dict(now or {})
@@ -163,7 +199,10 @@ def main():
     if not now or now.get("temp") is None:
         print("Oslo --")
         return
-    print("%s %d°" % (now["glyph"], round(now["temp"])))
+    label = "%s %d°" % (now["glyph"], round(now["temp"]))
+    if now.get("high") is not None and now.get("low") is not None:
+        label += " H:%d° L:%d°" % (round(now["high"]), round(now["low"]))
+    print(label)
 
 
 if __name__ == "__main__":

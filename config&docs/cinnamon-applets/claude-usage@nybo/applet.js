@@ -4,11 +4,17 @@ const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
 const PopupMenu = imports.ui.popupMenu;
 const Util = imports.misc.util;
+const ByteArray = imports.byteArray;
 
 const SCRIPT = GLib.get_home_dir() + "/.local/bin/claude-usage";
 const CODEX_SCRIPT = GLib.get_home_dir() + "/.local/bin/codex-usage";
 const REFRESH_SECONDS = 60;
 const USAGE_URL = "https://claude.ai/settings/usage";
+// Local machine readouts rendered next to the quota numbers.
+const CLK_TCK = 100;             // getconf CLK_TCK; /proc/<pid>/stat is in these ticks
+const BUSY_CPU_PERCENT = 5;      // a Claude Code session above this is "working"
+const CPU_AMBER = 70;            // 1-min load as % of cores
+const CPU_RED = 90;
 
 const AMBER = "#e0a33e";
 const RED = "#e05252";
@@ -26,7 +32,7 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         this.menuManager.addMenu(this.menu);
 
         this._items = {};
-        for (let key of ["five", "week", "codex", "burn", "models", "credits"]) {
+        for (let key of ["five", "week", "codex", "sessions", "cpu", "burn", "models", "credits"]) {
             this._items[key] = new PopupMenu.PopupMenuItem("", { reactive: false });
             this.menu.addMenuItem(this._items[key]);
         }
@@ -41,6 +47,7 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         this.menu.addMenuItem(open);
 
         this._timeout = null;
+        this._cpuPrev = {};   // pid -> [ticks, monotonic seconds] from the last poll
         this._update(false);
     }
 
@@ -119,6 +126,80 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         });
     }
 
+    _readFile(path) {
+        try {
+            let [ok, bytes] = GLib.file_get_contents(path);
+            return ok ? ByteArray.toString(bytes) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Running Claude Code sessions: one `claude` process each. A session waiting
+    // at the prompt sits near 0% CPU, so per-process CPU between two polls tells
+    // idle chats from working ones.
+    _sessions() {
+        let pids = [];
+        try {
+            let [ok, out] = GLib.spawn_command_line_sync("pgrep -x claude");
+            if (ok && out) {
+                pids = ByteArray.toString(out).trim().split("\n")
+                    .filter(x => x.length > 0).map(Number);
+            }
+        } catch (e) { /* pgrep missing: report nothing rather than fail the applet */ }
+
+        let now = GLib.get_monotonic_time() / 1e6;
+        let next = {};
+        let rows = [];
+        for (let pid of pids) {
+            let stat = this._readFile("/proc/" + pid + "/stat");
+            if (!stat) continue;
+            // Everything after "comm)" starts at field 3 (state); utime/stime are fields 14/15.
+            let rest = stat.slice(stat.lastIndexOf(")") + 2).trim().split(" ");
+            let ticks = parseInt(rest[11], 10) + parseInt(rest[12], 10);
+            let cpu = null;
+            let prev = this._cpuPrev[pid];
+            if (prev && now > prev[1]) {
+                cpu = Math.round((ticks - prev[0]) / CLK_TCK / (now - prev[1]) * 100);
+            }
+            next[pid] = [ticks, now];
+            let cwd = "";
+            try {
+                cwd = GLib.file_read_link("/proc/" + pid + "/cwd")
+                    .replace(GLib.get_home_dir(), "~");
+            } catch (e) { /* cwd unreadable; leave blank */ }
+            rows.push({ pid: pid, cpu: cpu, cwd: cwd, busy: cpu !== null && cpu >= BUSY_CPU_PERCENT });
+        }
+        this._cpuPrev = next;
+        return { total: rows.length, busy: rows.filter(r => r.busy).length, rows: rows };
+    }
+
+    // 1-minute load average as a percentage of cores. Load counts runnable and
+    // uninterruptible tasks, so it is "how busy is the box", not strict CPU time.
+    _cpu() {
+        let s = this._readFile("/proc/loadavg");
+        if (!s) return null;
+        let f = s.trim().split(/\s+/);
+        let cores = GLib.get_num_processors();
+        let load1 = parseFloat(f[0]);
+        return {
+            load1: load1, load5: parseFloat(f[1]), load15: parseFloat(f[2]),
+            cores: cores, percent: Math.round(load1 / cores * 100)
+        };
+    }
+
+    // "ch" = chats: Claude Code sessions, working/running.
+    _localMarkup(sess, cpu) {
+        let cl = "ch " + sess.busy + "/" + sess.total;
+        let clMarkup = sess.total === 0 ? '<span color="' + DIM + '">' + cl + "</span>"
+                     : (sess.busy > 0 ? "<b>" + cl + "</b>" : cl);
+        let cpuText = "cpu " + (cpu ? cpu.percent + "%" : "--");
+        let cpuMarkup = cpuText;
+        if (cpu && cpu.percent >= CPU_RED) cpuMarkup = '<span color="' + RED + '">' + cpuText + "</span>";
+        else if (cpu && cpu.percent >= CPU_AMBER) cpuMarkup = '<span color="' + AMBER + '">' + cpuText + "</span>";
+        return { plain: cl + "  " + cpuText, markup: clMarkup + "  " + cpuMarkup };
+    }
+
     // Colour comes from the server's own severity, escalated when our burn-rate
     // projection says the window runs dry before it resets.
     _colour(win) {
@@ -140,9 +221,23 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         return colour ? '<span color="' + colour + '">' + body + "</span>" : body;
     }
 
+    // Just the number, coloured and bolded like _seg, for the compact label.
+    _num(win) {
+        let value = (!win || win.percent === null || win.percent === undefined)
+            ? "--" : String(win.percent);
+        let colour = this._colour(win);
+        if (win && win.is_active) value = "<b>" + value + "</b>";
+        return colour ? '<span color="' + colour + '">' + value + "</span>" : value;
+    }
+
     _render(payload, codex) {
+        let sess = this._sessions();
+        let cpu = this._cpu();
+        let local = this._localMarkup(sess, cpu);
+        this._renderLocalMenu(sess, cpu);
+
         if (!payload) {
-            this.set_applet_label("claude ?");
+            this.set_applet_label("claude ?  " + local.plain);
             this.set_applet_tooltip("Claude usage unavailable — could not run " + SCRIPT);
             return;
         }
@@ -159,16 +254,14 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         }
         let codexTail = codex && codex.reset_label ? codex.reset_label : "";
 
-        let markup = this._seg("5h", five, five.resets_clock) + "  " +
-                     this._seg("wk", week, week.resets_day) + "  " +
-                     this._seg("cx", codex, codexTail) + stale;
+        // Compact: "cl 5h/wk%  cx %  ch busy/total  cpu %". Reset times live in
+        // the dropdown and tooltip; the active Claude window is bold.
+        let markup = "cl " + this._num(five) + "/" + this._num(week) + "%" + stale +
+                     "  cx " + this._num(codex) + "%  " + local.markup;
 
-        let plain = "5h " + (five.percent == null ? "--" : five.percent + "%") +
-                    (five.resets_clock ? " " + five.resets_clock : "") + "  wk " +
-                    (week.percent == null ? "--" : week.percent + "%") +
-                    (week.resets_day ? " " + week.resets_day : "") + "  cx " +
-                    (!codex || codex.percent == null ? "--" : codex.percent + "%") +
-                    (codexTail ? " " + codexTail : "") + stale;
+        let pct = w => (!w || w.percent == null) ? "--" : String(w.percent);
+        let plain = "cl " + pct(five) + "/" + pct(week) + "%" + stale +
+                    "  cx " + pct(codex) + "%  " + local.plain;
 
         this.set_applet_label(plain);
         try {
@@ -218,7 +311,7 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         this._items.credits.actor.visible = creditText.length > 0;
 
         let tip = "Claude usage\n5-hour:  " + fiveText + "\nWeekly:  " + weekText +
-            "\n\nCodex:  " + codexText;
+            "\n\nCodex:  " + codexText + "\n\n" + this._localText(sess, cpu);
         if (burn) tip += "\n\n" + burn;
         if (payload.error === "auth") {
             tip += "\n\nToken expired — run any Claude Code command to refresh it.";
@@ -228,6 +321,24 @@ class ClaudeUsageApplet extends Applet.TextIconApplet {
         this.set_applet_tooltip(tip);
     }
 }
+
+ClaudeUsageApplet.prototype._localText = function(sess, cpu) {
+    let lines = ["Claude Code sessions:  " + sess.busy + " working / " + sess.total + " running"];
+    for (let r of sess.rows) {
+        lines.push("   " + (r.busy ? "▶" : "·") + " " + (r.cpu === null ? " --" : String(r.cpu).padStart(3)) +
+            "%  " + r.cwd + "  (pid " + r.pid + ")");
+    }
+    lines.push("CPU:  " + (cpu ? cpu.percent + "% of " + cpu.cores + " cores (load " +
+        cpu.load1.toFixed(2) + " / " + cpu.load5.toFixed(2) + " / " + cpu.load15.toFixed(2) + ")" : "--"));
+    return lines.join("\n");
+};
+
+ClaudeUsageApplet.prototype._renderLocalMenu = function(sess, cpu) {
+    this._items.sessions.label.set_text("Sessions:  " + sess.busy + " working / " + sess.total + " running" +
+        (sess.rows.length ? "   " + sess.rows.map(r => (r.busy ? "▶" : "·") + r.cwd).join("  ") : ""));
+    this._items.cpu.label.set_text("CPU:  " + (cpu ? cpu.percent + "%  (load " + cpu.load1.toFixed(2) +
+        " on " + cpu.cores + " cores)" : "--"));
+};
 
 function main(metadata, orientation, panelHeight, instanceId) {
     return new ClaudeUsageApplet(orientation, panelHeight, instanceId);

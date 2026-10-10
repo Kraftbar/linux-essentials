@@ -488,8 +488,14 @@ it, so no `cinnamon --replace` is needed. Each script also runs standalone
 (`--json` for structured output, `--force` to bypass its cache), which is the
 fastest way to test one without touching the panel.
 
-`claude-usage@nybo` renders all three numbers - `5h 46% 05:30  wk 15% Sat  cx
-37% 22 Sep`. A standalone `codex-usage@nybo` is in the repo but deliberately
+`claude-usage@nybo` renders a compact label - `cl 46/15%  cx 37%  ch 1/3  cpu 36%`.
+`cl` is Claude 5-hour/weekly usage with the active window bold (reset times are in
+the dropdown and tooltip), `cx` is Codex. `ch` is Claude Code chats
+(`pgrep -x claude`) as working/running, where working means the process
+used over 5% CPU since the previous poll (`/proc/<pid>/stat` delta, so the first
+poll after a reload shows 0 working). `cpu` is the 1-minute load average as a
+percentage of cores, amber from 70%, red from 90%. The dropdown and tooltip list
+each session's cwd. A standalone `codex-usage@nybo` is in the repo but deliberately
 **not** enabled; it exists only if the combined label is ever worth splitting.
 
 ### Reloading and inspecting an applet
@@ -502,6 +508,10 @@ correct on disk, and simply never appeared:
 dbus-send --session --dest=org.Cinnamon /org/Cinnamon \
   org.Cinnamon.ReloadXlet string:'claude-usage@nybo' string:'APPLET'
 ```
+
+Call it with `--print-reply`. Without it `dbus-send` exits before the message
+is dispatched and Cinnamon never logs `Reloading applet`, so the old code keeps
+running while the file on disk looks right.
 
 Live applet state is reachable through `Eval`, which is far better than
 guessing from a screenshot. `appletManager.appletObj` is empty - the instance
@@ -587,6 +597,12 @@ the 95% threshold that suits a 5-hour window is far too late for a monthly one.
 requires an identifying `User-Agent` and asks clients not to poll harder than
 the data changes, so results are cached 15 min and revalidated with
 `If-None-Match`; a 304 refreshes the cache timestamp without refetching.
+
+Label is `<glyph> N° H:N° L:N°`, phone-widget style. met.no only forecasts
+forward, so by evening the payload no longer covers the morning; the script
+therefore keeps one temperature per local hour per day in `state.json`
+(`day_temps`), merged across polls, and takes today's high/low from that whole
+record. The dropdown shows both today's range and the next 24 hours.
 
 ## Login screen - your wallpaper instead of the Mint default
 

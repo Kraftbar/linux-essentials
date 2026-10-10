@@ -97,11 +97,19 @@ class OsloWeatherApplet extends Applet.TextIconApplet {
         }
 
         let temp = Math.round(payload.temp);
-        this.set_applet_label(payload.glyph + " " + temp + "°" + (payload.error ? " ⚠" : ""));
+        let hasRange = payload.high != null && payload.low != null;
+        // Phone-widget style: now, then today's high and low over the whole calendar day.
+        let label = payload.glyph + " " + temp + "°";
+        if (hasRange) label += " H:" + Math.round(payload.high) + "° L:" + Math.round(payload.low) + "°";
+        this.set_applet_label(label + (payload.error ? " ⚠" : ""));
 
         let nowText = payload.glyph + "  " + temp + "°C, " + payload.text;
-        let rangeText = (payload.high != null && payload.low != null)
-            ? "Today:  " + Math.round(payload.high) + "° / " + Math.round(payload.low) + "°" : "";
+        let rangeText = hasRange
+            ? "Today:  H " + Math.round(payload.high) + "°   L " + Math.round(payload.low) + "°" : "";
+        if (payload.next24_high != null && payload.next24_low != null) {
+            rangeText += (rangeText ? "      " : "") + "Next 24h:  H " + Math.round(payload.next24_high) +
+                "°   L " + Math.round(payload.next24_low) + "°";
+        }
         let windText = payload.wind != null
             ? "Wind:  " + payload.wind.toFixed(1) + " m/s" +
               (payload.humidity != null ? "    Humidity:  " + Math.round(payload.humidity) + "%" : "") : "";
