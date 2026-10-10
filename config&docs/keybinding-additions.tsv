@@ -1,4 +1,5 @@
 org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	next-tab	<Control>Tab
 org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	prev-tab	<Control><Shift>Tab
 org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	new-tab	<Control>n
+org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/	select-all	<Control><Shift>a
 org.cinnamon.desktop.keybindings.media-keys	area-screenshot-clip	<Super><Shift>s

@@ -344,14 +344,14 @@ echo "Setup complete!"
 
 ## Cinnamon extensions
 
-Two extensions in `cinnamon-extensions/`. Install both:
+Three extensions in `cinnamon-extensions/`. Install them:
 
 ```bash
-for e in windows-snap@nybo smart-close@nybo; do
+for e in windows-snap@nybo smart-close@nybo alttab-close@nybo; do
     ln -sfn "$PWD/config&docs/cinnamon-extensions/$e" \
             ~/.local/share/cinnamon/extensions/$e
 done
-gsettings set org.cinnamon enabled-extensions "['windows-snap@nybo', 'smart-close@nybo']"
+gsettings set org.cinnamon enabled-extensions "['windows-snap@nybo', 'smart-close@nybo', 'alttab-close@nybo']"
 # windows-snap owns Super+arrows, so clear muffin's own grabs on them
 for k in push-tile-left push-tile-right push-tile-up push-tile-down; do
     gsettings set org.cinnamon.desktop.keybindings.wm "$k" "[]"
@@ -359,7 +359,7 @@ done
 cinnamon --replace &
 ```
 
-Both are pure Meta/muffin API - no `xdotool`, no XTEST key injection, and no
+All are pure Meta/muffin API - no `xdotool`, no XTEST key injection, and no
 `sleep` to dodge a modifier race. Earlier script-based attempts at both
 features needed all three and were unreliable; the git history around
 `smart-tile.sh` / `smart-close.sh` has the details.
@@ -456,6 +456,16 @@ releases it:
 Verified both ways: with the grab held a press ran the extension callback and
 the terminal was untouched; with it released the callback did not run and the
 terminal closed its tab.
+
+### alttab-close@nybo - Q closes a window from Alt+Tab
+
+While the Alt+Tab switcher is open, Q closes the highlighted window, like
+Cmd+Tab then Q on a Mac. It is the polite close (same as clicking the X), and
+the switcher stays open while Alt is held, so Q can be pressed again.
+
+Cinnamon's switcher already handles a window going away while it is open, so
+the extension only adds the key: it wraps `AppSwitcher._keyPressEvent` and
+passes every other key to the original handler.
 
 ## Cinnamon applets - panel usage readouts
 
@@ -577,6 +587,45 @@ the 95% threshold that suits a 5-hour window is far too late for a monthly one.
 requires an identifying `User-Agent` and asks clients not to poll harder than
 the data changes, so results are cached 15 min and revalidated with
 `If-None-Match`; a 304 refreshes the cache timestamp without refetching.
+
+## Login screen - your wallpaper instead of the Mint default
+
+slick-greeter draws the user's desktop background (it reads the path from
+AccountsService) only if the `lightdm` user can read the file. With the home
+folder at `drwxr-x---` it cannot, so the login screen silently falls back to
+the dark Mint wallpaper. Give `lightdm` traverse rights to the home folder,
+and only that:
+
+```bash
+setfacl -m u:lightdm:x ~
+```
+
+Wallpapers are normally world-readable files in world-readable folders, so
+this is enough, and it keeps following whatever wallpaper is set in Cinnamon.
+`slick-greeter.conf` then turns off the hostname, accessibility and keyboard
+items in the top bar and keeps the clock:
+
+```bash
+sudo install -m 644 "config&docs/slick-greeter.conf" /etc/lightdm/slick-greeter.conf
+```
+
+Both take effect the next time the login screen appears; no restart needed.
+
+## Lock screen - lighter shade over the wallpaper
+
+Cinnamon's lock screen (cinnamon-screensaver) paints the wallpaper 70 % black
+while the clock shows and 75-90 % black around the unlock box. The numbers are
+hard-coded in `/usr/share/cinnamon-screensaver/monitorView.py`; there is no
+setting. `apply-lockscreen-shade.sh` edits them in place (15 %, 25 % and 40 %
+by default), keeps a `.orig` copy, and restarts the screensaver:
+
+```bash
+./config\&docs/apply-lockscreen-shade.sh
+IDLE=0 MIDDLE=0.3 ./config\&docs/apply-lockscreen-shade.sh   # other values
+```
+
+A cinnamon-screensaver upgrade restores the stock file; run it again then.
+The login screen is a different program (slick-greeter, section above).
 
 ## Bluetooth headphones - do not try to make idle A2DP suspend
 
