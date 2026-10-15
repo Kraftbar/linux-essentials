@@ -3,3 +3,4 @@ __pycache__/
 # Local wallpaper library (crawled from Unsplash, ~500 MB) - not for git
 wallpapers/nature-*.jpg
 wallpapers/unsplash-*.jpg
+wallpapers/arch-*.jpg
