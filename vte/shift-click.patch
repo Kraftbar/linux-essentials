@@ -1,0 +1,62 @@
+gnome-terminal: click, then shift-click to select the text in between.
+
+Stock VTE only extends a selection with shift-click if one already exists,
+so a plain click followed by a shift-click selects nothing.  This remembers
+the last plain left click and selects from there.
+
+Against Ubuntu 24.04 / Mint 22 vte2.91 0.76.0-1ubuntu0.1.  Build and install
+for gnome-terminal only (no root, apt untouched):
+
+  sudo apt install meson ninja-build libgtk-3-dev libgnutls28-dev liblz4-dev \
+      libpcre2-dev libsystemd-dev libfribidi-dev libicu-dev
+  d=http://archive.ubuntu.com/ubuntu/pool/main/v/vte2.91
+  for f in vte2.91_0.76.0-1ubuntu0.1.dsc vte2.91_0.76.0-1ubuntu0.1.debian.tar.xz \
+      vte2.91_0.76.0.orig.tar.xz; do curl -sO $d/$f; done
+  dpkg-source -x vte2.91_0.76.0-1ubuntu0.1.dsc vte && cd vte
+  patch -p1 < shift-click.patch
+  meson setup build -Dgtk4=false -Dgir=false -Dvapi=false -Ddocs=false -Dglade=false
+  ninja -C build src/libvte-2.91.so.0.7600.0
+  mkdir -p ~/.local/lib/vte-shiftclick
+  cp build/src/libvte-2.91.so.0.7600.0 ~/.local/lib/vte-shiftclick/libvte-2.91.so.0
+  mkdir -p ~/.config/systemd/user/gnome-terminal-server.service.d
+  printf '[Service]\nEnvironment=LD_LIBRARY_PATH=%%h/.local/lib/vte-shiftclick\n' \
+      > ~/.config/systemd/user/gnome-terminal-server.service.d/vte-shiftclick.conf
+  systemctl --user daemon-reload
+
+Takes effect once every gnome-terminal window is closed.  Undo by deleting
+the drop-in and ~/.local/lib/vte-shiftclick.
+
+diff --git a/src/vte.cc b/src/vte.cc
+index 55d2fe5..882a578 100644
+--- a/src/vte.cc
++++ b/src/vte.cc
+@@ -7259,8 +7259,17 @@ Terminal::widget_mouse_press(vte::platform::MouseEvent const& event)
+ 				if ((m_modifiers & GDK_SHIFT_MASK) &&
+                                     !m_selection_resolved.empty()) {
+ 					extend_selecting = TRUE;
++				} else if ((m_modifiers & GDK_SHIFT_MASK) &&
++                                           m_click_anchor.row() >= 0) {
++					/* No selection yet: select from the
++					 * last plain click to here. */
++                                        m_selection_block_mode = false;
++                                        start_selection(pos, SelectionType::eCHAR);
++                                        m_selection_origin = m_selection_last = m_click_anchor;
++					extend_selecting = TRUE;
+ 				} else {
+ 					start_selecting = TRUE;
++                                        m_click_anchor = selection_grid_halfcoords_from_view_coords(pos);
+ 				}
+ 			}
+ 			if (start_selecting) {
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index ed57ad1..88c5364 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -447,6 +447,7 @@ public:
+         bool m_selection_block_mode{false};  // FIXMEegmont move it into a 4th value in SelectionType?
+         SelectionType m_selection_type{SelectionType::eCHAR};
+         vte::grid::halfcoords m_selection_origin, m_selection_last;  /* BiDi: logical in normal modes, visual in m_selection_block_mode */
++        vte::grid::halfcoords m_click_anchor{-1, -1, 1};  /* last plain left click, for shift-click */
+         vte::grid::span m_selection_resolved;
+ 
+ 	/* Clipboard data information. */
