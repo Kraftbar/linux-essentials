@@ -344,14 +344,15 @@ echo "Setup complete!"
 
 ## Cinnamon extensions
 
-Three extensions in `cinnamon-extensions/`. Install them:
+Four extensions in `cinnamon-extensions/`. Install them:
 
 ```bash
-for e in windows-snap@nybo smart-close@nybo alttab-close@nybo; do
+for e in windows-snap@nybo smart-close@nybo alttab-close@nybo alttab-instant@nybo; do
     ln -sfn "$PWD/config&docs/cinnamon-extensions/$e" \
             ~/.local/share/cinnamon/extensions/$e
 done
-gsettings set org.cinnamon enabled-extensions "['windows-snap@nybo', 'smart-close@nybo', 'alttab-close@nybo']"
+gsettings set org.cinnamon enabled-extensions "['windows-snap@nybo', 'smart-close@nybo', 'alttab-close@nybo', 'alttab-instant@nybo']"
+gsettings set org.cinnamon alttab-switcher-delay 0   # alttab-instant pairs with this
 # windows-snap owns Super+arrows, so clear muffin's own grabs on them
 for k in push-tile-left push-tile-right push-tile-up push-tile-down; do
     gsettings set org.cinnamon.desktop.keybindings.wm "$k" "[]"
@@ -466,6 +467,15 @@ the switcher stays open while Alt is held, so Q can be pressed again.
 Cinnamon's switcher already handles a window going away while it is open, so
 the extension only adds the key: it wraps `AppSwitcher._keyPressEvent` and
 passes every other key to the original handler.
+
+### alttab-instant@nybo - no wait for the Alt+Tab thumbnail
+
+The icons+thumbnails switcher waits a hard-coded 300 ms after every selection
+change before building the window thumbnail, then fades it in over 100 ms; on
+top of the 100 ms `alttab-switcher-delay` that is about half a second. The
+extension wraps `ClassicSwitcher._setCurrentWindow` to cancel that timeout and
+build the thumbnail immediately, and `_createThumbnails` to drop the fade. Set
+`alttab-switcher-delay` to 0 alongside it.
 
 ## Cinnamon applets - panel usage readouts
 
